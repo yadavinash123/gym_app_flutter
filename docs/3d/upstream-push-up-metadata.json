@@ -1,0 +1,38 @@
+{
+  "license": {
+    "lane": "cc0",
+    "license": "CC0-1.0",
+    "source": "Push-up",
+    "pack": true
+  },
+  "id": "push_up",
+  "name": "Push-Up",
+  "equipment": "None",
+  "difficulty": "Beginner",
+  "primary": [
+    "Chest"
+  ],
+  "secondary": [
+    "Triceps",
+    "Core"
+  ],
+  "steps": [
+    "Start in a high plank, hands under shoulders.",
+    "Lower the chest to just above the floor, elbows ~45\u00b0 from the body.",
+    "Keep the body rigid from head to heels.",
+    "Press back up to full lockout."
+  ],
+  "glb": "assets/push_up.glb",
+  "thumb": "assets/push_up.png",
+  "strip": "assets/push_up.strip.png",
+  "sheet": "assets/push_up.sheet.png",
+  "pattern": "push_up",
+  "motion": "mocap",
+  "camera": "side",
+  "qa": {
+    "pass": true,
+    "fails": 0,
+    "critical_fails": 0,
+    "report": "assets/push_up.glb.qa.json"
+  }
+}

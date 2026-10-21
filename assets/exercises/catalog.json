@@ -1,0 +1,639 @@
+{
+  "version": 1,
+  "exercises": [
+    {
+      "id": "push-up",
+      "name": "Push-up",
+      "group": "Chest",
+      "primary": [
+        "Chest",
+        "Triceps"
+      ],
+      "secondary": [
+        "Shoulders",
+        "Abdominals"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Intermediate",
+      "movement": "Push",
+      "steps": [
+        "Place your hands slightly wider than your shoulders and extend your legs behind you.",
+        "Brace your trunk and lower your body together by bending the elbows. Keep them angled back rather than flared sideways.",
+        "Use a comfortable depth, then press back up without letting your hips sag."
+      ],
+      "cue": "Keep the head, trunk and legs aligned. Breathe in as you lower and out as you press.",
+      "mistake": "Sagging hips, a flared elbow position or jerky repetitions. Reduce the difficulty if you cannot control your alignment.",
+      "source": "NASM",
+      "url": "https://www.nasm.org/resource-center/exercise-library/push-up",
+      "animation": "push-up",
+      "alternatives": [
+        "wall-pushup",
+        "knee-pushup"
+      ]
+    },
+    {
+      "id": "squat",
+      "name": "Bodyweight squat",
+      "group": "Legs",
+      "primary": [
+        "Quadriceps",
+        "Glutes"
+      ],
+      "secondary": [
+        "Hamstrings",
+        "Abdominals"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Beginner",
+      "movement": "Squat",
+      "steps": [
+        "Stand with feet a little wider than your shoulders.",
+        "Bend at the hips and knees into a comfortable depth. Keep knees following the direction of your feet.",
+        "Stand back up with control."
+      ],
+      "cue": "Keep the spine neutral. Use your arms for balance.",
+      "mistake": "Knees collapsing inward or the back rounding. End the set when alignment becomes difficult.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/squat/vid-20084663",
+      "animation": null,
+      "alternatives": [
+        "sit-stand",
+        "lunge"
+      ]
+    },
+    {
+      "id": "dumbbell-curl",
+      "name": "Dumbbell curl",
+      "group": "Biceps",
+      "primary": [
+        "Biceps"
+      ],
+      "secondary": [
+        "Forearms"
+      ],
+      "equipment": [
+        "Dumbbells"
+      ],
+      "level": "Beginner",
+      "movement": "Elbow flexion",
+      "steps": [
+        "Hold a dumbbell with the palm facing forward.",
+        "Bend the elbow to lift the weight while the upper arm stays beside your body.",
+        "Lower slowly; repeat on the other side."
+      ],
+      "cue": "Keep the wrist straight and the elbow close to your side.",
+      "mistake": "Swinging the elbow or weight instead of controlling the movement.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/biceps-curl/vid-20084675",
+      "animation": null,
+      "alternatives": [
+        "barbell-curl"
+      ]
+    },
+    {
+      "id": "barbell-curl",
+      "name": "Barbell curl",
+      "group": "Biceps",
+      "primary": [
+        "Biceps"
+      ],
+      "secondary": [
+        "Forearms"
+      ],
+      "equipment": [
+        "Barbell"
+      ],
+      "level": "Intermediate",
+      "movement": "Elbow flexion",
+      "steps": [
+        "Hold the bar with palms forward, hands about shoulder width.",
+        "Brace your abdomen and bend the elbows to lift.",
+        "Lower the bar slowly."
+      ],
+      "cue": "Keep wrists neutral and upper arms near the torso.",
+      "mistake": "Leaning back or swinging the bar. A staggered stance can help balance.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/biceps-curl/vid-20084678",
+      "animation": null,
+      "alternatives": [
+        "dumbbell-curl"
+      ]
+    },
+    {
+      "id": "row",
+      "name": "Dumbbell bent-over row",
+      "group": "Back",
+      "primary": [
+        "Back"
+      ],
+      "secondary": [
+        "Biceps",
+        "Shoulders"
+      ],
+      "equipment": [
+        "Dumbbells"
+      ],
+      "level": "Intermediate",
+      "movement": "Pull",
+      "steps": [
+        "Stand with feet comfortably apart, knees slightly bent.",
+        "Hinge forward at the hips with a neutral back. Let the weight hang below your shoulder.",
+        "Draw the elbow back, bringing the upper arm alongside your torso. Lower slowly."
+      ],
+      "cue": "Brace your abdomen and keep the shoulder from rolling forward.",
+      "mistake": "Rounding the spine or jerking the weight.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/bent-over-row/vid-20084680",
+      "animation": null,
+      "alternatives": []
+    },
+    {
+      "id": "chest-press",
+      "name": "Dumbbell floor press",
+      "group": "Chest",
+      "primary": [
+        "Chest"
+      ],
+      "secondary": [
+        "Triceps",
+        "Shoulders"
+      ],
+      "equipment": [
+        "Dumbbells"
+      ],
+      "level": "Beginner",
+      "movement": "Push",
+      "steps": [
+        "Lie on your back on the floor with knees bent.",
+        "Position upper arms out from the torso and forearms upright.",
+        "Press the weights until the arms are almost straight, then lower with control."
+      ],
+      "cue": "Keep the neck neutral and avoid locking the elbows.",
+      "mistake": "Driving through the feet or dropping elbows below the torso on a bench.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/chest-press/vid-20084677",
+      "animation": null,
+      "alternatives": [
+        "wall-pushup",
+        "knee-pushup"
+      ]
+    },
+    {
+      "id": "triceps-extension",
+      "name": "Lying triceps extension",
+      "group": "Triceps",
+      "primary": [
+        "Triceps"
+      ],
+      "secondary": [],
+      "equipment": [
+        "Dumbbells"
+      ],
+      "level": "Intermediate",
+      "movement": "Elbow extension",
+      "steps": [
+        "Lie on your back. Point the upper arm toward the ceiling and bend the elbow.",
+        "Straighten the elbow to raise the weight.",
+        "Bend it again slowly while keeping the upper arm still."
+      ],
+      "cue": "Use the other hand to support the upper arm if needed.",
+      "mistake": "Moving the whole arm or shifting the head and trunk.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/triceps-extension/vid-20084676",
+      "animation": null,
+      "alternatives": []
+    },
+    {
+      "id": "knee-pushup",
+      "name": "Knee push-up",
+      "group": "Chest",
+      "primary": [
+        "Chest"
+      ],
+      "secondary": [
+        "Triceps",
+        "Abdominals"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Beginner",
+      "movement": "Push",
+      "steps": [
+        "Start on hands and knees on a mat, hands slightly wider than shoulders.",
+        "Brace your abdomen and keep the back straight as you bend the elbows to lower your chest.",
+        "Press up slowly."
+      ],
+      "cue": "Look toward the floor and keep the trunk aligned.",
+      "mistake": "Sagging or arching the back, or rushing the repetition.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/modified-pushup/vid-20084674",
+      "animation": null,
+      "alternatives": [
+        "wall-pushup",
+        "chest-press"
+      ]
+    },
+    {
+      "id": "lunge",
+      "name": "Stationary lunge",
+      "group": "Legs",
+      "primary": [
+        "Quadriceps",
+        "Glutes"
+      ],
+      "secondary": [
+        "Hamstrings"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Intermediate",
+      "movement": "Lunge",
+      "steps": [
+        "Step one foot forward.",
+        "Bend both knees to a comfortable depth, keeping the front knee aligned with the foot.",
+        "Return to the starting stance with control. Repeat on the other side."
+      ],
+      "cue": "Keep the back neutral and move only as far as you can control.",
+      "mistake": "The front knee drifting inward or outward. Stop when form becomes difficult.",
+      "source": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/lunge/vid-20084662",
+      "animation": null,
+      "alternatives": [
+        "squat",
+        "sit-stand"
+      ]
+    },
+    {
+      "id": "shoulder-press",
+      "name": "Dumbbell shoulder press",
+      "group": "Shoulders",
+      "primary": [
+        "Shoulders"
+      ],
+      "secondary": [
+        "Triceps"
+      ],
+      "equipment": [
+        "Dumbbells"
+      ],
+      "level": "Intermediate",
+      "movement": "Push",
+      "steps": [
+        "Hold weights at shoulder height, elbows under wrists.",
+        "Brace your trunk and press overhead.",
+        "Return to shoulder height."
+      ],
+      "cue": "Keep your chest lifted.",
+      "mistake": "Losing trunk control during the press.",
+      "source": "Mayo Clinic Health System",
+      "url": "https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/can-quick-workout-boost-health-and-fitness",
+      "animation": null,
+      "alternatives": []
+    },
+    {
+      "id": "bridge",
+      "name": "Glute bridge",
+      "group": "Legs",
+      "primary": [
+        "Glutes"
+      ],
+      "secondary": [
+        "Hamstrings"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Beginner",
+      "movement": "Hip extension",
+      "steps": [
+        "Lie on your back with knees bent and feet grounded.",
+        "Brace your abdomen, then squeeze the glutes and lift the hips.",
+        "Lower with control."
+      ],
+      "cue": "Aim for alignment through the trunk and thighs.",
+      "mistake": "Overextending the lower back.",
+      "source": "Mayo Clinic Health System",
+      "url": "https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/can-quick-workout-boost-health-and-fitness",
+      "animation": null,
+      "alternatives": [
+        "squat"
+      ]
+    },
+    {
+      "id": "step-up",
+      "name": "Step-up",
+      "group": "Legs",
+      "primary": [
+        "Quadriceps",
+        "Glutes"
+      ],
+      "secondary": [
+        "Hamstrings"
+      ],
+      "equipment": [
+        "Step"
+      ],
+      "level": "Beginner",
+      "movement": "Step",
+      "steps": [
+        "Place one foot on a sturdy low step.",
+        "Transfer weight onto that foot to stand on the step.",
+        "Step down carefully, then change sides."
+      ],
+      "cue": "Use a stable surface.",
+      "mistake": "Rushing the descent or using an unstable step.",
+      "source": "Mayo Clinic Health System",
+      "url": "https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/can-quick-workout-boost-health-and-fitness",
+      "animation": null,
+      "alternatives": [
+        "sit-stand"
+      ]
+    },
+    {
+      "id": "wall-pushup",
+      "name": "Wall push-up",
+      "group": "Chest",
+      "primary": [
+        "Chest"
+      ],
+      "secondary": [
+        "Triceps"
+      ],
+      "equipment": [
+        "Wall"
+      ],
+      "level": "Beginner",
+      "movement": "Push",
+      "steps": [
+        "Stand at arm’s length from a wall, hands at chest height.",
+        "Bend elbows beside your body and lean toward the wall.",
+        "Press back slowly."
+      ],
+      "cue": "Keep your back straight.",
+      "mistake": "Bending at the hips instead of keeping the body aligned.",
+      "source": "NHS",
+      "url": "https://www.nhs.uk/live-well/exercise/strength-exercises/",
+      "animation": null,
+      "alternatives": [
+        "knee-pushup"
+      ]
+    },
+    {
+      "id": "calf-raise",
+      "name": "Supported calf raise",
+      "group": "Legs",
+      "primary": [
+        "Calves"
+      ],
+      "secondary": [],
+      "equipment": [
+        "Chair"
+      ],
+      "level": "Beginner",
+      "movement": "Ankle extension",
+      "steps": [
+        "Hold a stable chair for balance.",
+        "Raise both heels as far as comfortable.",
+        "Lower slowly."
+      ],
+      "cue": "Stay upright.",
+      "mistake": "Moving quickly or losing balance.",
+      "source": "NHS",
+      "url": "https://www.nhs.uk/live-well/exercise/strength-exercises/",
+      "animation": null,
+      "alternatives": []
+    },
+    {
+      "id": "sit-stand",
+      "name": "Sit-to-stand",
+      "group": "Legs",
+      "primary": [
+        "Quadriceps",
+        "Glutes"
+      ],
+      "secondary": [],
+      "equipment": [
+        "Chair"
+      ],
+      "level": "Beginner",
+      "movement": "Squat",
+      "steps": [
+        "Sit near the front of a stable chair, feet hip width apart.",
+        "Lean forward slightly and stand using your legs.",
+        "Sit down slowly."
+      ],
+      "cue": "Look ahead; use your arms to guide your return.",
+      "mistake": "Using a chair that rolls or slips.",
+      "source": "NHS",
+      "url": "https://www.nhs.uk/live-well/exercise/strength-exercises/",
+      "animation": null,
+      "alternatives": [
+        "squat"
+      ]
+    },
+    {
+      "id": "seated-rotation",
+      "name": "Seated trunk rotation",
+      "group": "Mobility",
+      "primary": [
+        "Back"
+      ],
+      "secondary": [
+        "Abdominals"
+      ],
+      "equipment": [
+        "Chair"
+      ],
+      "level": "Beginner",
+      "movement": "Rotation",
+      "steps": [
+        "Sit upright, feet flat, arms crossed over your shoulders.",
+        "Turn your upper body gently without moving your hips.",
+        "Return to centre and change sides."
+      ],
+      "cue": "Move within a comfortable range.",
+      "mistake": "Forcing the rotation.",
+      "source": "NHS",
+      "url": "https://www.nhs.uk/live-well/exercise/sitting-exercises/",
+      "animation": null,
+      "alternatives": []
+    },
+    {
+      "id": "ankle-mobility",
+      "name": "Seated ankle mobility",
+      "group": "Mobility",
+      "primary": [
+        "Calves"
+      ],
+      "secondary": [],
+      "equipment": [
+        "Chair"
+      ],
+      "level": "Beginner",
+      "movement": "Ankle mobility",
+      "steps": [
+        "Sit securely and hold the chair sides.",
+        "Straighten one leg and lift the foot.",
+        "Point the toes away, then draw them back. Change legs."
+      ],
+      "cue": "Keep movement gentle.",
+      "mistake": "Straining for extra range.",
+      "source": "NHS",
+      "url": "https://www.nhs.uk/live-well/exercise/sitting-exercises/",
+      "animation": null,
+      "alternatives": []
+    },
+    {
+      "id": "chest-stretch",
+      "name": "Seated chest stretch",
+      "group": "Mobility",
+      "primary": [
+        "Chest"
+      ],
+      "secondary": [
+        "Shoulders"
+      ],
+      "equipment": [
+        "Chair"
+      ],
+      "level": "Beginner",
+      "movement": "Stretch",
+      "steps": [
+        "Sit upright with shoulders down and back.",
+        "Open the arms to the sides.",
+        "Gently lift the chest forward and upward."
+      ],
+      "cue": "Hold a comfortable stretch briefly.",
+      "mistake": "Forcing the shoulders backward.",
+      "source": "NHS",
+      "url": "https://www.nhs.uk/live-well/exercise/sitting-exercises/",
+      "animation": null,
+      "alternatives": []
+    },
+    {
+      "id": "bird-dog",
+      "name": "Bird dog",
+      "group": "Core",
+      "primary": [
+        "Abdominals",
+        "Back"
+      ],
+      "secondary": [
+        "Glutes",
+        "Shoulders"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Intermediate",
+      "movement": "Trunk stability",
+      "steps": [
+        "Start on all fours, hands below shoulders and knees below hips.",
+        "Brace your trunk. Reach one arm forward and the opposite leg backward.",
+        "Return with control and change sides."
+      ],
+      "cue": "Keep the spine neutral and the hips level.",
+      "mistake": "Rotating the pelvis, overreaching, or holding your breath.",
+      "source": "NASM",
+      "url": "https://www.nasm.org/resource-center/exercise-library/bird-dog",
+      "animation": null,
+      "alternatives": [
+        "dead-bug",
+        "plank"
+      ]
+    },
+    {
+      "id": "dead-bug",
+      "name": "Dead bug",
+      "group": "Core",
+      "primary": [
+        "Abdominals"
+      ],
+      "secondary": [],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Beginner",
+      "movement": "Trunk stability",
+      "steps": [
+        "Lie on your back with arms up and hips and knees bent to right angles.",
+        "Keep your lower back against the floor as you extend opposite arm and leg toward the floor.",
+        "Return and alternate sides."
+      ],
+      "cue": "Only extend as far as you can keep the trunk stable.",
+      "mistake": "Arching the lower back or moving too quickly.",
+      "source": "NASM",
+      "url": "https://www.nasm.org/resource-center/exercise-library/dead-bug",
+      "animation": null,
+      "alternatives": [
+        "bird-dog"
+      ]
+    },
+    {
+      "id": "plank",
+      "name": "Forearm plank",
+      "group": "Core",
+      "primary": [
+        "Abdominals"
+      ],
+      "secondary": [
+        "Back",
+        "Shoulders"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Intermediate",
+      "movement": "Isometric hold",
+      "steps": [
+        "Lie face down with elbows below the shoulders and toes tucked.",
+        "Brace your trunk and lift your body, maintaining a straight line.",
+        "Breathe throughout the hold; lower with control."
+      ],
+      "cue": "Keep shoulders away from the ears and the trunk aligned.",
+      "mistake": "Sagging the hips or lifting them too high. Stop if you develop lower-back pain.",
+      "source": "ACE",
+      "url": "https://www.acefitness.org/resources/everyone/exercise-library/32/front-plank/",
+      "animation": null,
+      "alternatives": [
+        "dead-bug",
+        "bird-dog"
+      ]
+    },
+    {
+      "id": "walking",
+      "name": "Walking",
+      "group": "Cardio",
+      "primary": [
+        "Quadriceps",
+        "Calves"
+      ],
+      "secondary": [
+        "Glutes",
+        "Hamstrings"
+      ],
+      "equipment": [
+        "Bodyweight"
+      ],
+      "level": "Beginner",
+      "movement": "Locomotion",
+      "steps": [
+        "Choose supportive, comfortable footwear and a suitable route.",
+        "Start at an easy pace and increase distance gradually.",
+        "For a brisk pace, aim to still be able to talk."
+      ],
+      "cue": "Build up gradually if you are new to regular walking.",
+      "mistake": "Increasing distance or pace faster than you can comfortably manage.",
+      "source": "NHS",
+      "url": "https://www.nhs.uk/live-well/exercise/walking-for-health/",
+      "animation": null,
+      "alternatives": []
+    }
+  ]
+}
