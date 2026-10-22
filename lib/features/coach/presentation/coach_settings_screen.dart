@@ -308,10 +308,37 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                       controller: _endpointController,
                       decoration: InputDecoration(
                         labelText: 'Custom Endpoint URL',
-                        hintText: 'https://api.openai.com/v1/chat/completions',
+                        hintText: 'https://api.groq.com/openai/v1/chat/completions',
                         prefixIcon: const Icon(Icons.link_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        ActionChip(
+                          avatar: const Icon(Icons.bolt, size: 14, color: Color(0xFFF55036)),
+                          label: const Text('Use Groq Preset', style: TextStyle(fontSize: 12)),
+                          onPressed: () {
+                            setState(() {
+                              _endpointController.text = 'https://api.groq.com/openai/v1/chat/completions';
+                              _modelController.text = 'llama-3.3-70b-versatile';
+                            });
+                          },
+                        ),
+                        ActionChip(
+                          avatar: const Icon(Icons.computer, size: 14, color: Color(0xFF00D4FF)),
+                          label: const Text('Local Ollama Preset', style: TextStyle(fontSize: 12)),
+                          onPressed: () {
+                            setState(() {
+                              _endpointController.text = 'http://localhost:11434/v1/chat/completions';
+                              _modelController.text = 'llama3.2';
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ],
 
