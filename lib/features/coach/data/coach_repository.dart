@@ -146,6 +146,10 @@ class CoachRepository {
     return aiClient.testConnection(credentials);
   }
 
+  Future<String?> checkConnection(AiCredentials credentials) {
+    return aiClient.checkConnection(credentials);
+  }
+
   // ---------------------------------------------------------------------------
   // Privacy-First Context Assembly & Anonymization
   // ---------------------------------------------------------------------------

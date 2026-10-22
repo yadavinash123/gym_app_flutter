@@ -56,6 +56,11 @@ class FakeAiClient implements AiClient {
   Future<bool> testConnection(AiCredentials credentials) async {
     return shouldSucceed;
   }
+
+  @override
+  Future<String?> checkConnection(AiCredentials credentials) async {
+    return shouldSucceed ? null : 'Simulated connection failure';
+  }
 }
 
 class FakeCoachMessagesNotifier extends CoachMessagesNotifier {

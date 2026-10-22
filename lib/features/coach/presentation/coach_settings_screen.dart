@@ -98,7 +98,8 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
       temperature: _temperature,
     );
 
-    final success = await ref.read(coachRepositoryProvider).testConnection(tempCreds);
+    final errorMsg = await ref.read(coachRepositoryProvider).checkConnection(tempCreds);
+    final success = errorMsg == null;
 
     if (!mounted) return;
     setState(() {
@@ -106,7 +107,7 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
       _testSuccess = success;
       _testResult = success
           ? 'Connected successfully to ${_selectedProvider.displayName}! Credentials verified and saved.'
-          : 'Connection failed. Verify your internet connection, API key, endpoint, or model name.';
+          : 'Connection failed: $errorMsg';
     });
 
     if (success) {
@@ -356,6 +357,28 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                           },
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10161E),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white12),
+                      ),
+                      child: const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.lightbulb_outline, size: 16, color: Color(0xFFB6FF3B)),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Tip: On Groq (https://api.groq.com/openai/v1), use models like llama-3.3-70b-versatile or llama-3.1-8b-instant. Model prefixes like "openai/..." belong to OpenRouter or OpenAI.',
+                              style: TextStyle(fontSize: 11, color: Color(0xFFA7B0BF), height: 1.3),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
 

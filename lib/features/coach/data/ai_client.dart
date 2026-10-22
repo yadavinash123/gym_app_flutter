@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -13,6 +14,11 @@ abstract class AiClient {
   });
 
   Future<bool> testConnection(AiCredentials credentials);
+
+  Future<String?> checkConnection(AiCredentials credentials) async {
+    final ok = await testConnection(credentials);
+    return ok ? null : 'Connection failed. Please check your network or credentials.';
+  }
 }
 
 class AiException implements Exception {
@@ -80,9 +86,11 @@ class HttpAiClient implements AiClient {
   }
 
   @override
-  Future<bool> testConnection(AiCredentials credentials) async {
-    if (credentials.provider == AiProvider.offline) return true;
-    if (credentials.apiKey.trim().isEmpty) return false;
+  Future<String?> checkConnection(AiCredentials credentials) async {
+    if (credentials.provider == AiProvider.offline) return null;
+    if (credentials.apiKey.trim().isEmpty) {
+      return 'API key is missing. Please enter your API key.';
+    }
 
     try {
       final testMessage = [
@@ -98,10 +106,18 @@ class HttpAiClient implements AiClient {
         systemPrompt: 'Respond in 1 word.',
         credentials: credentials.copyWith(maxTokens: 10),
       );
-      return res.content.isNotEmpty;
-    } catch (_) {
-      return false;
+      return res.content.isNotEmpty ? null : 'Model returned an empty response.';
+    } on AiException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
     }
+  }
+
+  @override
+  Future<bool> testConnection(AiCredentials credentials) async {
+    final err = await checkConnection(credentials);
+    return err == null;
   }
 
   // ---------------------------------------------------------------------------
@@ -144,20 +160,28 @@ class HttpAiClient implements AiClient {
     };
 
     final response = await _postJson(uri, payload, headers: {});
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    Map<String, dynamic>? json;
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        json = decoded;
+      }
+    } catch (_) {}
 
     if (response.statusCode != 200) {
-      final errorMsg = json['error']?['message'] as String? ?? 'Gemini API Error';
+      final errorMsg = json?['error']?['message'] as String? ??
+          (json?['message'] as String?) ??
+          'Gemini API Error (HTTP ${response.statusCode})';
       throw AiException(errorMsg, statusCode: response.statusCode);
     }
 
-    final candidates = json['candidates'] as List?;
+    final candidates = json?['candidates'] as List?;
     if (candidates == null || candidates.isEmpty) {
       throw const AiException('No response candidate returned by Gemini.');
     }
 
     final text = candidates[0]['content']?['parts']?[0]?['text'] as String? ?? '';
-    final tokenUsage = json['usageMetadata']?['totalTokenCount'] as num?;
+    final tokenUsage = json?['usageMetadata']?['totalTokenCount'] as num?;
 
     return CoachMessage(
       id: 'gemini_${DateTime.now().millisecondsSinceEpoch}',
@@ -217,20 +241,39 @@ class HttpAiClient implements AiClient {
     };
 
     final response = await _postJson(uri, payload, headers: headers);
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    Map<String, dynamic>? json;
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        json = decoded;
+      }
+    } catch (_) {}
 
     if (response.statusCode != 200) {
-      final errorMsg = json['error']?['message'] as String? ?? 'OpenAI API Error';
+      final rawError = json?['error']?['message'] as String? ??
+          (json?['message'] as String?) ??
+          (response.body.isNotEmpty
+              ? (response.body.length > 200 ? '${response.body.substring(0, 200)}...' : response.body)
+              : 'Request failed with status ${response.statusCode}');
+
+      var errorMsg = rawError;
+      final lower = rawError.toLowerCase();
+      if ((lower.contains('model') && (lower.contains('not found') || lower.contains('does not exist'))) ||
+          lower.contains('decommissioned')) {
+        if (endpointUrl.contains('groq.com')) {
+          errorMsg = '$rawError (On Groq, use supported models like "llama-3.3-70b-versatile" or "llama-3.1-8b-instant")';
+        }
+      }
       throw AiException(errorMsg, statusCode: response.statusCode);
     }
 
-    final choices = json['choices'] as List?;
+    final choices = json?['choices'] as List?;
     if (choices == null || choices.isEmpty) {
-      throw const AiException('No choices returned by OpenAI.');
+      throw const AiException('No choices returned by AI provider.');
     }
 
     final text = choices[0]['message']?['content'] as String? ?? '';
-    final totalTokens = json['usage']?['total_tokens'] as num?;
+    final totalTokens = json?['usage']?['total_tokens'] as num?;
 
     return CoachMessage(
       id: 'openai_${DateTime.now().millisecondsSinceEpoch}',
@@ -274,11 +317,13 @@ class HttpAiClient implements AiClient {
 
       return (statusCode: response.statusCode, body: responseBody);
     } on SocketException catch (e) {
-      throw AiException('Network connection failed: ${e.message}');
+      throw AiException('Internet connection error: ${e.message}. Please check your network connection.');
     } on HandshakeException catch (e) {
-      throw AiException('SSL Handshake error: ${e.message}');
+      throw AiException('SSL Handshake error: ${e.message}. Please verify the endpoint URL.');
     } on HttpException catch (e) {
       throw AiException('HTTP error: ${e.message}');
+    } on TimeoutException {
+      throw const AiException('Request timed out after 25s. Check your internet connection or endpoint speed.');
     } catch (e) {
       if (e is AiException) rethrow;
       throw AiException('AI request failed: $e');
