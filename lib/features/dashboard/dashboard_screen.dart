@@ -158,6 +158,15 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                   icon: Icons.restaurant_outlined,
                 ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  onPressed: () => context.go('/nutrition'),
+                  icon: const Icon(Icons.restaurant_outlined),
+                  label: const Text('Open Daily Nutrition Log'),
+                ),
                 const SizedBox(height: 20),
               ],
               if (sessions.isNotEmpty) ...[

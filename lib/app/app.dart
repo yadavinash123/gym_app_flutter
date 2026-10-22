@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/exercises/exercise_screens.dart';
+import '../features/nutrition/data/nutrition_repository.dart';
+import '../features/nutrition/screens/custom_food_screen.dart';
+import '../features/nutrition/screens/food_search_screen.dart';
+import '../features/nutrition/screens/nutrition_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/profile/profile_repository.dart';
 import '../features/planning/plan_screen.dart';
@@ -44,13 +48,25 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/workouts/custom',
         builder: (_, _) => const CustomWorkoutScreen(),
       ),
+      GoRoute(
+        path: '/nutrition/search',
+        builder: (_, _) => FoodSearchScreen(date: todayIsoDate()),
+      ),
+      GoRoute(
+        path: '/nutrition/custom',
+        builder: (_, _) => const CustomFoodScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) =>
             AppShell(path: state.uri.path, child: child),
         routes: [
           GoRoute(path: '/home', builder: (_, _) => const DashboardScreen()),
           GoRoute(path: '/workouts', builder: (_, _) => const PlanScreen()),
-          for (final item in destinations.skip(2))
+          GoRoute(
+            path: '/nutrition',
+            builder: (_, _) => const NutritionScreen(),
+          ),
+          for (final item in destinations.skip(3))
             GoRoute(
               path: item.path,
               builder: (_, _) =>

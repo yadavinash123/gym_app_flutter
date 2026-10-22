@@ -16,9 +16,17 @@ Future<void> start(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
+  final tempDir = Directory.systemTemp.createTempSync('widget_test_store');
+  addTearDown(() {
+    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+  });
+  final store = JsonStore(tempDir);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [profileRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        storeProvider.overrideWithValue(store),
+        profileRepositoryProvider.overrideWithValue(repository),
+      ],
       child: const FitForgeApp(),
     ),
   );
@@ -126,6 +134,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Your weekly outline'), findsOneWidget);
       await tester.tap(find.text('Nutrition'));
+      await tester.pumpAndSettle();
+      expect(find.text('DAILY MEALS'), findsOneWidget);
+      await tester.tap(find.text('Progress'));
       await tester.pumpAndSettle();
       expect(find.text('Coming in a later phase'), findsOneWidget);
       expect(tester.takeException(), isNull);

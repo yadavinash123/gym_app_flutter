@@ -79,7 +79,7 @@ See [3D upgrade and remaining scope](3d-upgrade.md).
 2. Onboarding, profile settings and deterministic initial plan generation: implemented.
 3. Exercise library starter implemented: 22 guides, muscle map, favorites and one 3D animated push-up preview. Full catalog and professional review outstanding.
 4. Workout planning, session timer, set logging, progressive overload, and session file persistence: implemented. See [Phase 4 details](phase-4.md).
-5. Offline food catalog, validated nutrition calculations and meal logs.
+5. Offline food catalog, validated nutrition calculations and meal logs: implemented. See [Phase 5 details](phase-5.md).
 6. Permission-based activity/health integrations with source attribution.
 7. Optional bring-your-own-key AI, secure credentials and consent previews.
 8. Progress charts, recovery, streaks and local notifications.
@@ -113,3 +113,13 @@ smart rest timer, progressive overload calculator, personal record tracking, cus
 routine builder, and atomic JSON persistence are implemented. See
 [Phase 4 details and verification](phase-4.md). All 40 automated tests passed with
 zero analyzer warnings.
+
+## Phase 5
+
+Offline verified food catalog (52 items from ICMR-NIN IFCT 2017 & USDA FoodData Central),
+custom portion measurements, real-time search with multi-attribute filtering, custom food
+creator, Mifflin–St Jeor BMR/TDEE calculations with goal calorie offsets, ISSN protein
+guidelines, hydration tracking, atomic daily meal logging (Breakfast, Lunch, Dinner, Snacks),
+backup corruption recovery, and dashboard integration are implemented. See
+[Phase 5 details and verification](phase-5.md). All 61 automated tests passed with zero
+analyzer warnings.
