@@ -161,12 +161,37 @@ void main() {
 
       expect(AiProvider.gemini.suggestedModels, contains('gemini-1.5-flash'));
       expect(AiProvider.openai.suggestedModels, contains('gpt-4o-mini'));
+      expect(AiProvider.custom.suggestedModels, contains('openai/gpt-oss-20b'));
+      expect(AiProvider.custom.suggestedModels, contains('llama-3.3-70b-versatile'));
 
       expect(AiProvider.fromString('gemini'), AiProvider.gemini);
       expect(AiProvider.fromString('openai'), AiProvider.openai);
       expect(AiProvider.fromString('custom'), AiProvider.custom);
       expect(AiProvider.fromString('offline'), AiProvider.offline);
       expect(AiProvider.fromString('unknown'), AiProvider.offline);
+    });
+
+    test('normalizeOpenAiEndpoint handles base URLs and variations', () {
+      expect(
+        normalizeOpenAiEndpoint('https://api.groq.com/openai/v1'),
+        'https://api.groq.com/openai/v1/chat/completions',
+      );
+      expect(
+        normalizeOpenAiEndpoint('https://api.groq.com/openai/v1/'),
+        'https://api.groq.com/openai/v1/chat/completions',
+      );
+      expect(
+        normalizeOpenAiEndpoint('https://api.groq.com/openai/v1/chat/completions'),
+        'https://api.groq.com/openai/v1/chat/completions',
+      );
+      expect(
+        normalizeOpenAiEndpoint('http://localhost:11434'),
+        'http://localhost:11434/v1/chat/completions',
+      );
+      expect(
+        normalizeOpenAiEndpoint(''),
+        'https://api.openai.com/v1/chat/completions',
+      );
     });
   });
 

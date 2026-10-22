@@ -24,6 +24,31 @@ class AiException implements Exception {
   String toString() => 'AiException: $message ${statusCode != null ? "(HTTP $statusCode)" : ""}';
 }
 
+/// Normalizes OpenAI-compatible base URLs so that entering `https://api.groq.com/openai/v1`
+/// or `http://localhost:11434` automatically resolves to the proper `/chat/completions` endpoint.
+String normalizeOpenAiEndpoint(String url) {
+  var trimmed = url.trim();
+  if (trimmed.isEmpty) return 'https://api.openai.com/v1/chat/completions';
+
+  while (trimmed.endsWith('/')) {
+    trimmed = trimmed.substring(0, trimmed.length - 1);
+  }
+
+  if (trimmed.endsWith('/chat/completions')) {
+    return trimmed;
+  }
+
+  if (trimmed.endsWith('/v1')) {
+    return '$trimmed/chat/completions';
+  }
+
+  if (!trimmed.contains('/v1')) {
+    return '$trimmed/v1/chat/completions';
+  }
+
+  return '$trimmed/chat/completions';
+}
+
 class HttpAiClient implements AiClient {
   HttpAiClient({HttpClient? httpClient}) : _httpClient = httpClient ?? HttpClient();
 
@@ -161,9 +186,10 @@ class HttpAiClient implements AiClient {
     AiCredentials credentials,
   ) async {
     final isCustom = credentials.provider == AiProvider.custom;
-    final endpointUrl = isCustom && credentials.customEndpointUrl.trim().isNotEmpty
+    final rawUrl = isCustom && credentials.customEndpointUrl.trim().isNotEmpty
         ? credentials.customEndpointUrl.trim()
         : 'https://api.openai.com/v1/chat/completions';
+    final endpointUrl = normalizeOpenAiEndpoint(rawUrl);
 
     final uri = Uri.parse(endpointUrl);
 

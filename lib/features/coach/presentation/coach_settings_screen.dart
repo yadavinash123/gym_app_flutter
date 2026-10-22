@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/widgets/page_body.dart';
+import '../data/ai_client.dart';
 import '../data/coach_repository.dart';
 import '../models/ai_credentials.dart';
 import '../models/ai_provider.dart';
@@ -54,16 +55,24 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
     super.dispose();
   }
 
-  Future<void> _saveCredentials() async {
+  Future<void> _saveCredentials({bool showSnackbar = true}) async {
+    final endpoint = _selectedProvider == AiProvider.custom && _endpointController.text.trim().isNotEmpty
+        ? normalizeOpenAiEndpoint(_endpointController.text)
+        : _endpointController.text.trim();
+
+    if (_selectedProvider == AiProvider.custom && endpoint.isNotEmpty) {
+      _endpointController.text = endpoint;
+    }
+
     final updated = AiCredentials(
       provider: _selectedProvider,
       apiKey: _keyController.text.trim(),
       modelName: _modelController.text.trim(),
-      customEndpointUrl: _endpointController.text.trim(),
+      customEndpointUrl: endpoint,
       temperature: _temperature,
     );
     await ref.read(coachCredentialsProvider.notifier).save(updated);
-    if (mounted) {
+    if (mounted && showSnackbar) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('AI Coach configuration saved successfully')),
       );
@@ -71,6 +80,10 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
   }
 
   Future<void> _testConnection() async {
+    if (_selectedProvider == AiProvider.custom && _endpointController.text.trim().isNotEmpty) {
+      _endpointController.text = normalizeOpenAiEndpoint(_endpointController.text);
+    }
+
     setState(() {
       _isTesting = true;
       _testResult = null;
@@ -92,9 +105,13 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
       _isTesting = false;
       _testSuccess = success;
       _testResult = success
-          ? 'Connected successfully to ${_selectedProvider.displayName}!'
-          : 'Connection failed. Verify your API key, endpoint, or network connection.';
+          ? 'Connected successfully to ${_selectedProvider.displayName}! Credentials verified and saved.'
+          : 'Connection failed. Verify your internet connection, API key, endpoint, or model name.';
     });
+
+    if (success) {
+      await _saveCredentials(showSnackbar: false);
+    }
   }
 
   Future<void> _confirmClearKey() async {
