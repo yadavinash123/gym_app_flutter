@@ -78,7 +78,7 @@ See [3D upgrade and remaining scope](3d-upgrade.md).
 1. Foundation: implemented; physical-device verification still pending.
 2. Onboarding, profile settings and deterministic initial plan generation: implemented.
 3. Exercise library starter implemented: 22 guides, muscle map, favorites and one 3D animated push-up preview. Full catalog and professional review outstanding.
-4. Workout planning, session timer, set logging and session file persistence.
+4. Workout planning, session timer, set logging, progressive overload, and session file persistence: implemented. See [Phase 4 details](phase-4.md).
 5. Offline food catalog, validated nutrition calculations and meal logs.
 6. Permission-based activity/health integrations with source attribution.
 7. Optional bring-your-own-key AI, secure credentials and consent previews.
@@ -105,3 +105,11 @@ Expanded profile schema v2, ten-step onboarding, profile settings, offline weekl
 outline and educational nutrition estimates are implemented. See
 [Phase 2 details and verification](phase-2.md). Physical-device testing and iOS
 compilation remain outstanding.
+
+## Phase 4
+
+Deterministic workout generation, live session player, interactive set logging,
+smart rest timer, progressive overload calculator, personal record tracking, custom
+routine builder, and atomic JSON persistence are implemented. See
+[Phase 4 details and verification](phase-4.md). All 40 automated tests passed with
+zero analyzer warnings.

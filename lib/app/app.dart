@@ -8,6 +8,8 @@ import '../features/onboarding/onboarding_screen.dart';
 import '../features/profile/profile_repository.dart';
 import '../features/planning/plan_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/workouts/history/workout_history_screen.dart';
+import '../features/workouts/custom/custom_workout_screen.dart';
 import '../shared/widgets/page_body.dart';
 import 'theme.dart';
 
@@ -33,6 +35,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/exercises/:id',
         builder: (_, state) =>
             ExerciseDetailScreen(id: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/workouts/history',
+        builder: (_, _) => const WorkoutHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/workouts/custom',
+        builder: (_, _) => const CustomWorkoutScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) =>
