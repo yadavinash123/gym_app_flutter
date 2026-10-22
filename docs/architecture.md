@@ -81,7 +81,7 @@ See [3D upgrade and remaining scope](3d-upgrade.md).
 4. Workout planning, session timer, set logging, progressive overload, and session file persistence: implemented. See [Phase 4 details](phase-4.md).
 5. Offline food catalog, validated nutrition calculations and meal logs: implemented. See [Phase 5 details](phase-5.md).
 6. Permission-based activity/health integrations with source attribution: implemented. See [Phase 6 details](phase-6.md).
-7. Optional bring-your-own-key AI, secure credentials and consent previews.
+7. Optional bring-your-own-key AI, secure credentials and consent previews: implemented. See [Phase 7 details](phase-7.md).
 8. Progress charts, recovery, streaks and local notifications.
 9. Export/import/deletion, localization, accessibility, device testing and release signing.
 
@@ -134,3 +134,18 @@ training zones, atomic on-device JSON persistence (`health_summaries.json`,
 `health_permissions.json`, `health_audit_logs.json`), audit trail, manual logging modal,
 and dashboard integration are implemented. See [Phase 6 details](phase-6.md). All 81
 automated tests passed with zero analyzer warnings.
+
+## Phase 7
+
+Optional Bring-Your-Own-Key (BYOK) AI Coach station, secure credentials storage, and
+granular consent previews are implemented. Supports 100% offline rule-based heuristic
+evaluations (ISSN protein guidelines, Tanaka cardiovascular zones, double-progression
+progressive overload, autonomic sleep/heart rate recovery), Google Gemini, OpenAI,
+and custom OpenAI-compatible endpoints with automatic offline fallback on network failure.
+Guarantees zero-PII prompt construction (user name and email are strictly omitted),
+granular data stream toggles (Profile, Workouts, Nutrition, Health), live prompt payload
+inspection dialog (`ConsentPreviewDialog`), obfuscated storage at rest in
+`coach_credentials.json`, chat persistence in `coach_chat.json`, responsive chat UI
+(`CoachScreen`), coach configuration (`CoachSettingsScreen`), and dashboard integration.
+See [Phase 7 details](phase-7.md). All 105 automated tests passed with zero analyzer warnings.
+

@@ -376,6 +376,59 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
               ],
+              // AI Coach Advisor Card
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF151B23), Color(0xFF182433)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF00D4FF).withValues(alpha: 0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.auto_awesome, color: Color(0xFF00D4FF), size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'AI COACH & ADVISOR',
+                          style: TextStyle(
+                            letterSpacing: 1.5,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                            color: Color(0xFF00D4FF),
+                          ),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => context.go('/coach'),
+                          child: const Text('Open Coach →'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Evidence-Based Fitness Guidance',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Ask about optimal set volume, daily macro distribution, or check your recovery status with evidence-based offline rules or BYOK AI.',
+                      style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 13, height: 1.3),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
               const InfoCard(
                 title: 'On your phone. Under your control.',
                 message:

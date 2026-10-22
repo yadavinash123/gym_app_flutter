@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/coach/presentation/coach_screen.dart';
+import '../features/coach/presentation/coach_settings_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/exercises/exercise_screens.dart';
 import '../features/health/screens/health_permissions_screen.dart';
@@ -74,6 +76,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           date: state.uri.queryParameters['date'] ?? todayIsoDate(),
         ),
       ),
+      GoRoute(
+        path: '/coach/settings',
+        builder: (_, _) => const CoachSettingsScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) =>
             AppShell(path: state.uri.path, child: child),
@@ -84,12 +90,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/nutrition',
             builder: (_, _) => const NutritionScreen(),
           ),
-          for (final item in destinations.skip(3))
-            GoRoute(
-              path: item.path,
-              builder: (_, _) =>
-                  PlannedFeature(title: item.label, icon: item.icon),
+          GoRoute(
+            path: '/progress',
+            builder: (_, _) => const PlannedFeature(
+              title: 'Progress',
+              icon: Icons.insights_outlined,
             ),
+          ),
+          GoRoute(
+            path: '/coach',
+            builder: (_, _) => const CoachScreen(),
+          ),
         ],
       ),
     ],

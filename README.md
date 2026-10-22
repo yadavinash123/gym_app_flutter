@@ -1,6 +1,6 @@
 # FitForge AI
 
-An offline-first Flutter fitness app, with Phases 1–2 and the Phase 3 exercise-library starter implemented.
+An offline-first Flutter fitness app, with Phases 1–7 implemented.
 Personal records use **JSON files in the phone's private application support directory**.
 No SQLite, Drift, PostgreSQL, Hive, Isar, cloud database, or backend.
 
@@ -35,15 +35,19 @@ Dependencies are locked in `pubspec.lock`.
 - Explicit source attribution badges (Health Connect, Apple Health, Hardware Sensors, FitForge, Manual).
 - Tanaka age-predicted HRmax calculation and 5 evidence-based cardiovascular training zones.
 - Local audit trail and manual health measurement logging modal.
+- Bring-Your-Own-Key (BYOK) AI Coach with multi-provider support (Google Gemini, OpenAI, Custom OpenAI-compatible endpoints).
+- 100% Offline Rule-Based Heuristic Coach (ISSN protein evaluation, Tanaka HR zones, progressive overload double-progression, autonomic sleep/HR readiness).
+- Strict Zero-PII Prompt Guarantee: user names, emails, and account identifiers are strictly omitted from prompts.
+- Granular Consent Previews: inspect exact assembled prompt payload and toggle independent data streams (Profile, Workouts, Nutrition, Health).
+- Secure credentials storage with XOR-salt obfuscation at rest in `coach_credentials.json` and immediate key zeroization.
+- Chat session persistence in `coach_chat.json`, 4 evidence-based coaching personas, suggested follow-up chips, and dashboard quick-access card.
 
 ## Not yet implemented
 
-Complete professionally reviewed exercise catalog/animations, AI providers (BYOK),
-progress charts, streaks, notifications, localization, portable backup import/export, and permanent deletion.
-No API keys are collected yet. When added, credentials will use platform secure storage.
-Local JSON files are sandboxed, not application-level encrypted. Clearing app data or
-uninstalling can delete them. Progress and AI Coach tabs remain explicitly marked
-as unfinished. The weekly outline is a planning aid, not an exercise prescription.
+Progress charts, volume recovery tracking, habit streaks, local notifications, complete
+professionally reviewed 3D exercise catalog, localization, portable backup import/export,
+and permanent account/data deletion. Only the Progress tab remains explicitly marked as unfinished.
+The weekly outline is a planning aid, not an exercise prescription.
 
 Web support is not yet configured; use an Android emulator or phone for this build.
 
@@ -56,5 +60,6 @@ flutter build apk --debug
 ```
 
 Open **Workouts → Browse exercises → Push-up** to try the 3D trainer.
-See [3D upgrade, asset licenses and remaining scope](docs/3d-upgrade.md).
-See [Phase 3 scope and sources](docs/phase-3.md), [architecture and roadmap](docs/architecture.md) and [Phase 2 behavior and calculation sources](docs/phase-2.md). This is an incremental development build, not the complete production application from the master brief.
+Open **AI Coach** from the bottom navigation or the Dashboard to test the offline heuristic engine or configure your BYOK credentials in Coach Settings.
+See [Phase 7 BYOK AI Coach details](docs/phase-7.md), [Phase 6 Health & Activity details](docs/phase-6.md), [Phase 5 Nutrition details](docs/phase-5.md), [Phase 4 Workout engine details](docs/phase-4.md), [Phase 3 3D trainer details](docs/3d-upgrade.md), [Phase 2 details](docs/phase-2.md), and [Architecture and roadmap](docs/architecture.md).
+
