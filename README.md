@@ -29,15 +29,20 @@ Dependencies are locked in `pubspec.lock`.
 - 22 offline exercise guides, combined filters, front/back muscle map and saved favorites.
 - One installed 3D push-up trainer with a real skinned GLB, camera/playback controls and fullscreen.
 - Clearly labeled muscle illustrations for guides without installed 3D assets.
+- Complete workout engine, live session player with rest timer, set logging, RPE, and progressive overload.
+- Offline food catalog with 52 verified items (ICMR-NIN & USDA), portion scaling, custom foods, and meal logs.
+- Permission-based health & activity sync (steps, distance, active kcal, resting HR, sleep architecture).
+- Explicit source attribution badges (Health Connect, Apple Health, Hardware Sensors, FitForge, Manual).
+- Tanaka age-predicted HRmax calculation and 5 evidence-based cardiovascular training zones.
+- Local audit trail and manual health measurement logging modal.
 
 ## Not yet implemented
 
-Complete professionally reviewed exercise catalog/animations, detailed workout engine, session logging,
-nutrition/meal logging, health integrations, AI providers, progress charts, notifications,
-localization, portable backup import/export and permanent deletion.
+Complete professionally reviewed exercise catalog/animations, AI providers (BYOK),
+progress charts, streaks, notifications, localization, portable backup import/export, and permanent deletion.
 No API keys are collected yet. When added, credentials will use platform secure storage.
 Local JSON files are sandboxed, not application-level encrypted. Clearing app data or
-uninstalling can delete them. Nutrition, Progress and AI Coach tabs are explicitly marked
+uninstalling can delete them. Progress and AI Coach tabs remain explicitly marked
 as unfinished. The weekly outline is a planning aid, not an exercise prescription.
 
 Web support is not yet configured; use an Android emulator or phone for this build.

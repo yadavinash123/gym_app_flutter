@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../exercises/exercise.dart';
 import '../profile/profile_repository.dart';
+import '../health/data/health_repository.dart';
 import '../planning/initial_plan.dart';
 import '../workouts/data/workout_generator.dart';
 import '../workouts/data/workout_repository.dart';
@@ -16,6 +17,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(workoutSessionsProvider).value ?? [];
+    final health = ref.watch(todayHealthSummaryProvider);
 
     return ref.watch(profileProvider).when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -166,6 +168,153 @@ class DashboardScreen extends ConsumerWidget {
                   onPressed: () => context.go('/nutrition'),
                   icon: const Icon(Icons.restaurant_outlined),
                   label: const Text('Open Daily Nutrition Log'),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF151B23),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF1C2430)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFB6FF3B).withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                    Icons.directions_walk_rounded,
+                                    color: Color(0xFFB6FF3B),
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Flexible(
+                                  child: Text(
+                                    'DAILY ACTIVITY & HEALTH',
+                                    style: TextStyle(
+                                      letterSpacing: 1.2,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                      color: Color(0xFFB6FF3B),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => context.push('/health'),
+                            child: const Text('Details →'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    '${health.steps}',
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  'steps (${health.stepSource.shortBadge})',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFA7B0BF),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    health.restingHeartRateBpm != null
+                                        ? '${health.restingHeartRateBpm}'
+                                        : '--',
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const Text(
+                                  'bpm resting HR',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFA7B0BF),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    health.sleepDurationMinutes != null
+                                        ? '${(health.sleepDurationMinutes! / 60).toStringAsFixed(1)}h'
+                                        : '--',
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const Text(
+                                  'sleep',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFA7B0BF),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],

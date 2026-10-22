@@ -112,6 +112,18 @@ class SettingsScreen extends ConsumerWidget {
                   9,
                   Icons.edit_calendar_outlined,
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.sync_rounded),
+                      title: const Text('Health & activity sync'),
+                      subtitle: const Text('Permissions, source attribution, and device sensor data'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/health'),
+                    ),
+                  ),
+                ),
               ],
               const SizedBox(height: 24),
               const InfoCard(

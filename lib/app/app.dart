@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/exercises/exercise_screens.dart';
+import '../features/health/screens/health_permissions_screen.dart';
+import '../features/health/screens/health_screen.dart';
+import '../features/health/screens/manual_health_entry_screen.dart';
 import '../features/nutrition/data/nutrition_repository.dart';
 import '../features/nutrition/screens/custom_food_screen.dart';
 import '../features/nutrition/screens/food_search_screen.dart';
@@ -55,6 +58,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/nutrition/custom',
         builder: (_, _) => const CustomFoodScreen(),
+      ),
+      GoRoute(
+        path: '/health',
+        builder: (_, state) =>
+            HealthScreen(initialDate: state.uri.queryParameters['date']),
+      ),
+      GoRoute(
+        path: '/health/permissions',
+        builder: (_, _) => const HealthPermissionsScreen(),
+      ),
+      GoRoute(
+        path: '/health/log',
+        builder: (_, state) => ManualHealthEntryScreen(
+          date: state.uri.queryParameters['date'] ?? todayIsoDate(),
+        ),
       ),
       ShellRoute(
         builder: (context, state, child) =>

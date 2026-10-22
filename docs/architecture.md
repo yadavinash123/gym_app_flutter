@@ -80,7 +80,7 @@ See [3D upgrade and remaining scope](3d-upgrade.md).
 3. Exercise library starter implemented: 22 guides, muscle map, favorites and one 3D animated push-up preview. Full catalog and professional review outstanding.
 4. Workout planning, session timer, set logging, progressive overload, and session file persistence: implemented. See [Phase 4 details](phase-4.md).
 5. Offline food catalog, validated nutrition calculations and meal logs: implemented. See [Phase 5 details](phase-5.md).
-6. Permission-based activity/health integrations with source attribution.
+6. Permission-based activity/health integrations with source attribution: implemented. See [Phase 6 details](phase-6.md).
 7. Optional bring-your-own-key AI, secure credentials and consent previews.
 8. Progress charts, recovery, streaks and local notifications.
 9. Export/import/deletion, localization, accessibility, device testing and release signing.
@@ -123,3 +123,14 @@ guidelines, hydration tracking, atomic daily meal logging (Breakfast, Lunch, Din
 backup corruption recovery, and dashboard integration are implemented. See
 [Phase 5 details and verification](phase-5.md). All 61 automated tests passed with zero
 analyzer warnings.
+
+## Phase 6
+
+Permission-based activity and health integrations (Steps, Distance, Active Energy,
+Resting Heart Rate, Sleep Architecture), granular metric permissions with clinical/product
+justifications, complete source attribution badges (Health Connect, Apple Health,
+Hardware Sensors, FitForge, Manual Entry), Tanaka formula age-predicted HRmax and 5
+training zones, atomic on-device JSON persistence (`health_summaries.json`,
+`health_permissions.json`, `health_audit_logs.json`), audit trail, manual logging modal,
+and dashboard integration are implemented. See [Phase 6 details](phase-6.md). All 81
+automated tests passed with zero analyzer warnings.
