@@ -17,6 +17,8 @@ import '../features/nutrition/screens/nutrition_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/profile/profile_repository.dart';
 import '../features/planning/plan_screen.dart';
+import '../features/progress/presentation/progress_screen.dart';
+import '../features/progress/presentation/reminder_settings_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/workouts/history/workout_history_screen.dart';
 import '../features/workouts/custom/custom_workout_screen.dart';
@@ -85,6 +87,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/coach/history',
         builder: (_, _) => const CoachHistoryScreen(),
       ),
+      GoRoute(
+        path: '/progress/reminders',
+        builder: (_, _) => const ReminderSettingsScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) =>
             AppShell(path: state.uri.path, child: child),
@@ -97,10 +103,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/progress',
-            builder: (_, _) => const PlannedFeature(
-              title: 'Progress',
-              icon: Icons.insights_outlined,
-            ),
+            builder: (_, _) => const ProgressScreen(),
           ),
           GoRoute(
             path: '/coach',
