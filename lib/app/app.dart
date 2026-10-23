@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/coach/presentation/coach_history_screen.dart';
 import '../features/coach/presentation/coach_screen.dart';
 import '../features/coach/presentation/coach_settings_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
@@ -80,6 +81,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/coach/settings',
         builder: (_, _) => const CoachSettingsScreen(),
       ),
+      GoRoute(
+        path: '/coach/history',
+        builder: (_, _) => const CoachHistoryScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) =>
             AppShell(path: state.uri.path, child: child),
@@ -99,7 +104,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/coach',
-            builder: (_, _) => const CoachScreen(),
+            builder: (_, state) => const CoachScreen(),
           ),
         ],
       ),
@@ -108,6 +113,8 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
+
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class FitForgeApp extends ConsumerWidget {
   const FitForgeApp({super.key});
@@ -179,40 +186,48 @@ class ProfileScreen extends ConsumerWidget {
 
 const destinations = [
   (path: '/home', label: 'Home', icon: Icons.home_outlined),
-  (path: '/workouts', label: 'Workouts', icon: Icons.fitness_center),
+  (path: '/workouts', label: 'Workouts', icon: Icons.fitness_center_rounded),
   (path: '/nutrition', label: 'Nutrition', icon: Icons.restaurant_outlined),
   (path: '/progress', label: 'Progress', icon: Icons.insights_outlined),
-  (path: '/coach', label: 'AI Coach', icon: Icons.auto_awesome_outlined),
+  (path: '/coach', label: 'AI', icon: Icons.auto_awesome),
 ];
 
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.path, required this.child});
   final String path;
   final Widget child;
+
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text(
-        'FITFORGE',
-        style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 3),
+  Widget build(BuildContext context) {
+    final hideAppBar = path.startsWith('/coach');
+    final selectedIndex = destinations.indexWhere((d) => d.path == path);
+
+    return Scaffold(
+      appBar: hideAppBar
+          ? null
+          : AppBar(
+              title: const Text(
+                'FITFORGE',
+                style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 3),
+              ),
+              actions: [
+                IconButton(
+                  tooltip: 'Profile settings',
+                  onPressed: () => context.push('/settings'),
+                  icon: const Icon(Icons.person_outline),
+                ),
+              ],
+            ),
+      body: SafeArea(top: !hideAppBar, child: child),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selectedIndex >= 0 ? selectedIndex : 2,
+        onDestinationSelected: (index) => context.go(destinations[index].path),
+        destinations: destinations
+            .map((d) => NavigationDestination(icon: Icon(d.icon), label: d.label))
+            .toList(),
       ),
-      actions: [
-        IconButton(
-          tooltip: 'Profile settings',
-          onPressed: () => context.push('/settings'),
-          icon: const Icon(Icons.person_outline),
-        ),
-      ],
-    ),
-    body: SafeArea(child: child),
-    bottomNavigationBar: NavigationBar(
-      selectedIndex: destinations.indexWhere((d) => d.path == path),
-      onDestinationSelected: (index) => context.go(destinations[index].path),
-      destinations: destinations
-          .map((d) => NavigationDestination(icon: Icon(d.icon), label: d.label))
-          .toList(),
-    ),
-  );
+    );
+  }
 }
 
 class PlannedFeature extends StatelessWidget {

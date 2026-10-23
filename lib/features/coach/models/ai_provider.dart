@@ -26,7 +26,7 @@ enum AiProvider {
       case AiProvider.openai:
         return 'gpt-4o-mini';
       case AiProvider.custom:
-        return 'custom-model';
+        return 'llama-3.3-70b-versatile';
       case AiProvider.offline:
         return 'offline-rules-v1';
     }

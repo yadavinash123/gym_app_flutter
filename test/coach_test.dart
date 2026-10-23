@@ -20,6 +20,7 @@ import 'package:fitforge_ai/features/health/models/daily_health_summary.dart';
 import 'package:fitforge_ai/features/nutrition/models/meal_log.dart';
 import 'package:fitforge_ai/features/profile/profile.dart';
 import 'package:fitforge_ai/features/profile/profile_repository.dart';
+import 'package:fitforge_ai/features/coach/presentation/widgets/formatted_coach_text.dart';
 
 class FakeAiClient implements AiClient {
   FakeAiClient({this.shouldSucceed = true, this.mockResponse = 'Mock LLM Response'});
@@ -583,29 +584,33 @@ void main() {
 
       await tester.pump();
 
-      expect(find.text('AI COACH'), findsOneWidget);
-      expect(find.text('Offline Coach'), findsOneWidget);
-      expect(find.byIcon(Icons.privacy_tip_outlined), findsOneWidget);
-      expect(find.textContaining('Welcome to FitForge AI Coach'), findsOneWidget);
+      expect(find.text('FitForge'), findsOneWidget);
+      expect(find.text('AI Coach • Ready'), findsOneWidget);
+      expect(find.textContaining('crush your goals'), findsOneWidget);
 
-      expect(find.text('Check today\'s macro balance'), findsOneWidget);
-
-      await tester.tap(find.text('Check today\'s macro balance'));
+      await tester.dragUntilVisible(
+        find.text('Continue Last Chat'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -150),
+      );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
 
-      expect(find.textContaining('Nutritional Balance & Fueling Analysis'), findsOneWidget);
+      await tester.tap(find.text('Continue Last Chat'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('FitForge AI'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField), 'How to overload safely?');
-      await tester.tap(find.byIcon(Icons.send));
+      await tester.tap(find.byIcon(Icons.arrow_forward_rounded));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('How to overload safely?'), findsOneWidget);
       expect(find.textContaining('Progressive Overload'), findsOneWidget);
     });
 
-    testWidgets('CoachSettingsScreen toggles providers and privacy switches', (tester) async {
+    testWidgets('CoachSettingsScreen displays sections and preferences', (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -634,40 +639,29 @@ void main() {
 
       await tester.pump();
 
-      expect(find.text('COACH & AI SETTINGS'), findsOneWidget);
-      expect(find.text('Google Gemini'), findsOneWidget);
-      expect(find.text('OpenAI'), findsOneWidget);
-      expect(find.text('Offline Heuristic Coach'), findsOneWidget);
-
-      await tester.tap(find.text('Google Gemini'));
-      await tester.pump();
-
-      expect(find.text('Google Gemini Credentials'), findsOneWidget);
-      expect(find.text('Test Connection'), findsOneWidget);
+      expect(find.text('AI Coach Settings'), findsOneWidget);
+      expect(find.text('AI Configuration'), findsOneWidget);
+      expect(find.text('AI Model'), findsOneWidget);
+      expect(find.text('Provider'), findsOneWidget);
+      expect(find.text('Personalization'), findsOneWidget);
+      expect(find.text('Fitness Goal'), findsOneWidget);
 
       await tester.dragUntilVisible(
-        find.text('Test Connection'),
+        find.text('Chat Preferences'),
         find.byType(ListView),
-        const Offset(0, -150),
+        const Offset(0, -200),
+      );
+      await tester.pump();
+      expect(find.text('Chat Preferences'), findsOneWidget);
+
+      await tester.dragUntilVisible(
+        find.text('Clear Chat History'),
+        find.byType(ListView),
+        const Offset(0, -200),
       );
       await tester.pump();
 
-      await tester.tap(find.text('Test Connection'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(find.textContaining('Connected successfully'), findsOneWidget);
-
-      await tester.dragUntilVisible(
-        find.text('Profile & Fitness Goals'),
-        find.byType(ListView),
-        const Offset(0, -150),
-      );
-      await tester.pump();
-
-      expect(find.text('Profile & Fitness Goals'), findsOneWidget);
-      expect(find.text('Workout History'), findsOneWidget);
-      expect(find.text('Nutrition & Fuel Logs'), findsOneWidget);
-      expect(find.text('Health & Sleep Biomarkers'), findsOneWidget);
+      expect(find.text('Clear Chat History'), findsOneWidget);
     });
 
     testWidgets('ConsentPreviewDialog renders payload without overflow', (tester) async {
@@ -739,5 +733,37 @@ void main() {
       await tester.pump();
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('FormattedCoachText removes all stray and unclosed ** characters and renders clean text', (tester) async {
+      const responseWithAsterisks = '''
+### **Zone 2 Cardiovascular Plan**
+• **Optimal Target:** 135 bpm
+- **Energy:** **2100 / 2500 kcal**
+**Sub-optimal Sleep Volume:** Under 7 hours
+| Nutrient | Target |
+| Protein | **160g** |
+**
+• **
+*- **Consistency is key**
+''';
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: FormattedCoachText(text: responseWithAsterisks),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      // Ensure no raw "**" is displayed anywhere in text widgets
+      expect(find.textContaining('**'), findsNothing);
+      expect(find.text('Zone 2 Cardiovascular Plan'), findsOneWidget);
+      expect(find.textContaining('Optimal Target:'), findsOneWidget);
+      expect(find.textContaining('Sub-optimal Sleep Volume:'), findsOneWidget);
+      expect(find.textContaining('Consistency is key'), findsOneWidget);
+    });
   });
 }
+

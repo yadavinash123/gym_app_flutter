@@ -1,4 +1,5 @@
 import 'ai_provider.dart';
+import 'coach_conversation.dart';
 
 enum MessageRole {
   user,
@@ -29,6 +30,8 @@ class CoachMessage {
     this.modelName,
     this.tokensUsed,
     this.suggestedActions = const [],
+    this.workoutPlan,
+    this.isLiked,
   });
 
   final String id;
@@ -40,6 +43,8 @@ class CoachMessage {
   final String? modelName;
   final int? tokensUsed;
   final List<String> suggestedActions;
+  final WorkoutPlanCardData? workoutPlan;
+  final bool? isLiked;
 
   bool get isUser => role == MessageRole.user;
   bool get isAssistant => role == MessageRole.assistant;
@@ -55,6 +60,8 @@ class CoachMessage {
     String? modelName,
     int? tokensUsed,
     List<String>? suggestedActions,
+    WorkoutPlanCardData? workoutPlan,
+    bool? isLiked,
   }) {
     return CoachMessage(
       id: id ?? this.id,
@@ -66,6 +73,8 @@ class CoachMessage {
       modelName: modelName ?? this.modelName,
       tokensUsed: tokensUsed ?? this.tokensUsed,
       suggestedActions: suggestedActions ?? this.suggestedActions,
+      workoutPlan: workoutPlan ?? this.workoutPlan,
+      isLiked: isLiked ?? this.isLiked,
     );
   }
 
@@ -80,6 +89,8 @@ class CoachMessage {
       'modelName': modelName,
       'tokensUsed': tokensUsed,
       'suggestedActions': suggestedActions,
+      'workoutPlan': workoutPlan?.toJson(),
+      'isLiked': isLiked,
     };
   }
 
@@ -100,6 +111,11 @@ class CoachMessage {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
+      workoutPlan: json['workoutPlan'] != null
+          ? WorkoutPlanCardData.fromJson(
+              json['workoutPlan'] as Map<String, dynamic>)
+          : null,
+      isLiked: json['isLiked'] as bool?,
     );
   }
 

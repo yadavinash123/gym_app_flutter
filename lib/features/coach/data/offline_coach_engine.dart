@@ -3,6 +3,7 @@ import '../../health/models/heart_rate_zone.dart';
 import '../../nutrition/models/meal_log.dart';
 import '../../profile/profile.dart';
 import '../../workouts/models/workout_session.dart';
+import '../models/coach_conversation.dart';
 import '../models/coach_message.dart';
 import '../models/coach_persona.dart';
 
@@ -21,8 +22,39 @@ class OfflineCoachEngine {
 
     String content;
     List<String> suggestions;
+    WorkoutPlanCardData? workoutPlan;
 
-    if (_matches(lower, ['heart', 'zone', 'tanaka', 'cardio', 'bpm', 'hr', 'step', 'walk'])) {
+    if (_matches(lower, ['upper lower', '4-day', 'split', 'muscle gain', 'workout plan', 'build my workout', 'program'])) {
+      content = 'Absolutely! Here\'s a 4-day upper/lower workout plan designed for muscle gain. It focuses on compound movements, progressive overload, and balanced volume.';
+      workoutPlan = const WorkoutPlanCardData(
+        title: 'Day 1 - Upper Body (Push)',
+        duration: '~60 min',
+        targetMuscles: 'Chest • Shoulders • Triceps',
+        exercises: [
+          WorkoutPlanExercise(
+            name: 'Bench Press',
+            setsReps: '4 sets × 8-10 reps',
+            targetMuscle: 'Chest',
+          ),
+          WorkoutPlanExercise(
+            name: 'Incline Dumbbell Press',
+            setsReps: '3 sets × 8-12 reps',
+            targetMuscle: 'Upper Chest',
+          ),
+          WorkoutPlanExercise(
+            name: 'Shoulder Press',
+            setsReps: '3 sets × 8-12 reps',
+            targetMuscle: 'Shoulders',
+          ),
+          WorkoutPlanExercise(
+            name: 'Triceps Pushdown',
+            setsReps: '3 sets × 10-15 reps',
+            targetMuscle: 'Triceps',
+          ),
+        ],
+      );
+      suggestions = const ['Show Day 2', 'Add rest times', 'Make it home gym'];
+    } else if (_matches(lower, ['heart', 'zone', 'tanaka', 'cardio', 'bpm', 'hr', 'step', 'walk'])) {
       content = _analyzeCardioAndHealth(persona, profile, todayHealth);
       suggestions = const ['Check today\'s macro balance', 'Recovery & readiness assessment', 'Today\'s workout recommendation'];
     } else if (_matches(lower, ['overload', 'progress', 'progression', 'weight', 'pr', 'heavy', 'rep', 'rir', 'rpe'])) {
@@ -34,7 +66,7 @@ class OfflineCoachEngine {
     } else if (_matches(lower, ['nutrition', 'protein', 'calorie', 'macro', 'water', 'hydrat', 'diet', 'eat', 'food'])) {
       content = _analyzeNutrition(persona, profile, todayNutrition);
       suggestions = const ['Recovery & readiness assessment', 'Today\'s workout recommendation', 'Explain Tanaka HR zones'];
-    } else if (_matches(lower, ['workout', 'routine', 'split', 'schedule', 'exercise plan', 'training plan', 'train today', 'lift today'])) {
+    } else if (_matches(lower, ['workout', 'routine', 'schedule', 'exercise plan', 'training plan', 'train today', 'lift today'])) {
       content = _analyzeWorkout(persona, profile, recentWorkouts);
       suggestions = const ['How to overload safely?', 'Check today\'s macro balance', 'Recovery & readiness assessment'];
     } else {
@@ -52,6 +84,7 @@ class OfflineCoachEngine {
       content: content,
       timestamp: DateTime.now(),
       offlineGenerated: true,
+      workoutPlan: workoutPlan,
       suggestedActions: suggestions,
     );
   }
@@ -307,10 +340,8 @@ class OfflineCoachEngine {
     final zones = HeartRateZone.calculateZones(age);
 
     buffer.writeln('**Tanaka Formula Age-Predicted HRmax:** $hrMax bpm *(208 - 0.7 × $age)*\n');
-    buffer.writeln('| Zone | Focus | Intensity | Target BPM |');
-    buffer.writeln('|---|---|---|---|');
     for (final zone in zones) {
-      buffer.writeln('| **Z${zone.zoneNumber}** | ${zone.name} | ${(zone.minPercent * 100).round()}%–${(zone.maxPercent * 100).round()}% | ${zone.minBpm}–${zone.maxBpm} bpm |');
+      buffer.writeln('• **${zone.name} (Z${zone.zoneNumber}):** ${(zone.minPercent * 100).round()}%–${(zone.maxPercent * 100).round()}% intensity (${zone.minBpm}–${zone.maxBpm} bpm)');
     }
 
     final steps = health?.steps ?? 0;

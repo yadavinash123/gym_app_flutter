@@ -97,16 +97,16 @@ class HttpAiClient implements AiClient {
         CoachMessage(
           id: 'ping_${DateTime.now().millisecondsSinceEpoch}',
           role: MessageRole.user,
-          content: 'Ping. Reply with "pong" only.',
+          content: 'Hello, reply with "Hello Athlete!" only.',
           timestamp: DateTime.now(),
         ),
       ];
       final res = await sendMessage(
         history: testMessage,
-        systemPrompt: 'Respond in 1 word.',
-        credentials: credentials.copyWith(maxTokens: 10),
+        systemPrompt: 'You are a fitness coach. Greet the athlete.',
+        credentials: credentials.copyWith(maxTokens: 100),
       );
-      return res.content.isNotEmpty ? null : 'Model returned an empty response.';
+      return res.content.trim().isNotEmpty ? null : 'Model returned an empty response. Please verify model name.';
     } on AiException catch (e) {
       return e.message;
     } catch (e) {
@@ -272,7 +272,19 @@ class HttpAiClient implements AiClient {
       throw const AiException('No choices returned by AI provider.');
     }
 
-    final text = choices[0]['message']?['content'] as String? ?? '';
+    String text = choices[0]['message']?['content'] as String? ?? '';
+    if (text.trim().isEmpty) {
+      final reasoning = choices[0]['message']?['reasoning_content'] as String?;
+      if (reasoning != null && reasoning.trim().isNotEmpty) {
+        text = reasoning;
+      }
+    }
+    if (text.trim().isEmpty) {
+      final fallbackText = choices[0]['text'] as String?;
+      if (fallbackText != null && fallbackText.trim().isNotEmpty) {
+        text = fallbackText;
+      }
+    }
     final totalTokens = json?['usage']?['total_tokens'] as num?;
 
     return CoachMessage(

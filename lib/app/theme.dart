@@ -25,6 +25,7 @@ ThemeData buildTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
+      fillColor: const Color(0xFF1C2430),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,

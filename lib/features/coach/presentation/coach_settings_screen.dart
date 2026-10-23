@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../shared/widgets/page_body.dart';
 import '../data/ai_client.dart';
 import '../data/coach_repository.dart';
 import '../models/ai_credentials.dart';
 import '../models/ai_provider.dart';
-import 'consent_preview_dialog.dart';
+import '../models/coach_persona.dart';
+import '../models/coach_preferences.dart';
 
 class CoachSettingsScreen extends ConsumerStatefulWidget {
   const CoachSettingsScreen({super.key});
@@ -16,89 +15,19 @@ class CoachSettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
-  final _keyController = TextEditingController();
-  final _modelController = TextEditingController();
-  final _endpointController = TextEditingController();
-
-  AiProvider _selectedProvider = AiProvider.gemini;
-  double _temperature = 0.7;
-  bool _obscureKey = true;
   bool _isTesting = false;
   String? _testResult;
   bool? _testSuccess;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initFromStore());
-  }
-
-  Future<void> _initFromStore() async {
-    final creds = await ref.read(coachCredentialsProvider.future);
-    if (!mounted) return;
-    setState(() {
-      _selectedProvider = creds.provider;
-      _keyController.text = creds.apiKey;
-      _modelController.text = creds.modelName.isNotEmpty
-          ? creds.modelName
-          : creds.provider.defaultModel;
-      _endpointController.text = creds.customEndpointUrl;
-      _temperature = creds.temperature;
-    });
-  }
-
-  @override
-  void dispose() {
-    _keyController.dispose();
-    _modelController.dispose();
-    _endpointController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _saveCredentials({bool showSnackbar = true}) async {
-    final endpoint = _selectedProvider == AiProvider.custom && _endpointController.text.trim().isNotEmpty
-        ? normalizeOpenAiEndpoint(_endpointController.text)
-        : _endpointController.text.trim();
-
-    if (_selectedProvider == AiProvider.custom && endpoint.isNotEmpty) {
-      _endpointController.text = endpoint;
-    }
-
-    final updated = AiCredentials(
-      provider: _selectedProvider,
-      apiKey: _keyController.text.trim(),
-      modelName: _modelController.text.trim(),
-      customEndpointUrl: endpoint,
-      temperature: _temperature,
-    );
-    await ref.read(coachCredentialsProvider.notifier).save(updated);
-    if (mounted && showSnackbar) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('AI Coach configuration saved successfully')),
-      );
-    }
-  }
-
-  Future<void> _testConnection() async {
-    if (_selectedProvider == AiProvider.custom && _endpointController.text.trim().isNotEmpty) {
-      _endpointController.text = normalizeOpenAiEndpoint(_endpointController.text);
-    }
-
+  Future<void> _testConnection(AiCredentials creds) async {
     setState(() {
       _isTesting = true;
       _testResult = null;
       _testSuccess = null;
     });
 
-    final tempCreds = AiCredentials(
-      provider: _selectedProvider,
-      apiKey: _keyController.text.trim(),
-      modelName: _modelController.text.trim(),
-      customEndpointUrl: _endpointController.text.trim(),
-      temperature: _temperature,
-    );
-
-    final errorMsg = await ref.read(coachRepositoryProvider).checkConnection(tempCreds);
+    final errorMsg =
+        await ref.read(coachRepositoryProvider).checkConnection(creds);
     final success = errorMsg == null;
 
     if (!mounted) return;
@@ -106,523 +35,898 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
       _isTesting = false;
       _testSuccess = success;
       _testResult = success
-          ? 'Connected successfully to ${_selectedProvider.displayName}! Credentials verified and saved.'
+          ? 'Connected successfully to ${creds.provider.displayName}!'
           : 'Connection failed: $errorMsg';
     });
-
-    if (success) {
-      await _saveCredentials(showSnackbar: false);
-    }
   }
 
-  Future<void> _confirmClearKey() async {
-    final confirmed = await showDialog<bool>(
+  void _showApiKeySheet(AiCredentials currentCreds) {
+    final controller = TextEditingController(text: currentCreds.apiKey);
+    bool obscure = true;
+
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF151B23),
-        title: const Text('Clear API Key?'),
-        content: const Text(
-          'This will remove your API key from this device and return FitForge to 100% Offline Coach mode.',
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF151B23),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) => Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${currentCreds.provider.displayName} API Key',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Your API key is stored securely on your device and never sent to any third-party server.',
+                style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 12),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller,
+                obscureText: obscure,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Paste API key here (sk-... or AIza...)',
+                  hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                  filled: true,
+                  fillColor: const Color(0xFF1E2836),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscure
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: Colors.white70,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setSheetState(() => obscure = !obscure);
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  if (currentCreds.apiKey.isNotEmpty) ...[
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        side: const BorderSide(color: Colors.redAccent),
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                      ),
+                      onPressed: () async {
+                        await ref
+                            .read(coachCredentialsProvider.notifier)
+                            .save(currentCreds.copyWith(apiKey: ''));
+                        if (context.mounted) Navigator.pop(ctx);
+                        setState(() {
+                          _testResult = null;
+                          _testSuccess = null;
+                        });
+                      },
+                      child: const Text('Clear Key'),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                  Expanded(
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFFB6FF3B),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () async {
+                        final key = controller.text.trim();
+                        final updated = currentCreds.copyWith(apiKey: key);
+                        await ref
+                            .read(coachCredentialsProvider.notifier)
+                            .save(updated);
+                        if (context.mounted) Navigator.pop(ctx);
+                        if (key.isNotEmpty) {
+                          _testConnection(updated);
+                        }
+                      },
+                      child: const Text(
+                        'Save API Key',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Clear Key'),
-          ),
-        ],
       ),
     );
-
-    if (confirmed == true && mounted) {
-      await ref.read(coachCredentialsProvider.notifier).clear();
-      setState(() {
-        _keyController.clear();
-        _selectedProvider = AiProvider.offline;
-        _testResult = null;
-        _testSuccess = null;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('API credentials cleared. Switched to Offline mode.')),
-        );
-      }
-    }
   }
 
-  Future<void> _confirmResetChat() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF151B23),
-        title: const Text('Reset Chat History?'),
-        content: const Text('This will delete all past conversation messages with the coach.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Reset'),
-          ),
-        ],
-      ),
+  void _showEndpointSheet(AiCredentials currentCreds) {
+    final controller = TextEditingController(
+      text: currentCreds.customEndpointUrl.isNotEmpty
+          ? currentCreds.customEndpointUrl
+          : (currentCreds.provider == AiProvider.gemini
+              ? ''
+              : 'https://api.openai.com/v1'),
     );
 
-    if (confirmed == true && mounted) {
-      await ref.read(coachMessagesProvider.notifier).clear();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Chat history reset.')),
-        );
-      }
-    }
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF151B23),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'API Base URL / Endpoint',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Specify base endpoint URL for OpenAI, OpenRouter, Groq, Ollama, or custom proxy.',
+              style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+              decoration: InputDecoration(
+                hintText: 'https://api.openai.com/v1',
+                hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                filled: true,
+                fillColor: const Color(0xFF1E2836),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFFB6FF3B),
+                foregroundColor: Colors.black,
+                minimumSize: const Size.fromHeight(44),
+              ),
+              onPressed: () async {
+                final url = controller.text.trim();
+                final normalized = url.isNotEmpty ? normalizeOpenAiEndpoint(url) : '';
+                final updated = currentCreds.copyWith(customEndpointUrl: normalized);
+                await ref.read(coachCredentialsProvider.notifier).save(updated);
+                if (context.mounted) Navigator.pop(ctx);
+              },
+              child: const Text(
+                'Save Endpoint URL',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final consentAsync = ref.watch(coachConsentProvider);
+    final prefsAsync = ref.watch(coachPreferencesProvider);
+    final credsAsync = ref.watch(coachCredentialsProvider);
+
+    final prefs = prefsAsync.value ?? const CoachPreferences();
+    final creds = credsAsync.value ?? const AiCredentials();
 
     return Scaffold(
+      backgroundColor: const Color(0xFF0B0F14),
       appBar: AppBar(
-        title: const Text('COACH & AI SETTINGS'),
-        actions: [
-          IconButton(
-            tooltip: 'Inspect Prompt Payload',
-            icon: const Icon(Icons.privacy_tip_outlined),
-            onPressed: () => showDialog(
-              context: context,
-              builder: (_) => const ConsentPreviewDialog(),
-            ),
+        backgroundColor: const Color(0xFF0B0F14),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 20,
           ),
-        ],
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          'AI Coach Settings',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: false,
       ),
-      body: PageBody(
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
-          // 1. AI Provider Selection
-          Text('AI Engine & Provider (BYOK)', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 4),
-          const Text(
-            'FitForge is offline-first. Connect your own API key to enable online LLM reasoning, or use the 100% private offline engine.',
-            style: TextStyle(fontSize: 13, color: Color(0xFFA7B0BF)),
-          ),
-          const SizedBox(height: 12),
-
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: AiProvider.values.map((p) {
-              final isSelected = _selectedProvider == p;
-              return ChoiceChip(
-                avatar: Icon(p.icon, size: 18, color: isSelected ? Colors.black : p.brandColor),
-                label: Text(p.displayName),
-                selected: isSelected,
-                selectedColor: p.brandColor,
-                onSelected: (val) {
-                  if (val) {
-                    setState(() {
-                      _selectedProvider = p;
-                      if (_modelController.text.isEmpty ||
-                          AiProvider.values.any((item) => item.suggestedModels.contains(_modelController.text))) {
-                        _modelController.text = p.defaultModel;
-                      }
-                      _testResult = null;
-                      _testSuccess = null;
-                    });
-                  }
-                },
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 20),
-
-          // 2. Credentials Configuration (if not offline)
-          if (_selectedProvider != AiProvider.offline) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF151B23),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: _selectedProvider.brandColor.withValues(alpha: 0.4)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      Icon(_selectedProvider.icon, color: _selectedProvider.brandColor, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${_selectedProvider.displayName} Credentials',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // API Key Field
-                  TextField(
-                    controller: _keyController,
-                    obscureText: _obscureKey,
-                    decoration: InputDecoration(
-                      labelText: 'API Key',
-                      hintText: _selectedProvider == AiProvider.gemini ? 'AIzaSy...' : 'sk-...',
-                      prefixIcon: const Icon(Icons.key_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscureKey ? Icons.visibility_off : Icons.visibility),
-                        onPressed: () => setState(() => _obscureKey = !_obscureKey),
-                      ),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-
-                  if (_selectedProvider.keyDocumentationUrl.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      'Get your key from: ${_selectedProvider.keyDocumentationUrl}',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF00D4FF)),
-                    ),
-                  ],
-
-                  const SizedBox(height: 14),
-
-                  // Model Selection
-                  TextField(
-                    controller: _modelController,
-                    decoration: InputDecoration(
-                      labelText: 'Model Name',
-                      hintText: _selectedProvider.defaultModel,
-                      prefixIcon: const Icon(Icons.memory_outlined),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-
-                  if (_selectedProvider.suggestedModels.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: _selectedProvider.suggestedModels.map((m) {
-                        return ActionChip(
-                          label: Text(m, style: const TextStyle(fontSize: 11)),
-                          onPressed: () => setState(() => _modelController.text = m),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-
-                  if (_selectedProvider == AiProvider.custom) ...[
-                    const SizedBox(height: 14),
-                    TextField(
-                      controller: _endpointController,
-                      decoration: InputDecoration(
-                        labelText: 'Custom Endpoint URL',
-                        hintText: 'https://api.groq.com/openai/v1/chat/completions',
-                        prefixIcon: const Icon(Icons.link_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      children: [
-                        ActionChip(
-                          avatar: const Icon(Icons.bolt, size: 14, color: Color(0xFFF55036)),
-                          label: const Text('Use Groq Preset', style: TextStyle(fontSize: 12)),
-                          onPressed: () {
-                            setState(() {
-                              _endpointController.text = 'https://api.groq.com/openai/v1/chat/completions';
-                              _modelController.text = 'llama-3.3-70b-versatile';
-                            });
-                          },
-                        ),
-                        ActionChip(
-                          avatar: const Icon(Icons.computer, size: 14, color: Color(0xFF00D4FF)),
-                          label: const Text('Local Ollama Preset', style: TextStyle(fontSize: 12)),
-                          onPressed: () {
-                            setState(() {
-                              _endpointController.text = 'http://localhost:11434/v1/chat/completions';
-                              _modelController.text = 'llama3.2';
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10161E),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.white12),
-                      ),
-                      child: const Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(Icons.lightbulb_outline, size: 16, color: Color(0xFFB6FF3B)),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Tip: On Groq (https://api.groq.com/openai/v1), use models like llama-3.3-70b-versatile or llama-3.1-8b-instant. Model prefixes like "openai/..." belong to OpenRouter or OpenAI.',
-                              style: TextStyle(fontSize: 11, color: Color(0xFFA7B0BF), height: 1.3),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 16),
-
-                  // Temperature Slider
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Flexible(
-                        child: Text('Creativity (Temperature):', style: TextStyle(color: Colors.white70)),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(_temperature.toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFB6FF3B))),
-                    ],
-                  ),
-                  Slider(
-                    value: _temperature,
-                    min: 0.0,
-                    max: 1.0,
-                    divisions: 10,
-                    onChanged: (val) => setState(() => _temperature = val),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Test Connection & Save Controls
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      OutlinedButton.icon(
-                        icon: _isTesting
-                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.network_check, size: 18),
-                        label: Text(_isTesting ? 'Testing...' : 'Test Connection'),
-                        onPressed: _isTesting ? null : _testConnection,
-                      ),
-                      FilledButton.icon(
-                        icon: const Icon(Icons.save, size: 18),
-                        label: const Text('Save Config'),
-                        onPressed: _saveCredentials,
-                      ),
-                    ],
-                  ),
-
-                  if (_testResult != null) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: _testSuccess == true
-                            ? Colors.green.withValues(alpha: 0.15)
-                            : Colors.red.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _testSuccess == true ? Colors.green : Colors.redAccent,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _testSuccess == true ? Icons.check_circle : Icons.error_outline,
-                            color: _testSuccess == true ? Colors.green : Colors.redAccent,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              _testResult!,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: _testSuccess == true ? Colors.greenAccent : Colors.redAccent,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ] else ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF151B23),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFB6FF3B).withValues(alpha: 0.4)),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.offline_bolt_outlined, color: Color(0xFFB6FF3B), size: 22),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Offline Heuristic Mode Active',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'All coaching advice is evaluated locally on this phone using deterministic exercise science algorithms, ISSN nutrition guidelines, and the Tanaka HR formula. Zero network requests are made.',
-                    style: TextStyle(fontSize: 13, color: Color(0xFFA7B0BF), height: 1.4),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            FilledButton.icon(
-              icon: const Icon(Icons.save, size: 18),
-              label: const Text('Save Offline Setting'),
-              onPressed: _saveCredentials,
-            ),
-          ],
-
-          const SizedBox(height: 28),
-
-          // 3. Privacy & Granular Consent Toggles
-          Text('Privacy & Data Sharing Toggles', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 4),
-          const Text(
-            'Control what anonymized fitness data is included in the AI context prompt. You can inspect the exact payload at any time.',
-            style: TextStyle(fontSize: 13, color: Color(0xFFA7B0BF)),
-          ),
-          const SizedBox(height: 12),
-
-          consentAsync.when(
-            data: (consent) => Material(
-              color: const Color(0xFF151B23),
-              borderRadius: BorderRadius.circular(16),
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                children: [
-                  SwitchListTile(
-                    title: const Text('Profile & Fitness Goals'),
-                    subtitle: const Text('Age, height, weight, experience level, goal (No name or email)'),
-                    value: consent.shareProfile,
-                    onChanged: (val) => ref
-                        .read(coachConsentProvider.notifier)
-                        .updateConsent(consent.copyWith(shareProfile: val)),
-                  ),
-                  const Divider(height: 1),
-                  SwitchListTile(
-                    title: const Text('Workout History'),
-                    subtitle: const Text('Recent exercise names, completed sets, volume, and PRs'),
-                    value: consent.shareWorkouts,
-                    onChanged: (val) => ref
-                        .read(coachConsentProvider.notifier)
-                        .updateConsent(consent.copyWith(shareWorkouts: val)),
-                  ),
-                  const Divider(height: 1),
-                  SwitchListTile(
-                    title: const Text('Nutrition & Fuel Logs'),
-                    subtitle: const Text('Daily calories, protein, carbs, fats, and water intake'),
-                    value: consent.shareNutrition,
-                    onChanged: (val) => ref
-                        .read(coachConsentProvider.notifier)
-                        .updateConsent(consent.copyWith(shareNutrition: val)),
-                  ),
-                  const Divider(height: 1),
-                  SwitchListTile(
-                    title: const Text('Health & Sleep Biomarkers'),
-                    subtitle: const Text('Daily steps, resting heart rate, and sleep duration'),
-                    value: consent.shareHealth,
-                    onChanged: (val) => ref
-                        .read(coachConsentProvider.notifier)
-                        .updateConsent(consent.copyWith(shareHealth: val)),
-                  ),
-                ],
-              ),
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, _) => const Text('Unable to load privacy toggles'),
-          ),
-
-          const SizedBox(height: 14),
-
-          OutlinedButton.icon(
-            icon: const Icon(Icons.remove_red_eye_outlined),
-            label: const Text('Inspect Assembled Payload Preview'),
-            onPressed: () => showDialog(
-              context: context,
-              builder: (_) => const ConsentPreviewDialog(),
-            ),
-          ),
-
-          const SizedBox(height: 28),
-
-          // 4. Data Management & Key Clearing
-          Text('Data & Security Management', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 12),
-
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
+          // -----------------------------------------------------------------
+          // 1. AI Configuration Section
+          // -----------------------------------------------------------------
+          _buildSectionHeader('AI Configuration'),
+          _buildGroupContainer(
             children: [
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(foregroundColor: Colors.redAccent),
-                icon: const Icon(Icons.delete_outline, size: 18),
-                label: const Text('Clear API Key'),
-                onPressed: _confirmClearKey,
+              _buildNavigationRow(
+                icon: Icons.psychology_outlined,
+                title: 'AI Model',
+                value: prefs.aiModel,
+                onTap: () => _pickOption(
+                  title: 'Select AI Model',
+                  options: [
+                    'GPT-4o',
+                    'GPT-4o-mini',
+                    'gemini-1.5-flash',
+                    'gemini-1.5-pro',
+                    'claude-3-5-sonnet',
+                    'llama-3.3-70b',
+                  ],
+                  current: prefs.aiModel,
+                  onSelected: (val) {
+                    ref.read(coachPreferencesProvider.notifier).savePreferences(
+                          prefs.copyWith(aiModel: val),
+                        );
+                    ref.read(coachCredentialsProvider.notifier).save(
+                          creds.copyWith(modelName: val),
+                        );
+                  },
+                ),
               ),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.restart_alt, size: 18),
-                label: const Text('Reset Chat History'),
-                onPressed: _confirmResetChat,
+              _buildDivider(),
+              _buildNavigationRow(
+                icon: Icons.dns_outlined,
+                title: 'Provider',
+                value: prefs.providerName,
+                onTap: () => _pickProvider(creds),
+              ),
+              _buildDivider(),
+              _buildNavigationRow(
+                icon: Icons.key_rounded,
+                title: 'API Key',
+                value: creds.apiKey.isNotEmpty ? creds.maskedApiKey : 'Not Configured',
+                valueColor: creds.apiKey.isNotEmpty
+                    ? const Color(0xFFB6FF3B)
+                    : const Color(0xFFEF4444),
+                onTap: () => _showApiKeySheet(creds),
+              ),
+              _buildDivider(),
+              _buildNavigationRow(
+                icon: Icons.link_rounded,
+                title: 'API Endpoint URL',
+                value: creds.customEndpointUrl.isNotEmpty
+                    ? (creds.customEndpointUrl.length > 20
+                        ? '${creds.customEndpointUrl.substring(0, 20)}...'
+                        : creds.customEndpointUrl)
+                    : 'Default URL',
+                onTap: () => _showEndpointSheet(creds),
+              ),
+              _buildDivider(),
+              // Test Connection Row Button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFB6FF3B),
+                          side: BorderSide(
+                            color: const Color(0xFFB6FF3B).withValues(alpha: 0.6),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onPressed: _isTesting ? null : () => _testConnection(creds),
+                        icon: _isTesting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Color(0xFFB6FF3B),
+                                ),
+                              )
+                            : const Icon(Icons.wifi_tethering_rounded, size: 18),
+                        label: Text(
+                          _isTesting ? 'Testing Connection...' : 'Test Connection',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    if (_testResult != null) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _testSuccess == true
+                              ? const Color(0xFF10281C)
+                              : const Color(0xFF2E1719),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _testSuccess == true
+                                ? const Color(0xFF4ADE80)
+                                : const Color(0xFFEF4444),
+                          ),
+                        ),
+                        child: Text(
+                          _testResult!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _testSuccess == true
+                                ? const Color(0xFF4ADE80)
+                                : const Color(0xFFFCA5A5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              _buildDivider(),
+              _buildNavigationRow(
+                icon: Icons.language_rounded,
+                title: 'Response Language',
+                value: prefs.responseLanguage,
+                onTap: () => _pickOption(
+                  title: 'Select Language',
+                  options: [
+                    'English',
+                    'Spanish',
+                    'French',
+                    'German',
+                    'Japanese',
+                    'Portuguese',
+                    'Hindi',
+                  ],
+                  current: prefs.responseLanguage,
+                  onSelected: (val) {
+                    ref.read(coachPreferencesProvider.notifier).savePreferences(
+                          prefs.copyWith(responseLanguage: val),
+                        );
+                  },
+                ),
+              ),
+              _buildDivider(),
+              _buildSwitchRow(
+                icon: Icons.bolt_rounded,
+                title: 'Streaming Responses',
+                value: prefs.streamingResponses,
+                onChanged: (val) {
+                  ref.read(coachPreferencesProvider.notifier).savePreferences(
+                        prefs.copyWith(streamingResponses: val),
+                      );
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // -----------------------------------------------------------------
+          // 2. Personalization Section
+          // -----------------------------------------------------------------
+          _buildSectionHeader('Personalization'),
+          _buildGroupContainer(
+            children: [
+              _buildNavigationRow(
+                icon: Icons.track_changes_rounded,
+                title: 'Fitness Goal',
+                value: prefs.fitnessGoal,
+                onTap: () => _pickOption(
+                  title: 'Select Fitness Goal',
+                  options: [
+                    'Muscle Gain',
+                    'Fat Loss',
+                    'Strength & Power',
+                    'Cardio & Endurance',
+                    'Mobility & Longevity',
+                  ],
+                  current: prefs.fitnessGoal,
+                  onSelected: (val) {
+                    ref.read(coachPreferencesProvider.notifier).savePreferences(
+                          prefs.copyWith(fitnessGoal: val),
+                        );
+                  },
+                ),
+              ),
+              _buildDivider(),
+              _buildNavigationRow(
+                icon: Icons.bar_chart_rounded,
+                title: 'Training Level',
+                value: prefs.trainingLevel,
+                onTap: () => _pickOption(
+                  title: 'Select Training Level',
+                  options: [
+                    'Beginner',
+                    'Intermediate',
+                    'Advanced',
+                    'Elite Athlete',
+                  ],
+                  current: prefs.trainingLevel,
+                  onSelected: (val) {
+                    ref.read(coachPreferencesProvider.notifier).savePreferences(
+                          prefs.copyWith(trainingLevel: val),
+                        );
+                  },
+                ),
+              ),
+              _buildDivider(),
+              _buildNavigationRow(
+                icon: Icons.person_pin_circle_outlined,
+                title: 'Preferred Coach Tone',
+                value: prefs.preferredCoachTone,
+                onTap: () => _pickOption(
+                  title: 'Select Coach Tone',
+                  options: [
+                    'Motivational',
+                    'Scientific / Evidence-Based',
+                    'Strict Drill-Sergeant',
+                    'Friendly & Casual',
+                    'Holistic & Mindful',
+                  ],
+                  current: prefs.preferredCoachTone,
+                  onSelected: (val) {
+                    ref.read(coachPreferencesProvider.notifier).savePreferences(
+                          prefs.copyWith(preferredCoachTone: val),
+                        );
+                    if (val.contains('Scientific')) {
+                      ref
+                          .read(coachPersonaProvider.notifier)
+                          .setPersona(CoachPersona.scientific);
+                    } else if (val.contains('Motivational')) {
+                      ref
+                          .read(coachPersonaProvider.notifier)
+                          .setPersona(CoachPersona.supportive);
+                    } else if (val.contains('Strict')) {
+                      ref
+                          .read(coachPersonaProvider.notifier)
+                          .setPersona(CoachPersona.hypertrophy);
+                    } else if (val.contains('Holistic')) {
+                      ref
+                          .read(coachPersonaProvider.notifier)
+                          .setPersona(CoachPersona.wellness);
+                    }
+                  },
+                ),
+              ),
+              _buildDivider(),
+              _buildNavigationRow(
+                icon: Icons.format_align_left_rounded,
+                title: 'Response Detail',
+                value: prefs.responseDetail,
+                onTap: () => _pickOption(
+                  title: 'Select Response Detail',
+                  options: [
+                    'Balanced',
+                    'Concise & Direct',
+                    'In-Depth & Comprehensive',
+                  ],
+                  current: prefs.responseDetail,
+                  onSelected: (val) {
+                    ref.read(coachPreferencesProvider.notifier).savePreferences(
+                          prefs.copyWith(responseDetail: val),
+                        );
+                  },
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // -----------------------------------------------------------------
+          // 3. Chat Preferences Section
+          // -----------------------------------------------------------------
+          _buildSectionHeader('Chat Preferences'),
+          _buildGroupContainer(
+            children: [
+              _buildSwitchRow(
+                icon: Icons.schedule_rounded,
+                title: 'Save Chat History',
+                value: prefs.saveChatHistory,
+                onChanged: (val) {
+                  ref.read(coachPreferencesProvider.notifier).savePreferences(
+                        prefs.copyWith(saveChatHistory: val),
+                      );
+                },
+              ),
+              _buildDivider(),
+              _buildSwitchRow(
+                icon: Icons.storage_rounded,
+                title: 'Remember Conversation Context',
+                value: prefs.rememberConversationContext,
+                onChanged: (val) {
+                  ref.read(coachPreferencesProvider.notifier).savePreferences(
+                        prefs.copyWith(rememberConversationContext: val),
+                      );
+                },
+              ),
+              _buildDivider(),
+              _buildSwitchRow(
+                icon: Icons.mic_none_rounded,
+                title: 'Voice Responses',
+                value: prefs.voiceResponses,
+                onChanged: (val) {
+                  ref.read(coachPreferencesProvider.notifier).savePreferences(
+                        prefs.copyWith(voiceResponses: val),
+                      );
+                },
               ),
             ],
           ),
 
           const SizedBox(height: 32),
 
-          // 5. Medical Disclaimer
+          // -----------------------------------------------------------------
+          // 4. Destructive Clear Chat History Button
+          // -----------------------------------------------------------------
           Container(
-            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF1C2430),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white12),
+              color: const Color(0xFF2A1519),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.35),
+              ),
             ),
-            child: const Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.info_outline, color: Color(0xFFA7B0BF), size: 20),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'FitForge AI Coach offers educational suggestions based on general exercise and nutrition science. It does not provide medical diagnosis, treatment, or physical therapy. Consult a physician before beginning any strenuous regimen.',
-                    style: TextStyle(fontSize: 12, color: Color(0xFFA7B0BF), height: 1.4),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: _confirmClearAllChats,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.delete_outline_rounded,
+                        color: Color(0xFFEF4444),
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Clear Chat History',
+                        style: TextStyle(
+                          color: Color(0xFFEF4444),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-          const SizedBox(height: 24),
+
+          const SizedBox(height: 32),
         ],
       ),
     );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFF8B949E),
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupContainer({required List<Widget> children}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF141A22),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      thickness: 0.8,
+      indent: 48,
+      color: Colors.white.withValues(alpha: 0.06),
+    );
+  }
+
+  Widget _buildNavigationRow({
+    required IconData icon,
+    required String title,
+    required String value,
+    Color? valueColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, color: const Color(0xFFA7B0BF), size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                color: valueColor ?? const Color(0xFFA7B0BF),
+                fontSize: 13,
+                fontWeight: valueColor != null ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Color(0xFF6E7681),
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwitchRow({
+    required IconData icon,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFA7B0BF), size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Switch(
+            value: value,
+            activeThumbColor: Colors.black,
+            activeTrackColor: const Color(0xFFB6FF3B),
+            inactiveThumbColor: Colors.white70,
+            inactiveTrackColor: const Color(0xFF1F2937),
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _pickOption({
+    required String title,
+    required List<String> options,
+    required String current,
+    required ValueChanged<String> onSelected,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF151B23),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const Divider(color: Colors.white10),
+              ...options.map((opt) {
+                final isSelected = opt == current;
+                return ListTile(
+                  title: Text(
+                    opt,
+                    style: TextStyle(
+                      color: isSelected ? const Color(0xFFB6FF3B) : Colors.white,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: Color(0xFFB6FF3B))
+                      : null,
+                  onTap: () {
+                    onSelected(opt);
+                    Navigator.pop(ctx);
+                  },
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _pickProvider(AiCredentials creds) {
+    // Only Online Providers: Offline option removed
+    final providers = [
+      'OpenAI',
+      'Google Gemini',
+      'Custom (OpenAI-compatible)',
+    ];
+    _pickOption(
+      title: 'Select AI Provider',
+      options: providers,
+      current: creds.provider == AiProvider.gemini
+          ? 'Google Gemini'
+          : (creds.provider == AiProvider.custom
+              ? 'Custom (OpenAI-compatible)'
+              : 'OpenAI'),
+      onSelected: (val) {
+        AiProvider selected = AiProvider.openai;
+        if (val.contains('Gemini')) {
+          selected = AiProvider.gemini;
+        } else if (val.contains('Custom')) {
+          selected = AiProvider.custom;
+        }
+
+        ref.read(coachPreferencesProvider.notifier).savePreferences(
+              (ref.read(coachPreferencesProvider).value ?? const CoachPreferences())
+                  .copyWith(providerName: val),
+            );
+
+        ref.read(coachCredentialsProvider.notifier).save(
+              creds.copyWith(provider: selected),
+            );
+      },
+    );
+  }
+
+  void _confirmClearAllChats() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF151B23),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 22),
+            SizedBox(width: 8),
+            Text(
+              'Clear Chat History?',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'This will permanently erase all saved conversations and messages on this device.',
+          style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Clear All', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      await ref.read(coachConversationsProvider.notifier).clearAll();
+      await ref.read(coachMessagesProvider.notifier).clear();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Chat history cleared successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 }

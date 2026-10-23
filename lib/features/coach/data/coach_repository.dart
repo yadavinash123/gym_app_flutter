@@ -12,8 +12,10 @@ import '../../workouts/models/workout_session.dart';
 import '../models/ai_credentials.dart';
 import '../models/ai_provider.dart';
 import '../models/coach_consent.dart';
+import '../models/coach_conversation.dart';
 import '../models/coach_message.dart';
 import '../models/coach_persona.dart';
+import '../models/coach_preferences.dart';
 import 'ai_client.dart';
 import 'offline_coach_engine.dart';
 import 'secure_credentials_store.dart';
@@ -33,8 +35,77 @@ class CoachRepository {
 
   static const String chatStorageKey = 'coach_chat';
   static const String consentStorageKey = 'coach_consent';
+  static const String conversationsStorageKey = 'coach_conversations';
+  static const String preferencesStorageKey = 'coach_preferences';
 
   Future<void> _tail = Future.value();
+
+  // ---------------------------------------------------------------------------
+  // Multi-Session Conversations
+  // ---------------------------------------------------------------------------
+
+  Future<List<CoachConversation>> loadConversations() async {
+    await _tail;
+    final data = await store.read(conversationsStorageKey);
+    if (data == null || data['conversations'] is! List) {
+      final seed = CoachConversation.seedConversations();
+      await saveConversations(seed);
+      return seed;
+    }
+    final raw = data['conversations'] as List;
+    final list = raw
+        .map((e) => CoachConversation.fromJson(e as Map<String, dynamic>))
+        .toList();
+    if (list.isEmpty) {
+      final seed = CoachConversation.seedConversations();
+      await saveConversations(seed);
+      return seed;
+    }
+    // Filter redundant empty conversations
+    final cleaned = <CoachConversation>[];
+    bool hasEmpty = false;
+    for (final c in list) {
+      if (c.messages.isEmpty && c.lastMessageSnippet.isEmpty) {
+        if (!hasEmpty) {
+          cleaned.add(c);
+          hasEmpty = true;
+        }
+      } else {
+        cleaned.add(c);
+      }
+    }
+    return cleaned.isEmpty ? list : cleaned;
+  }
+
+  Future<void> saveConversations(List<CoachConversation> conversations) {
+    final payload = {
+      'version': 1,
+      'updatedAt': DateTime.now().toIso8601String(),
+      'conversations': conversations.map((c) => c.toJson()).toList(),
+    };
+    final result =
+        _tail.then((_) => store.write(conversationsStorageKey, payload));
+    _tail = result.catchError((_) {});
+    return result;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Preferences
+  // ---------------------------------------------------------------------------
+
+  Future<CoachPreferences> loadPreferences() async {
+    await _tail;
+    final data = await store.read(preferencesStorageKey);
+    if (data == null) return const CoachPreferences();
+    return CoachPreferences.fromJson(data);
+  }
+
+  Future<void> savePreferences(CoachPreferences prefs) {
+    final result =
+        _tail.then((_) => store.write(preferencesStorageKey, prefs.toJson()));
+    _tail = result.catchError((_) {});
+    return result;
+  }
 
   // ---------------------------------------------------------------------------
   // Chat History
@@ -71,15 +142,15 @@ class CoachRepository {
       CoachMessage(
         id: 'welcome_1',
         role: MessageRole.assistant,
-        content: '👋 **Welcome to FitForge AI Coach!**\n\n'
-            'I am your private, intelligent fitness companion. I can analyze your workout volume, '
+        content: '👋 Welcome to FitForge AI Coach!\n\n'
+            'I am your intelligent fitness companion. I can analyze your workout volume, '
             'review daily macros against ISSN guidelines, assess your recovery from sleep/heart rate biomarkers, '
             'and guide your progressive overload.\n\n'
-            '🔒 **Privacy First:** By default, I operate **100% offline on your device** without sending any data. '
-            'If you wish to enable online LLMs (Gemini / OpenAI), configure your own API key in **Coach Settings**.\n\n'
+            '🔒 Privacy First: Your personal identifiable information is never shared. '
+            'Connect your AI API key in Coach Settings to start personalized coaching.\n\n'
             'How can I help you today?',
         timestamp: DateTime.now(),
-        offlineGenerated: true,
+        offlineGenerated: false,
         suggestedActions: const [
           'Check today\'s macro balance',
           'Recovery & readiness assessment',
@@ -239,8 +310,9 @@ class CoachRepository {
     buffer.writeln('\nCRITICAL GUIDELINES:');
     buffer.writeln('1. You are FitForge AI Coach, a supportive fitness educator. You provide evidence-based guidance.');
     buffer.writeln('2. Medical Disclaimer: You are NOT a doctor or registered dietitian. Remind user to seek professional clinical advice for pain, injury, or severe symptoms.');
-    buffer.writeln('3. Format responses in clean GitHub markdown with bullet points and bolding for readability on mobile screens.');
+    buffer.writeln('3. Format responses in clean GitHub markdown with bullet points (•) and bold headers for readability on mobile screens. DO NOT use ASCII or pipe tables (| col | col |); always present structured comparisons, nutrition targets, and workout plans as clean bullet points, exactly like ChatGPT.');
     buffer.writeln('4. Keep advice actionable, direct, and under 350 words unless specifically asked for an in-depth essay.');
+    buffer.writeln('5. NEVER include raw unformatted markdown asterisks or stray "**" characters. For emphasis, properly wrap text like "**keyword**". Never output lonely or dangling "**".');
     buffer.writeln('\n${buildPromptContext(
       consent: consent,
       profile: profile,
@@ -351,6 +423,103 @@ final coachRepositoryProvider = Provider<CoachRepository>((ref) {
   );
 });
 
+final activeConversationIdProvider =
+    NotifierProvider<ActiveConversationIdNotifier, String>(
+  ActiveConversationIdNotifier.new,
+);
+
+class ActiveConversationIdNotifier extends Notifier<String> {
+  @override
+  String build() => 'conv_muscle_plan';
+
+  void setActive(String id) => state = id;
+}
+
+final coachConversationsProvider =
+    AsyncNotifierProvider<CoachConversationsNotifier, List<CoachConversation>>(
+  CoachConversationsNotifier.new,
+);
+
+class CoachConversationsNotifier extends AsyncNotifier<List<CoachConversation>> {
+  @override
+  Future<List<CoachConversation>> build() {
+    return ref.watch(coachRepositoryProvider).loadConversations();
+  }
+
+  Future<String> createConversation({
+    String? title,
+    ConversationCategory category = ConversationCategory.workout,
+    String? initialPrompt,
+  }) async {
+    final repo = ref.read(coachRepositoryProvider);
+    final current = state.value ?? [];
+
+    // If creating an empty chat (+ New Chat), reuse existing empty chat if available
+    if (initialPrompt == null &&
+        current.isNotEmpty &&
+        current.first.messages.isEmpty &&
+        current.first.lastMessageSnippet.isEmpty) {
+      final existingId = current.first.id;
+      ref.read(activeConversationIdProvider.notifier).setActive(existingId);
+      ref.invalidate(coachMessagesProvider);
+      return existingId;
+    }
+
+    final id = 'conv_${DateTime.now().millisecondsSinceEpoch}';
+    final newConv = CoachConversation(
+      id: id,
+      title: title ??
+          (initialPrompt != null && initialPrompt.length > 25
+              ? '${initialPrompt.substring(0, 25)}...'
+              : 'New Conversation'),
+      lastMessageSnippet: initialPrompt ?? '',
+      updatedAt: DateTime.now(),
+      createdAt: DateTime.now(),
+      category: category,
+      messages: const [],
+    );
+    final updated = [newConv, ...current];
+    state = AsyncData(updated);
+    await repo.saveConversations(updated);
+    ref.read(activeConversationIdProvider.notifier).setActive(id);
+    ref.invalidate(coachMessagesProvider);
+    return id;
+  }
+
+  Future<void> renameConversation(String id, String newTitle) async {
+    final repo = ref.read(coachRepositoryProvider);
+    final current = state.value ?? [];
+    final updated = current.map((c) {
+      if (c.id == id) {
+        return c.copyWith(title: newTitle, updatedAt: DateTime.now());
+      }
+      return c;
+    }).toList();
+    state = AsyncData(updated);
+    await repo.saveConversations(updated);
+  }
+
+  Future<void> deleteConversation(String id) async {
+    final repo = ref.read(coachRepositoryProvider);
+    final current = state.value ?? [];
+    final updated = current.where((c) => c.id != id).toList();
+    state = AsyncData(updated);
+    await repo.saveConversations(updated);
+    if (ref.read(activeConversationIdProvider) == id && updated.isNotEmpty) {
+      ref.read(activeConversationIdProvider.notifier).setActive(updated.first.id);
+      ref.invalidate(coachMessagesProvider);
+    }
+  }
+
+  Future<void> clearAll() async {
+    final repo = ref.read(coachRepositoryProvider);
+    final empty = <CoachConversation>[];
+    state = AsyncData(empty);
+    await repo.saveConversations(empty);
+    ref.invalidate(coachMessagesProvider);
+  }
+}
+
 final coachMessagesProvider =
     AsyncNotifierProvider<CoachMessagesNotifier, List<CoachMessage>>(
   CoachMessagesNotifier.new,
@@ -358,15 +527,23 @@ final coachMessagesProvider =
 
 class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
   @override
-  Future<List<CoachMessage>> build() {
-    return ref.watch(coachRepositoryProvider).loadMessages();
+  Future<List<CoachMessage>> build() async {
+    final activeId = ref.watch(activeConversationIdProvider);
+    final conversations = await ref.watch(coachConversationsProvider.future);
+    final activeConv = conversations.firstWhere(
+      (c) => c.id == activeId,
+      orElse: () => conversations.isNotEmpty
+          ? conversations.first
+          : CoachConversation.seedConversations().first,
+    );
+    return activeConv.messages;
   }
 
   Future<void> send(String text, CoachPersona persona) async {
+    final activeId = ref.read(activeConversationIdProvider);
     final repo = ref.read(coachRepositoryProvider);
     final profile = await ref.read(profileProvider.future);
 
-    // Load today's nutrition and health if available
     DailyNutritionLog? todayLog;
     try {
       final allLogs = await ref.read(nutritionRepositoryProvider).loadAllLogs();
@@ -383,26 +560,142 @@ class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
       sessions = await ref.read(workoutRepositoryProvider).loadSessions();
     } catch (_) {}
 
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      return repo.sendMessage(
-        text: text,
+    final currentMessages = state.value ?? [];
+    final userMessage = CoachMessage(
+      id: 'usr_${DateTime.now().microsecondsSinceEpoch}',
+      role: MessageRole.user,
+      content: text,
+      timestamp: DateTime.now(),
+    );
+
+    final withUser = [...currentMessages, userMessage];
+    state = AsyncData(withUser);
+
+    final credentials = await repo.loadCredentials();
+    final consent = await repo.loadConsent();
+
+    CoachMessage assistantMessage;
+    if (!credentials.isConfigured || credentials.provider == AiProvider.offline) {
+      assistantMessage = repo.offlineEngine.generateResponse(
+        userQuery: text,
         persona: persona,
         profile: profile,
         todayNutrition: todayLog,
         todayHealth: todayHealth,
         recentWorkouts: sessions,
       );
-    });
+    } else {
+      try {
+        final systemPrompt = repo.buildFullSystemPrompt(
+          persona: persona,
+          consent: consent,
+          profile: profile,
+          todayNutrition: todayLog,
+          todayHealth: todayHealth,
+          recentWorkouts: sessions,
+        );
+        assistantMessage = await repo.aiClient.sendMessage(
+          history: withUser,
+          systemPrompt: systemPrompt,
+          credentials: credentials,
+        );
+      } catch (e) {
+        final fallback = repo.offlineEngine.generateResponse(
+          userQuery: text,
+          persona: persona,
+          profile: profile,
+          todayNutrition: todayLog,
+          todayHealth: todayHealth,
+          recentWorkouts: sessions,
+        );
+        assistantMessage = fallback.copyWith(
+          content: '⚠️ *Could not reach ${credentials.provider.displayName} (${e.toString()}). Falling back to Offline Engine:*\n\n${fallback.content}',
+        );
+      }
+    }
+
+    final finalMessages = [...withUser, assistantMessage];
+    state = AsyncData(finalMessages);
+
+    // Update conversation in list
+    final convs = await repo.loadConversations();
+    final updatedConvs = convs.map((c) {
+      if (c.id == activeId) {
+        final cleanContent = assistantMessage.content
+            .replaceAll(RegExp(r'<think>[\s\S]*?</think>', caseSensitive: false), '')
+            .replaceAll(RegExp(r'</?think>', caseSensitive: false), '')
+            .replaceAll('**', '')
+            .replaceAll(RegExp(r'^#+\s*', multiLine: true), '')
+            .replaceAll('\n', ' ')
+            .trim();
+        return c.copyWith(
+          messages: finalMessages,
+          lastMessageSnippet: cleanContent.length > 60
+              ? '${cleanContent.substring(0, 60)}...'
+              : cleanContent,
+          updatedAt: DateTime.now(),
+        );
+      }
+      return c;
+    }).toList();
+
+    await repo.saveConversations(updatedConvs);
+    ref.invalidate(coachConversationsProvider);
+  }
+
+  Future<void> toggleLike(String messageId, bool? isLiked) async {
+    final current = state.value ?? [];
+    final updated = current.map((m) {
+      if (m.id == messageId) {
+        return m.copyWith(isLiked: isLiked);
+      }
+      return m;
+    }).toList();
+    state = AsyncData(updated);
+
+    final activeId = ref.read(activeConversationIdProvider);
+    final repo = ref.read(coachRepositoryProvider);
+    final convs = await repo.loadConversations();
+    final updatedConvs = convs.map((c) {
+      if (c.id == activeId) {
+        return c.copyWith(messages: updated);
+      }
+      return c;
+    }).toList();
+    await repo.saveConversations(updatedConvs);
   }
 
   Future<void> clear() async {
+    state = const AsyncData([]);
+    final activeId = ref.read(activeConversationIdProvider);
     final repo = ref.read(coachRepositoryProvider);
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await repo.clearChat();
-      return repo.loadMessages();
-    });
+    final convs = await repo.loadConversations();
+    final updatedConvs = convs.map((c) {
+      if (c.id == activeId) {
+        return c.copyWith(messages: [], lastMessageSnippet: '');
+      }
+      return c;
+    }).toList();
+    await repo.saveConversations(updatedConvs);
+    ref.invalidate(coachConversationsProvider);
+  }
+}
+
+final coachPreferencesProvider =
+    AsyncNotifierProvider<CoachPreferencesNotifier, CoachPreferences>(
+  CoachPreferencesNotifier.new,
+);
+
+class CoachPreferencesNotifier extends AsyncNotifier<CoachPreferences> {
+  @override
+  Future<CoachPreferences> build() {
+    return ref.watch(coachRepositoryProvider).loadPreferences();
+  }
+
+  Future<void> savePreferences(CoachPreferences prefs) async {
+    final repo = ref.read(coachRepositoryProvider);
+    state = AsyncData(prefs);
+    await repo.savePreferences(prefs);
   }
 }
 
