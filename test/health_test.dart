@@ -489,10 +489,9 @@ void main() {
       await tester.pump();
 
       expect(find.text('Activity & Health'), findsOneWidget);
-      expect(find.text('Activity & Sensor Sync'), findsOneWidget);
-      expect(find.text('Sync Now'), findsOneWidget);
-      expect(find.text('Manual Log'), findsWidgets);
-      expect(find.text('Recent Synchronization Audit Trail'), findsOneWidget);
+      expect(find.text('Daily Activity & Manual Log'), findsOneWidget);
+      expect(find.text('Log Daily Activity Record'), findsOneWidget);
+      expect(find.text('Daily Activity Entry History'), findsOneWidget);
     });
 
     testWidgets(

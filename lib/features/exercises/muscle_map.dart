@@ -251,8 +251,14 @@ class _MuscleMapState extends State<MuscleMap> {
           runSpacing: 6,
           alignment: WrapAlignment.center,
           children: [
-            _buildLegendItem(color: const Color(0xFFB6FF3B), label: 'Primary'),
-            _buildLegendItem(color: const Color(0xFF00D4FF), label: 'Secondary'),
+            _buildLegendItem(
+              color: Theme.of(context).colorScheme.primary,
+              label: 'Primary',
+            ),
+            _buildLegendItem(
+              color: Theme.of(context).colorScheme.secondary,
+              label: 'Secondary',
+            ),
             _buildLegendItem(color: const Color(0xFF1C2430), label: 'Inactive', border: true),
           ],
         ),
@@ -341,6 +347,8 @@ class _MuscleMapState extends State<MuscleMap> {
               secondary: widget.secondary,
               selectedMuscle: _selectedMuscle,
               diagramData: diagramData,
+              primaryColor: Theme.of(context).colorScheme.primary,
+              secondaryColor: Theme.of(context).colorScheme.secondary,
             ),
           ),
         ),
@@ -439,19 +447,21 @@ class _MuscleMapState extends State<MuscleMap> {
     required ThemeData theme,
   }) {
     final labelText = count != null ? '$muscle ($count)' : muscle;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
     return FilterChip(
       selected: isSelected,
       label: Text(labelText),
       labelStyle: TextStyle(
         fontSize: 12,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        color: isSelected ? Colors.black : const Color(0xFFFFFFFF),
+        color: isSelected ? onPrimary : const Color(0xFFFFFFFF),
       ),
-      selectedColor: const Color(0xFFB6FF3B),
+      selectedColor: primaryColor,
       backgroundColor: const Color(0xFF1C2430),
-      checkmarkColor: Colors.black,
+      checkmarkColor: onPrimary,
       side: BorderSide(
-        color: isSelected ? const Color(0xFFB6FF3B) : const Color(0xFF283241),
+        color: isSelected ? primaryColor : const Color(0xFF283241),
       ),
       onSelected: (_) {
         setState(() => _selectedMuscle = muscle);
@@ -468,6 +478,8 @@ class _VectorMusclePainter extends CustomPainter {
     required this.secondary,
     this.selectedMuscle,
     this.diagramData,
+    this.primaryColor = const Color(0xFFB6FF3B),
+    this.secondaryColor = const Color(0xFF00D4FF),
   });
 
   final bool back;
@@ -475,6 +487,8 @@ class _VectorMusclePainter extends CustomPainter {
   final List<String> secondary;
   final String? selectedMuscle;
   final BodyDiagramData? diagramData;
+  final Color primaryColor;
+  final Color secondaryColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -531,16 +545,16 @@ class _VectorMusclePainter extends CustomPainter {
       double strokeWidth = 2.0;
 
       if (isSelected) {
-        fillColor = const Color(0xFFB6FF3B);
+        fillColor = primaryColor;
         strokeColor = Colors.white;
         strokeWidth = 4.0;
       } else if (isPrimary) {
-        fillColor = const Color(0xFFB6FF3B);
-        strokeColor = const Color(0xFFB6FF3B);
+        fillColor = primaryColor;
+        strokeColor = primaryColor;
         strokeWidth = 3.0;
       } else if (isSecondary) {
-        fillColor = const Color(0xFF00D4FF);
-        strokeColor = const Color(0xFF00D4FF);
+        fillColor = secondaryColor;
+        strokeColor = secondaryColor;
         strokeWidth = 2.5;
       }
 
@@ -590,9 +604,9 @@ class _VectorMusclePainter extends CustomPainter {
       final isSec = !isPrim && secondary.contains(entry.key);
 
       final color = isPrim
-          ? const Color(0xFFB6FF3B)
+          ? primaryColor
           : isSec
-          ? const Color(0xFF00D4FF)
+          ? secondaryColor
           : const Color(0xFF526175);
 
       for (final rect in entry.value) {
@@ -611,5 +625,7 @@ class _VectorMusclePainter extends CustomPainter {
       primary != oldDelegate.primary ||
       secondary != oldDelegate.secondary ||
       selectedMuscle != oldDelegate.selectedMuscle ||
-      diagramData != oldDelegate.diagramData;
+      diagramData != oldDelegate.diagramData ||
+      primaryColor != oldDelegate.primaryColor ||
+      secondaryColor != oldDelegate.secondaryColor;
 }

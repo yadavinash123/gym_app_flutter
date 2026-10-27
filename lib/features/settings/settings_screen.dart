@@ -3,11 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/theme.dart';
 import '../../shared/widgets/page_body.dart';
 import '../profile/profile_repository.dart';
 import 'data/settings_repository.dart';
-import 'models/app_settings.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -44,7 +42,7 @@ class SettingsScreen extends ConsumerWidget {
               title: 'Character & Appearance',
               subtitle: 'Anatomical model, animation drawings, and theme accents',
               icon: Icons.accessibility_new_rounded,
-              iconColor: const Color(0xFFB6FF3B),
+              iconColor: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 12),
 
@@ -247,7 +245,7 @@ class SettingsScreen extends ConsumerWidget {
                       style: TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
                     ),
                     value: settings.weighInBeforeWorkout,
-                    activeColor: const Color(0xFFB6FF3B),
+                    activeThumbColor: Theme.of(context).colorScheme.primary,
                     onChanged: (val) {
                       HapticFeedback.selectionClick();
                       settingsNotifier.setWeighIn(val);
@@ -262,7 +260,7 @@ class SettingsScreen extends ConsumerWidget {
                       style: TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
                     ),
                     value: settings.keepScreenAwake,
-                    activeColor: const Color(0xFFB6FF3B),
+                    activeThumbColor: Theme.of(context).colorScheme.primary,
                     onChanged: (val) {
                       HapticFeedback.selectionClick();
                       settingsNotifier.setKeepScreenAwake(val);

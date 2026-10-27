@@ -19,8 +19,10 @@ import '../features/profile/profile_repository.dart';
 import '../features/workouts/workout_home_screen.dart';
 import '../features/progress/presentation/progress_screen.dart';
 import '../features/progress/presentation/reminder_settings_screen.dart';
+import '../features/settings/data/settings_repository.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/workouts/history/workout_history_screen.dart';
+import '../features/splash/splash_screen.dart';
 import '../features/workouts/custom/custom_workout_screen.dart';
 import '../shared/widgets/page_body.dart';
 import 'theme.dart';
@@ -29,7 +31,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(path: '/', builder: (_, _) => const StartupScreen()),
+      GoRoute(path: '/', builder: (_, _) => const SplashScreen()),
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
       GoRoute(
         path: '/profile',
@@ -77,6 +79,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/health/log',
         builder: (_, state) => ManualHealthEntryScreen(
           date: state.uri.queryParameters['date'] ?? todayIsoDate(),
+          initialMetric: state.uri.queryParameters['metric'],
         ),
       ),
       GoRoute(
@@ -118,46 +121,34 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class FitForgeApp extends ConsumerWidget {
   const FitForgeApp({super.key});
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
-    title: 'FitForge AI',
-    debugShowCheckedModeBanner: false,
-    theme: buildTheme(),
-    routerConfig: ref.watch(routerProvider),
-  );
-}
 
-class StartupScreen extends ConsumerWidget {
-  const StartupScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileProvider);
-    if (profile.hasValue) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          context.go(profile.value == null ? '/onboarding' : '/home');
-        }
-      });
-    }
-    return Scaffold(
-      body: profile.hasError
-          ? PageBody(
-              children: [
-                const InfoCard(
-                  title: 'Unable to open your profile',
-                  message: 'Existing data has been preserved. Please retry.',
-                  icon: Icons.error_outline,
-                ),
-                FilledButton(
-                  onPressed: () => ref.invalidate(profileProvider),
-                  child: const Text('Retry'),
-                ),
-              ],
-            )
-          : const Center(child: CircularProgressIndicator()),
+    final settings = ref.watch(appSettingsProvider);
+    final themeMode = switch (settings.themeMode.toLowerCase()) {
+      'light' => ThemeMode.light,
+      'system' => ThemeMode.system,
+      _ => ThemeMode.dark,
+    };
+
+    return MaterialApp.router(
+      title: 'FitForge AI',
+      debugShowCheckedModeBanner: false,
+      theme: buildTheme(
+        accentColor: settings.accentColor,
+        brightness: Brightness.light,
+      ),
+      darkTheme: buildTheme(
+        accentColor: settings.accentColor,
+        brightness: Brightness.dark,
+      ),
+      themeMode: themeMode,
+      routerConfig: ref.watch(routerProvider),
     );
   }
 }
+
+
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key, this.initialStep = 0});

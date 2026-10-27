@@ -170,13 +170,13 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
             floating: true,
             pinned: false,
             backgroundColor: const Color(0xFF0B0F14),
-            title: const Text(
+            title: Text(
               'WORKOUTS',
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2,
                 fontSize: 16,
-                color: Color(0xFFB6FF3B),
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             actions: [
@@ -366,54 +366,67 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
             style: const TextStyle(color: Color(0xFFA7B0BF), fontSize: 13),
           ),
           const SizedBox(height: 18),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
+          Row(
             children: [
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFB6FF3B),
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed: () => _startRoutine(context, todayRoutine),
-                icon: const Icon(Icons.play_arrow_rounded, size: 22),
-                label: Text(
-                  isRecovery ? 'Start Mobility' : 'Start Workout',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 14,
+              Expanded(
+                child: SizedBox(
+                  height: 48,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () => _startRoutine(context, todayRoutine),
+                    icon: const Icon(Icons.play_arrow_rounded, size: 20),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        isRecovery ? 'Start Mobility' : 'Start Workout',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Color(0xFF283241)),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Color(0xFF283241)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              CustomWorkoutScreen(initialRoutine: todayRoutine),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.tune_rounded, size: 20),
+                    label: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Customize',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          CustomWorkoutScreen(initialRoutine: todayRoutine),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.tune_rounded, size: 18),
-                label: const Text('Customize'),
               ),
             ],
           ),
@@ -748,38 +761,65 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
+          Row(
             children: [
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF1C2430),
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Color(0xFF283241)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+              Expanded(
+                child: SizedBox(
+                  height: 48,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF1C2430),
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Color(0xFF283241)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () => _startQuickWorkout(context, catalog),
+                    icon: Icon(
+                      Icons.play_circle_outline,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 20,
+                    ),
+                    label: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Instant Session',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                onPressed: () => _startQuickWorkout(context, catalog),
-                icon: const Icon(
-                  Icons.play_circle_outline,
-                  color: Color(0xFFB6FF3B),
-                  size: 18,
-                ),
-                label: const Text('Start Instant Session'),
               ),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Color(0xFF283241)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Color(0xFF283241)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () => context.push('/workouts/custom'),
+                    icon: const Icon(Icons.add, size: 20),
+                    label: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Build Custom',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                onPressed: () => context.push('/workouts/custom'),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Build Custom'),
               ),
             ],
           ),
@@ -886,46 +926,66 @@ class _WorkoutHomeScreenState extends ConsumerState<WorkoutHomeScreen> {
               style: const TextStyle(color: Color(0xFFA7B0BF), fontSize: 12),
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            Row(
               children: [
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFB6FF3B),
-                    foregroundColor: Colors.black,
-                    visualDensity: VisualDensity.compact,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () => _startRoutine(context, routine),
-                  icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                  label: const Text(
-                    'Start',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Color(0xFF283241)),
-                    visualDensity: VisualDensity.compact,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            CustomWorkoutScreen(initialRoutine: routine),
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        visualDensity: VisualDensity.compact,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.edit_outlined, size: 14),
-                  label: const Text('Edit'),
+                      onPressed: () => _startRoutine(context, routine),
+                      icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                      label: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Start',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Color(0xFF283241)),
+                        visualDensity: VisualDensity.compact,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                CustomWorkoutScreen(initialRoutine: routine),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.edit_outlined, size: 16),
+                      label: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Customize',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
                 IconButton(
                   tooltip: 'Duplicate routine',
                   icon: const Icon(

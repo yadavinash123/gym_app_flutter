@@ -5,9 +5,14 @@ import '../data/health_repository.dart';
 import '../models/health_metric_type.dart';
 
 class ManualHealthEntryScreen extends ConsumerStatefulWidget {
-  const ManualHealthEntryScreen({super.key, required this.date});
+  const ManualHealthEntryScreen({
+    super.key,
+    required this.date,
+    this.initialMetric,
+  });
 
   final String date;
+  final String? initialMetric;
 
   @override
   ConsumerState<ManualHealthEntryScreen> createState() =>
@@ -23,6 +28,60 @@ class _ManualHealthEntryScreenState
   bool _isSaving = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.initialMetric != null) {
+      for (final m in HealthMetricType.values) {
+        if (m.name.toLowerCase() == widget.initialMetric!.toLowerCase()) {
+          _selectedMetric = m;
+          break;
+        }
+      }
+    }
+    Future.microtask(_prefillCurrentValue);
+  }
+
+  void _prefillCurrentValue() async {
+    try {
+      final summary = await ref
+          .read(healthRepositoryProvider)
+          .getSummaryForDate(widget.date);
+      double? existingVal;
+      switch (_selectedMetric) {
+        case HealthMetricType.steps:
+          if (summary.steps > 0) existingVal = summary.steps.toDouble();
+          break;
+        case HealthMetricType.distance:
+          if (summary.distanceKm > 0) existingVal = summary.distanceKm;
+          break;
+        case HealthMetricType.activeEnergy:
+          if (summary.activeKcal > 0) existingVal = summary.activeKcal;
+          break;
+        case HealthMetricType.restingHeartRate:
+          if (summary.restingHeartRateBpm != null) {
+            existingVal = summary.restingHeartRateBpm!.toDouble();
+          }
+          break;
+        case HealthMetricType.sleep:
+          if (summary.sleepDurationMinutes != null) {
+            existingVal = summary.sleepDurationMinutes!.toDouble();
+          }
+          break;
+        case HealthMetricType.workouts:
+          if (summary.externalWorkoutsCount > 0) {
+            existingVal = summary.externalWorkoutsCount.toDouble();
+          }
+          break;
+      }
+      if (existingVal != null && mounted) {
+        _valueController.text = existingVal % 1 == 0
+            ? existingVal.toInt().toString()
+            : existingVal.toString();
+      }
+    } catch (_) {}
+  }
+
+  @override
   void dispose() {
     _valueController.dispose();
     _notesController.dispose();
@@ -34,6 +93,7 @@ class _ManualHealthEntryScreenState
       _selectedMetric = metric;
       _valueController.clear();
     });
+    _prefillCurrentValue();
   }
 
   String? _validateValue(String? text) {
@@ -56,8 +116,9 @@ class _ManualHealthEntryScreenState
         if (val > 10000) return 'Active calories cannot exceed 10,000 kcal';
         break;
       case HealthMetricType.restingHeartRate:
-        if (val < 30 || val > 220)
+        if (val < 30 || val > 220) {
           return 'Resting HR must be between 30 and 220 bpm';
+        }
         break;
       case HealthMetricType.sleep:
         if (val > 1440) return 'Sleep cannot exceed 24 hours (1440 minutes)';
@@ -92,7 +153,7 @@ class _ManualHealthEntryScreenState
             content: Text(
               'Recorded ${_selectedMetric.label}: $value ${_selectedMetric.unitLabel} (Manual Entry)',
             ),
-            backgroundColor: const Color(0xFFB6FF3B),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -134,9 +195,9 @@ class _ManualHealthEntryScreenState
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.edit_note,
-                      color: Color(0xFFB6FF3B),
+                      color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -196,7 +257,7 @@ class _ManualHealthEntryScreenState
                     ),
                     selected: isSelected,
                     onSelected: (_) => _onMetricChanged(metric),
-                    selectedColor: const Color(0xFFB6FF3B),
+                    selectedColor: Theme.of(context).colorScheme.primary,
                     backgroundColor: const Color(0xFF151B23),
                     labelStyle: TextStyle(
                       color: isSelected ? Colors.black : Colors.white,
@@ -255,8 +316,8 @@ class _ManualHealthEntryScreenState
               const SizedBox(height: 32),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFB6FF3B),
-                  foregroundColor: Colors.black,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

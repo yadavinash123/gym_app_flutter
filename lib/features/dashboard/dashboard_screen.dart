@@ -109,9 +109,12 @@ class DashboardScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFB6FF3B),
-                    foregroundColor: Colors.black,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   onPressed: () {
                     final schedule = InitialPlan.scheduleFor(profile);
@@ -146,6 +149,9 @@ class DashboardScreen extends ConsumerWidget {
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   onPressed: () => context.go('/workouts'),
                   child: const Text('View weekly outline'),
@@ -164,6 +170,9 @@ class DashboardScreen extends ConsumerWidget {
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   onPressed: () => context.go('/nutrition'),
                   icon: const Icon(Icons.restaurant_outlined),
@@ -193,21 +202,21 @@ class DashboardScreen extends ConsumerWidget {
                                         .withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.directions_walk_rounded,
-                                    color: Color(0xFFB6FF3B),
+                                    color: Theme.of(context).colorScheme.primary,
                                     size: 18,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                const Flexible(
+                                Flexible(
                                   child: Text(
                                     'DAILY ACTIVITY & HEALTH',
                                     style: TextStyle(
                                       letterSpacing: 1.2,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 11,
-                                      color: Color(0xFFB6FF3B),
+                                      color: Theme.of(context).colorScheme.primary,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -215,9 +224,24 @@ class DashboardScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          TextButton(
-                            onPressed: () => context.push('/health'),
-                            child: const Text('Details →'),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () => context.push('/health/log'),
+                                icon: const Icon(Icons.edit_note, size: 16),
+                                label: const Text('Log'),
+                                style: TextButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => context.push('/health'),
+                                child: const Text('Details →'),
+                              ),
+                            ],
                           ),
                         ],
                       ),

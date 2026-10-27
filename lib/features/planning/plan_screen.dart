@@ -68,44 +68,97 @@ class PlanScreen extends ConsumerWidget {
               const SizedBox(height: 20),
 
               // Action Bar
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  onPressed: () => _startRoutineForDay(
+                    context,
+                    ref,
+                    profile,
+                    todayKind,
+                    todayIndex,
+                  ),
+                  icon: const Icon(Icons.play_arrow),
+                  label: Text(
+                    todayKind == 'Recovery'
+                        ? 'Start Active Recovery'
+                        : 'Start Today ($todayKind)',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
                 children: [
-                  FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFB6FF3B),
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => _startRoutineForDay(
-                      context,
-                      ref,
-                      profile,
-                      todayKind,
-                      todayIndex,
-                    ),
-                    icon: const Icon(Icons.play_arrow),
-                    label: Text(
-                      todayKind == 'Recovery'
-                          ? 'Start Active Recovery'
-                          : 'Start Today ($todayKind)',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () => context.push('/workouts/history'),
+                        icon: const Icon(Icons.history_outlined, size: 18),
+                        label: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text('History'),
+                        ),
+                      ),
                     ),
                   ),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/workouts/history'),
-                    icon: const Icon(Icons.history_outlined),
-                    label: const Text('Workout History'),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () => context.push('/workouts/custom'),
+                        icon: const Icon(
+                          Icons.dashboard_customize_outlined,
+                          size: 18,
+                        ),
+                        label: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text('Custom Plans'),
+                        ),
+                      ),
+                    ),
                   ),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/workouts/custom'),
-                    icon: const Icon(Icons.dashboard_customize_outlined),
-                    label: const Text('Custom Routines'),
-                  ),
-                  FilledButton.icon(
-                    onPressed: () => context.push('/exercises'),
-                    icon: const Icon(Icons.menu_book_outlined),
-                    label: const Text('Browse exercises'),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () => context.push('/exercises'),
+                        icon: const Icon(Icons.menu_book_outlined, size: 18),
+                        label: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text('Exercises'),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -338,8 +391,8 @@ class PlanScreen extends ConsumerWidget {
                   height: 50,
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFB6FF3B),
-                      foregroundColor: Colors.black,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),

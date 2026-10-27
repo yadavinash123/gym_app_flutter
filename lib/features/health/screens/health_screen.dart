@@ -58,10 +58,10 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
       lastDate: DateTime.now().add(const Duration(days: 1)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFB6FF3B),
-            onPrimary: Colors.black,
-            surface: Color(0xFF151B23),
+          colorScheme: ColorScheme.dark(
+            primary: Theme.of(context).colorScheme.primary,
+            onPrimary: Theme.of(context).colorScheme.onPrimary,
+            surface: const Color(0xFF151B23),
             onSurface: Colors.white,
           ),
         ),
@@ -70,38 +70,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     );
     if (picked != null) {
       setState(() => _selectedDate = picked);
-    }
-  }
-
-  Future<void> _sync() async {
-    setState(() => _isSyncing = true);
-    try {
-      await ref.read(dailyHealthSummariesProvider.notifier).sync(_dateIso);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Successfully synchronized health data!'),
-            backgroundColor: Color(0xFFB6FF3B),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sync failed: $e'),
-            backgroundColor: Colors.redAccent,
-            action: SnackBarAction(
-              label: 'Permissions',
-              textColor: Colors.white,
-              onPressed: () => context.push('/health/permissions'),
-            ),
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSyncing = false);
     }
   }
 
@@ -141,8 +109,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
             _buildDateBar(),
             const SizedBox(height: 16),
 
-            // Hero Sync & Integration Card
-            _buildSyncHeroCard(summary, stepState),
+            // Hero Daily Activity & Manual Log Card
+            _buildDailyActivityCard(summary, stepState),
             const SizedBox(height: 20),
 
             // Metric Cards Grid
@@ -230,11 +198,13 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     );
   }
 
-  Widget _buildSyncHeroCard(
+  Widget _buildDailyActivityCard(
     DailyHealthSummary summary,
     StepTrackingState? stepState,
   ) {
     final isWalking = stepState?.isWalking ?? false;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -249,15 +219,15 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFB6FF3B).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
+                  color: primaryColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
-                  Icons.sync_rounded,
-                  color: Color(0xFFB6FF3B),
-                  size: 22,
+                child: Icon(
+                  Icons.edit_note_rounded,
+                  color: primaryColor,
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 12),
@@ -266,7 +236,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Activity & Sensor Sync',
+                      'Daily Activity & Manual Log',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -274,30 +244,32 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       ),
                     ),
                     Text(
-                      summary.syncedAt != null
-                          ? 'Last synchronized: ${summary.syncedAt!.hour.toString().padLeft(2, '0')}:${summary.syncedAt!.minute.toString().padLeft(2, '0')}'
-                          : 'Not synchronized today',
+                      summary.notes != null && summary.notes!.isNotEmpty
+                          ? 'Latest: ${summary.notes}'
+                          : 'Record your steps, calories, heart rate, and sleep manually',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFFA7B0BF),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: isWalking
-                  ? const Color(0xFFB6FF3B).withValues(alpha: 0.15)
+                  ? primaryColor.withValues(alpha: 0.15)
                   : const Color(0xFF1C2430),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isWalking
-                    ? const Color(0xFFB6FF3B).withValues(alpha: 0.4)
+                    ? primaryColor.withValues(alpha: 0.4)
                     : const Color(0xFF283241),
               ),
             ),
@@ -309,22 +281,20 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       : Icons.sensors_rounded,
                   size: 16,
                   color: isWalking
-                      ? const Color(0xFFB6FF3B)
+                      ? primaryColor
                       : const Color(0xFF00D4FF),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     isWalking
-                        ? '🚶 Walking detected · Counting footsteps live'
-                        : (stepState?.hasHardwareSensor ?? true)
-                        ? '⚡ Auto-step counter active · Hardware sensor continuous'
-                        : 'Step tracking ready (sensor listening)',
+                        ? '🚶 Active walking detected · Hardware counter live'
+                        : 'Manual entry ready · Record and update metrics below',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
                       color: isWalking
-                          ? const Color(0xFFB6FF3B)
+                          ? primaryColor
                           : const Color(0xFFA7B0BF),
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -333,90 +303,100 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 14),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 280;
-              if (isNarrow) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFB6FF3B),
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: _isSyncing ? null : _sync,
-                      icon: _isSyncing
-                          ? const Icon(Icons.hourglass_top, size: 18)
-                          : const Icon(Icons.refresh, size: 18),
-                      label: Text(_isSyncing ? 'Syncing...' : 'Sync Now'),
-                    ),
-                    const SizedBox(height: 8),
-                    OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFF1C2430)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () =>
-                          context.push('/health/log?date=$_dateIso'),
-                      icon: const Icon(Icons.edit_note, size: 18),
-                      label: const Text('Manual Log'),
-                    ),
-                  ],
-                );
-              }
-              return Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFB6FF3B),
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: _isSyncing ? null : _sync,
-                      icon: _isSyncing
-                          ? const Icon(Icons.hourglass_top, size: 18)
-                          : const Icon(Icons.refresh, size: 18),
-                      label: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(_isSyncing ? 'Syncing...' : 'Sync Now'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFF1C2430)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () =>
-                          context.push('/health/log?date=$_dateIso'),
-                      icon: const Icon(Icons.edit_note, size: 18),
-                      label: const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text('Manual Log'),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
+          const SizedBox(height: 16),
+          // Main action button: Log Activity Record (full width, height 48, matched)
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: () => context.push('/health/log?date=$_dateIso'),
+              icon: const Icon(Icons.add_circle_outline, size: 20),
+              label: const Text(
+                'Log Daily Activity Record',
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Quick metric shortcuts:
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildQuickMetricPill(
+                  label: '+ Steps',
+                  icon: Icons.directions_walk,
+                  metricName: 'steps',
+                ),
+                const SizedBox(width: 8),
+                _buildQuickMetricPill(
+                  label: '+ Heart Rate',
+                  icon: Icons.favorite_outline,
+                  metricName: 'restingHeartRate',
+                ),
+                const SizedBox(width: 8),
+                _buildQuickMetricPill(
+                  label: '+ Sleep',
+                  icon: Icons.bedtime_outlined,
+                  metricName: 'sleep',
+                ),
+                const SizedBox(width: 8),
+                _buildQuickMetricPill(
+                  label: '+ Calories',
+                  icon: Icons.local_fire_department_outlined,
+                  metricName: 'activeEnergy',
+                ),
+                const SizedBox(width: 8),
+                _buildQuickMetricPill(
+                  label: '+ Distance',
+                  icon: Icons.straighten,
+                  metricName: 'distance',
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuickMetricPill({
+    required String label,
+    required IconData icon,
+    required String metricName,
+  }) {
+    return InkWell(
+      onTap: () => context.push('/health/log?date=$_dateIso&metric=$metricName'),
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1C2430),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFF283241)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: const Color(0xFFA7B0BF)),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -445,7 +425,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                 displayValue: summary.activeKcal.toStringAsFixed(0),
                 unit: 'kcal',
                 source: summary.activeKcalSource,
-                subtitle: 'Active calorie burn',
+                target: '500 kcal',
+                progress: (summary.activeKcal / 500).clamp(0.0, 1.0),
+                subtitle: summary.activeKcal > 0
+                    ? '${summary.activeKcal.toStringAsFixed(0)} kcal burned'
+                    : 'Active burn goal',
                 onTap: () => context.push('/health/log?date=$_dateIso'),
               ),
             ),
@@ -462,8 +446,15 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     : '--',
                 unit: 'bpm',
                 source: summary.restingHeartRateSource ?? HealthSource.manual,
+                target: '60-80 bpm',
+                progress: summary.restingHeartRateBpm != null
+                    ? (summary.restingHeartRateBpm! <= 80
+                        ? 1.0
+                        : ((100 - summary.restingHeartRateBpm!) / 100)
+                            .clamp(0.1, 0.9))
+                    : 0.0,
                 subtitle: summary.restingHeartRateBpm != null
-                    ? 'Cardio baseline'
+                    ? 'Optimal resting zone'
                     : 'Tap to log pulse',
                 onTap: () => context.push('/health/log?date=$_dateIso'),
               ),
@@ -623,7 +614,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               const SizedBox(width: 8),
               const Expanded(
                 child: Text(
-                  'Recent Synchronization Audit Trail',
+                  'Daily Activity Entry History',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -637,7 +628,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           const SizedBox(height: 12),
           if (auditLogs.isEmpty)
             const Text(
-              'No synchronization history yet. Tap "Sync Now" or "Manual Log" above.',
+              'No manual logs recorded yet. Tap "Log Daily Activity Record" above to pass your entry.',
               style: TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
             )
           else
@@ -651,7 +642,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       log.isSuccess ? Icons.check_circle : Icons.error,
                       size: 16,
                       color: log.isSuccess
-                          ? const Color(0xFFB6FF3B)
+                          ? Theme.of(context).colorScheme.primary
                           : Colors.redAccent,
                     ),
                     const SizedBox(width: 8),

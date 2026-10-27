@@ -607,8 +607,10 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                             height: 52,
                             child: FilledButton.icon(
                               style: FilledButton.styleFrom(
-                                backgroundColor: const Color(0xFFB6FF3B),
-                                foregroundColor: Colors.black,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
