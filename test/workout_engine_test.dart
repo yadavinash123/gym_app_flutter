@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,89 +27,88 @@ Profile sampleProfile({
   List<String> equipment = const ['Dumbbells'],
   bool limited = false,
   String avoided = '',
-}) =>
-    Profile(
-      name: 'Avi',
-      level: level,
-      goal: goal,
-      days: days,
-      minutes: minutes,
-      environment: 'Home',
-      equipment: equipment,
-      hasLimitations: limited,
-      avoidedExercises: avoided,
-    );
+}) => Profile(
+  name: 'Avi',
+  level: level,
+  goal: goal,
+  days: days,
+  minutes: minutes,
+  environment: 'Home',
+  equipment: equipment,
+  hasLimitations: limited,
+  avoidedExercises: avoided,
+);
 
 List<Exercise> sampleCatalog() => [
-      Exercise.fromJson({
-        'id': 'push-up',
-        'name': 'Push-up',
-        'group': 'Chest',
-        'primary': ['Chest', 'Triceps'],
-        'secondary': ['Shoulders'],
-        'equipment': ['Bodyweight'],
-        'level': 'Intermediate',
-        'movement': 'Push',
-        'steps': ['Lower chest to floor', 'Press back up'],
-        'cue': 'Keep core braced',
-        'mistake': 'Sagging hips',
-        'source': 'NASM',
-        'url': 'https://example.com/pushup',
-        'animation': null,
-        'alternatives': <String>[],
-      }),
-      Exercise.fromJson({
-        'id': 'squat',
-        'name': 'Bodyweight squat',
-        'group': 'Legs',
-        'primary': ['Quadriceps', 'Glutes'],
-        'secondary': ['Hamstrings'],
-        'equipment': ['Bodyweight'],
-        'level': 'Beginner',
-        'movement': 'Squat',
-        'steps': ['Bend hips and knees', 'Stand up'],
-        'cue': 'Knees follow toes',
-        'mistake': 'Rounding back',
-        'source': 'Mayo Clinic',
-        'url': 'https://example.com/squat',
-        'animation': null,
-        'alternatives': <String>[],
-      }),
-      Exercise.fromJson({
-        'id': 'dumbbell-curl',
-        'name': 'Dumbbell curl',
-        'group': 'Biceps',
-        'primary': ['Biceps'],
-        'secondary': ['Forearms'],
-        'equipment': ['Dumbbells'],
-        'level': 'Beginner',
-        'movement': 'Elbow flexion',
-        'steps': ['Curl dumbbell up', 'Lower with control'],
-        'cue': 'Elbows tucked',
-        'mistake': 'Swinging weight',
-        'source': 'Mayo Clinic',
-        'url': 'https://example.com/curl',
-        'animation': null,
-        'alternatives': <String>[],
-      }),
-      Exercise.fromJson({
-        'id': 'chest-stretch',
-        'name': 'Chest stretch',
-        'group': 'Chest',
-        'primary': ['Chest', 'Shoulders'],
-        'secondary': <String>[],
-        'equipment': ['Bodyweight'],
-        'level': 'Beginner',
-        'movement': 'Mobility',
-        'steps': ['Open arms wide', 'Breathe gently'],
-        'cue': 'Gentle stretch only',
-        'mistake': 'Over-extending',
-        'source': 'NHS',
-        'url': 'https://example.com/stretch',
-        'animation': null,
-        'alternatives': <String>[],
-      }),
-    ];
+  Exercise.fromJson({
+    'id': 'push-up',
+    'name': 'Push-up',
+    'group': 'Chest',
+    'primary': ['Chest', 'Triceps'],
+    'secondary': ['Shoulders'],
+    'equipment': ['Bodyweight'],
+    'level': 'Intermediate',
+    'movement': 'Push',
+    'steps': ['Lower chest to floor', 'Press back up'],
+    'cue': 'Keep core braced',
+    'mistake': 'Sagging hips',
+    'source': 'NASM',
+    'url': 'https://example.com/pushup',
+    'animation': null,
+    'alternatives': <String>[],
+  }),
+  Exercise.fromJson({
+    'id': 'squat',
+    'name': 'Bodyweight squat',
+    'group': 'Legs',
+    'primary': ['Quadriceps', 'Glutes'],
+    'secondary': ['Hamstrings'],
+    'equipment': ['Bodyweight'],
+    'level': 'Beginner',
+    'movement': 'Squat',
+    'steps': ['Bend hips and knees', 'Stand up'],
+    'cue': 'Knees follow toes',
+    'mistake': 'Rounding back',
+    'source': 'Mayo Clinic',
+    'url': 'https://example.com/squat',
+    'animation': null,
+    'alternatives': <String>[],
+  }),
+  Exercise.fromJson({
+    'id': 'dumbbell-curl',
+    'name': 'Dumbbell curl',
+    'group': 'Biceps',
+    'primary': ['Biceps'],
+    'secondary': ['Forearms'],
+    'equipment': ['Dumbbells'],
+    'level': 'Beginner',
+    'movement': 'Elbow flexion',
+    'steps': ['Curl dumbbell up', 'Lower with control'],
+    'cue': 'Elbows tucked',
+    'mistake': 'Swinging weight',
+    'source': 'Mayo Clinic',
+    'url': 'https://example.com/curl',
+    'animation': null,
+    'alternatives': <String>[],
+  }),
+  Exercise.fromJson({
+    'id': 'chest-stretch',
+    'name': 'Chest stretch',
+    'group': 'Chest',
+    'primary': ['Chest', 'Shoulders'],
+    'secondary': <String>[],
+    'equipment': ['Bodyweight'],
+    'level': 'Beginner',
+    'movement': 'Mobility',
+    'steps': ['Open arms wide', 'Breathe gently'],
+    'cue': 'Gentle stretch only',
+    'mistake': 'Over-extending',
+    'source': 'NHS',
+    'url': 'https://example.com/stretch',
+    'animation': null,
+    'alternatives': <String>[],
+  }),
+];
 
 void main() {
   group('WorkoutGenerator', () {
@@ -156,10 +156,7 @@ void main() {
         catalog: catalog,
       );
 
-      expect(
-        routine.exercises.any((e) => e.exerciseId == 'push-up'),
-        isFalse,
-      );
+      expect(routine.exercises.any((e) => e.exerciseId == 'push-up'), isFalse);
     });
   });
 
@@ -207,18 +204,14 @@ void main() {
         ],
       );
 
-      final recommendation =
-          ProgressiveOverloadCalculator.evaluateProgression(
+      final recommendation = ProgressiveOverloadCalculator.evaluateProgression(
         exerciseId: 'dumbbell-curl',
         pastSessions: [session],
         isBodyweight: false,
         isLowerBody: false,
       );
 
-      expect(
-        recommendation.decision,
-        ProgressionDecision.increaseLoad,
-      );
+      expect(recommendation.decision, ProgressionDecision.increaseLoad);
       expect(recommendation.suggestedWeightKg, 11.25);
     });
 
@@ -253,19 +246,18 @@ void main() {
         ],
       );
 
-      final recommendation =
-          ProgressiveOverloadCalculator.evaluateProgression(
+      final recommendation = ProgressiveOverloadCalculator.evaluateProgression(
         exerciseId: 'push-up',
         pastSessions: [session],
         isBodyweight: true,
         isLowerBody: false,
       );
 
+      expect(recommendation.decision, ProgressionDecision.painWarning);
       expect(
-        recommendation.decision,
-        ProgressionDecision.painWarning,
+        recommendation.message,
+        contains('Pain or discomfort was reported'),
       );
-      expect(recommendation.message, contains('Pain or discomfort was reported'));
     });
 
     test('recommends deload or maintenance if RPE >= 9', () {
@@ -297,18 +289,14 @@ void main() {
         ],
       );
 
-      final recommendation =
-          ProgressiveOverloadCalculator.evaluateProgression(
+      final recommendation = ProgressiveOverloadCalculator.evaluateProgression(
         exerciseId: 'dumbbell-curl',
         pastSessions: [session],
         isBodyweight: false,
         isLowerBody: false,
       );
 
-      expect(
-        recommendation.decision,
-        ProgressionDecision.deloadOrRest,
-      );
+      expect(recommendation.decision, ProgressionDecision.deloadOrRest);
       expect(recommendation.message, contains('High perceived effort'));
     });
   });
@@ -407,78 +395,86 @@ void main() {
       expect(afterDelete.isEmpty, isTrue);
     });
 
-    test('loads default templates and supports saving custom templates', () async {
-      final templates = await repo.loadTemplates();
-      expect(templates.isNotEmpty, isTrue);
+    test(
+      'loads default templates and supports saving custom templates',
+      () async {
+        final templates = await repo.loadTemplates();
+        expect(templates.isNotEmpty, isTrue);
 
-      const custom = PlannedRoutine(
-        id: 'custom-1',
-        name: 'My Special Routine',
-        category: 'Upper-body strength',
-        exercises: [],
-        isCustom: true,
-      );
+        const custom = PlannedRoutine(
+          id: 'custom-1',
+          name: 'My Special Routine',
+          category: 'Upper-body strength',
+          exercises: [],
+          isCustom: true,
+        );
 
-      await repo.saveTemplate(custom);
-      final updated = await repo.loadTemplates();
-      expect(updated.any((t) => t.id == 'custom-1'), isTrue);
-    });
+        await repo.saveTemplate(custom);
+        final updated = await repo.loadTemplates();
+        expect(updated.any((t) => t.id == 'custom-1'), isTrue);
+      },
+    );
 
-    testWidgets('WorkoutSessionScreen renders without overflow on narrow device', (tester) async {
-      tester.view.physicalSize = const Size(360, 640);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'WorkoutSessionScreen renders without overflow on narrow device',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      const routine = PlannedRoutine(
-        id: 'r1',
-        name: 'Full Body Heavy Blast Test',
-        category: 'Full-body strength',
-        exercises: [
-          PlannedExercise(
-            exerciseId: 'squat',
-            exerciseName: 'Bodyweight squat with deep range',
-            primaryMuscles: ['Quadriceps', 'Glutes'],
-            sets: [
-              PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 60),
-              PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 60),
-            ],
-          ),
-        ],
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            workoutRepositoryProvider.overrideWithValue(repo),
+        const routine = PlannedRoutine(
+          id: 'r1',
+          name: 'Full Body Heavy Blast Test',
+          category: 'Full-body strength',
+          exercises: [
+            PlannedExercise(
+              exerciseId: 'squat',
+              exerciseName: 'Bodyweight squat with deep range',
+              primaryMuscles: ['Quadriceps', 'Glutes'],
+              sets: [
+                PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 60),
+                PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 60),
+              ],
+            ),
           ],
-          child: const MaterialApp(
-            home: WorkoutSessionScreen(routine: routine),
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [workoutRepositoryProvider.overrideWithValue(repo)],
+            child: const MaterialApp(
+              home: WorkoutSessionScreen(routine: routine),
+            ),
           ),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
 
-      expect(tester.takeException(), isNull);
-      expect(find.text('Bodyweight squat with deep range'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        expect(find.text('Bodyweight squat with deep range'), findsOneWidget);
 
-      // Verify tapping pain check
-      await tester.ensureVisible(find.text('Report discomfort or joint pain'));
-      await tester.tap(find.text('Report discomfort or joint pain'));
-      await tester.pump();
-      expect(tester.takeException(), isNull);
+        // Verify tapping pain check
+        await tester.ensureVisible(
+          find.text('Report discomfort or joint pain'),
+        );
+        await tester.tap(find.text('Report discomfort or joint pain'));
+        await tester.pump();
+        expect(tester.takeException(), isNull);
 
-      // Verify logging set
-      await tester.ensureVisible(find.text('LOG SET & START REST'));
-      await tester.tap(find.text('LOG SET & START REST'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(tester.takeException(), isNull);
-      expect(find.text('REST PERIOD'), findsOneWidget);
-    });
+        // Verify logging set
+        await tester.ensureVisible(find.text('LOG SET & START REST'));
+        await tester.tap(find.text('LOG SET & START REST'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(tester.takeException(), isNull);
+        expect(find.text('REST PERIOD'), findsOneWidget);
+      },
+    );
 
-    testWidgets('RestTimerWidget operates without overflow on narrow screen', (tester) async {
+    testWidgets('RestTimerWidget operates without overflow on narrow screen', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -508,120 +504,122 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('WorkoutSummaryScreen renders on small screen without overflow', (tester) async {
+    testWidgets(
+      'WorkoutSummaryScreen renders on small screen without overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final session = WorkoutSession(
+          id: 's-sum',
+          routineId: 'r-sum',
+          routineName: 'Hypertrophy Upper Body Power Routine',
+          startedAt: DateTime.now().subtract(const Duration(minutes: 45)),
+          completedAt: DateTime.now(),
+          durationSeconds: 2700,
+          exercises: const [
+            CompletedExercise(
+              exerciseId: 'push-up',
+              exerciseName: 'Push-up',
+              primaryMuscles: ['Chest'],
+              sets: [
+                CompletedSet(
+                  setNumber: 1,
+                  targetReps: 15,
+                  actualReps: 15,
+                  weightKg: 0,
+                ),
+              ],
+            ),
+          ],
+          totalVolumeKg: 2500,
+          estimatedCalories: 320,
+          musclesTrained: const ['Chest', 'Triceps', 'Shoulders'],
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [workoutRepositoryProvider.overrideWithValue(repo)],
+            child: MaterialApp(home: WorkoutSummaryScreen(session: session)),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(find.text('Great Job!'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'WorkoutHistoryScreen and WorkoutDetailScreen render without overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final session = WorkoutSession(
+          id: 's-hist',
+          routineId: 'r-hist',
+          routineName: 'Heavy Duty Lower Body Hypertrophy Session',
+          startedAt: DateTime(2026, 10, 20, 10, 0),
+          completedAt: DateTime(2026, 10, 20, 10, 40),
+          durationSeconds: 2400,
+          exercises: const [
+            CompletedExercise(
+              exerciseId: 'squat',
+              exerciseName: 'Barbell Back Squats with Heavy Load',
+              primaryMuscles: ['Quadriceps', 'Glutes'],
+              sets: [
+                CompletedSet(
+                  setNumber: 1,
+                  targetReps: 8,
+                  actualReps: 8,
+                  weightKg: 100,
+                ),
+              ],
+            ),
+          ],
+          totalVolumeKg: 800,
+          estimatedCalories: 280,
+          musclesTrained: const ['Quadriceps'],
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [workoutRepositoryProvider.overrideWithValue(repo)],
+            child: MaterialApp(home: WorkoutDetailScreen(session: session)),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(find.text('EXERCISES PERFORMED'), findsOneWidget);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [workoutRepositoryProvider.overrideWithValue(repo)],
+            child: const MaterialApp(home: WorkoutHistoryScreen()),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('CustomWorkoutScreen renders and interacts without overflow', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(360, 640);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      final session = WorkoutSession(
-        id: 's-sum',
-        routineId: 'r-sum',
-        routineName: 'Hypertrophy Upper Body Power Routine',
-        startedAt: DateTime.now().subtract(const Duration(minutes: 45)),
-        completedAt: DateTime.now(),
-        durationSeconds: 2700,
-        exercises: const [
-          CompletedExercise(
-            exerciseId: 'push-up',
-            exerciseName: 'Push-up',
-            primaryMuscles: ['Chest'],
-            sets: [
-              CompletedSet(setNumber: 1, targetReps: 15, actualReps: 15, weightKg: 0),
-            ],
-          ),
-        ],
-        totalVolumeKg: 2500,
-        estimatedCalories: 320,
-        musclesTrained: const ['Chest', 'Triceps', 'Shoulders'],
-      );
-
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            workoutRepositoryProvider.overrideWithValue(repo),
-          ],
-          child: MaterialApp(
-            home: WorkoutSummaryScreen(session: session),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('Great Job!'), findsOneWidget);
-    });
-
-    testWidgets('WorkoutHistoryScreen and WorkoutDetailScreen render without overflow', (tester) async {
-      tester.view.physicalSize = const Size(360, 640);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      final session = WorkoutSession(
-        id: 's-hist',
-        routineId: 'r-hist',
-        routineName: 'Heavy Duty Lower Body Hypertrophy Session',
-        startedAt: DateTime(2026, 10, 20, 10, 0),
-        completedAt: DateTime(2026, 10, 20, 10, 40),
-        durationSeconds: 2400,
-        exercises: const [
-          CompletedExercise(
-            exerciseId: 'squat',
-            exerciseName: 'Barbell Back Squats with Heavy Load',
-            primaryMuscles: ['Quadriceps', 'Glutes'],
-            sets: [
-              CompletedSet(setNumber: 1, targetReps: 8, actualReps: 8, weightKg: 100),
-            ],
-          ),
-        ],
-        totalVolumeKg: 800,
-        estimatedCalories: 280,
-        musclesTrained: const ['Quadriceps'],
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            workoutRepositoryProvider.overrideWithValue(repo),
-          ],
-          child: MaterialApp(
-            home: WorkoutDetailScreen(session: session),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('EXERCISES PERFORMED'), findsOneWidget);
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            workoutRepositoryProvider.overrideWithValue(repo),
-          ],
-          child: const MaterialApp(
-            home: WorkoutHistoryScreen(),
-          ),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('CustomWorkoutScreen renders and interacts without overflow', (tester) async {
-      tester.view.physicalSize = const Size(360, 640);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            workoutRepositoryProvider.overrideWithValue(repo),
-          ],
-          child: const MaterialApp(
-            home: CustomWorkoutScreen(),
-          ),
+          overrides: [workoutRepositoryProvider.overrideWithValue(repo)],
+          child: const MaterialApp(home: CustomWorkoutScreen()),
         ),
       );
       await tester.pumpAndSettle();

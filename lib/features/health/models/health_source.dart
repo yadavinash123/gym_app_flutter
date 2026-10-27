@@ -28,9 +28,13 @@ class HealthSource {
   String get displayName {
     switch (type) {
       case HealthSourceType.healthConnect:
-        return deviceModel != null ? 'Health Connect ($deviceModel)' : 'Google Health Connect';
+        return deviceModel != null
+            ? 'Health Connect ($deviceModel)'
+            : 'Google Health Connect';
       case HealthSourceType.appleHealth:
-        return deviceModel != null ? 'Apple Health ($deviceModel)' : 'Apple Health';
+        return deviceModel != null
+            ? 'Apple Health ($deviceModel)'
+            : 'Apple Health';
       case HealthSourceType.deviceSensor:
         return 'Device Hardware Sensor';
       case HealthSourceType.fitforgeSession:
@@ -86,12 +90,12 @@ class HealthSource {
   }
 
   Map<String, dynamic> toJson() => {
-        'type': type.name,
-        'name': name,
-        if (deviceModel != null) 'deviceModel': deviceModel,
-        if (appPackage != null) 'appPackage': appPackage,
-        'isVerified': isVerified,
-      };
+    'type': type.name,
+    'name': name,
+    if (deviceModel != null) 'deviceModel': deviceModel,
+    if (appPackage != null) 'appPackage': appPackage,
+    'isVerified': isVerified,
+  };
 
   factory HealthSource.fromJson(Map<String, dynamic> json) {
     final typeName = json['type'] as String? ?? 'manualEntry';

@@ -8,6 +8,9 @@ import 'package:fitforge_ai/core/storage/json_store.dart';
 import 'package:fitforge_ai/features/profile/profile.dart';
 import 'package:fitforge_ai/features/profile/profile_repository.dart';
 
+import 'package:fitforge_ai/features/progress/data/progress_repository.dart';
+import 'package:fitforge_ai/features/progress/models/muscle_recovery.dart';
+
 Future<void> start(
   WidgetTester tester,
   MemoryProfileRepository repository,
@@ -26,6 +29,26 @@ Future<void> start(
       overrides: [
         storeProvider.overrideWithValue(store),
         profileRepositoryProvider.overrideWithValue(repository),
+        progressDashboardProvider.overrideWith(
+          (ref) async => ProgressDashboardData(
+            profile: repository.profile,
+            measurements: const [],
+            sessions: const [],
+            prs: const [],
+            readiness: const OverallSystemReadiness(
+              readinessScore: 90,
+              advice: 'Ready',
+              sleepFactor: 1.0,
+              heartRateFactor: 1.0,
+              muscles: [],
+            ),
+            streaks: const {},
+            milestones: const [],
+            reminders: const [],
+            nutritionLogs: const {},
+            healthSummaries: const {},
+          ),
+        ),
       ],
       child: const FitForgeApp(),
     ),
@@ -132,13 +155,13 @@ void main() {
       expect(find.text('Welcome back,\nAvi.'), findsOneWidget);
       await tester.tap(find.text('Workouts'));
       await tester.pumpAndSettle();
-      expect(find.text('Your weekly outline'), findsOneWidget);
+      expect(find.text('EXPLORE EXERCISES'), findsOneWidget);
       await tester.tap(find.text('Nutrition'));
       await tester.pumpAndSettle();
       expect(find.text('DAILY MEALS'), findsOneWidget);
       await tester.tap(find.text('Progress'));
       await tester.pumpAndSettle();
-      expect(find.text('Coming in a later phase'), findsOneWidget);
+      expect(find.text('PROGRESS & ANALYTICS'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,8 +8,9 @@ import '../../profile/profile_repository.dart';
 import '../models/food_item.dart';
 
 Future<List<FoodItem>> loadFoodCatalog([AssetBundle? bundle]) async {
-  final jsonString = await (bundle ?? rootBundle)
-      .loadString('assets/nutrition/food_catalog.json');
+  final jsonString = await (bundle ?? rootBundle).loadString(
+    'assets/nutrition/food_catalog.json',
+  );
   final json = jsonDecode(jsonString) as Map<String, dynamic>;
   if (json['version'] != 1 || json['foods'] is! List) {
     throw const FormatException('Invalid food catalog asset');
@@ -97,8 +99,8 @@ final foodCatalogRepositoryProvider = Provider<FoodCatalogRepository>(
 
 final customFoodsProvider =
     AsyncNotifierProvider<CustomFoodsController, List<FoodItem>>(
-  CustomFoodsController.new,
-);
+      CustomFoodsController.new,
+    );
 
 class CustomFoodsController extends AsyncNotifier<List<FoodItem>> {
   @override
@@ -106,14 +108,16 @@ class CustomFoodsController extends AsyncNotifier<List<FoodItem>> {
       ref.watch(foodCatalogRepositoryProvider).loadCustomFoods();
 
   Future<void> addCustomFood(FoodItem food) async {
-    final updated =
-        await ref.read(foodCatalogRepositoryProvider).saveCustomFood(food);
+    final updated = await ref
+        .read(foodCatalogRepositoryProvider)
+        .saveCustomFood(food);
     if (ref.mounted) state = AsyncData(updated);
   }
 
   Future<void> removeCustomFood(String id) async {
-    final updated =
-        await ref.read(foodCatalogRepositoryProvider).deleteCustomFood(id);
+    final updated = await ref
+        .read(foodCatalogRepositoryProvider)
+        .deleteCustomFood(id);
     if (ref.mounted) state = AsyncData(updated);
   }
 }

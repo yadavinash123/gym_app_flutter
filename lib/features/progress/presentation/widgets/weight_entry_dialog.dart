@@ -41,14 +41,18 @@ class _WeightEntryDialogState extends State<WeightEntryDialog> {
     final initialWeight = entry != null
         ? entry.weightInUnits(widget.units)
         : (widget.initialWeightKg != null
-            ? (isImperial ? widget.initialWeightKg! * 2.20462 : widget.initialWeightKg!)
-            : null);
+              ? (isImperial
+                    ? widget.initialWeightKg! * 2.20462
+                    : widget.initialWeightKg!)
+              : null);
 
     final initialWaist = entry != null
         ? entry.waistInUnits(widget.units)
         : (widget.initialWaistCm != null
-            ? (isImperial ? widget.initialWaistCm! / 2.54 : widget.initialWaistCm!)
-            : null);
+              ? (isImperial
+                    ? widget.initialWaistCm! / 2.54
+                    : widget.initialWaistCm!)
+              : null);
 
     _weightController = TextEditingController(
       text: initialWeight != null ? initialWeight.toStringAsFixed(1) : '',
@@ -75,7 +79,8 @@ class _WeightEntryDialogState extends State<WeightEntryDialog> {
     final weightVal = double.tryParse(_weightController.text.trim());
     if (weightVal == null || weightVal <= 10.0 || weightVal >= 500.0) {
       setState(() {
-        _errorMessage = 'Please enter a valid weight between 10 and 500 $weightUnit';
+        _errorMessage =
+            'Please enter a valid weight between 10 and 500 $weightUnit';
       });
       return;
     }
@@ -96,7 +101,9 @@ class _WeightEntryDialogState extends State<WeightEntryDialog> {
     final dateStr = _selectedDate.toIso8601String().substring(0, 10);
 
     final entry = BodyMeasurementEntry(
-      id: widget.existingEntry?.id ?? 'weight_${DateTime.now().millisecondsSinceEpoch}',
+      id:
+          widget.existingEntry?.id ??
+          'weight_${DateTime.now().millisecondsSinceEpoch}',
       date: dateStr,
       weightKg: canonicalWeight,
       waistCm: waistKg,
@@ -143,7 +150,10 @@ class _WeightEntryDialogState extends State<WeightEntryDialog> {
                 onTap: _pickDate,
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1C2430),
                     borderRadius: BorderRadius.circular(12),
@@ -153,8 +163,11 @@ class _WeightEntryDialogState extends State<WeightEntryDialog> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today_rounded,
-                              size: 16, color: Color(0xFF00D4FF)),
+                          const Icon(
+                            Icons.calendar_today_rounded,
+                            size: 16,
+                            color: Color(0xFF00D4FF),
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             _selectedDate.toIso8601String().substring(0, 10),
@@ -182,7 +195,9 @@ class _WeightEntryDialogState extends State<WeightEntryDialog> {
               // Weight input
               TextField(
                 controller: _weightController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 autofocus: true,
                 decoration: InputDecoration(
                   labelText: 'Body Weight ($weightUnit)',
@@ -194,7 +209,9 @@ class _WeightEntryDialogState extends State<WeightEntryDialog> {
               // Waist input (optional)
               TextField(
                 controller: _waistController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Waist Circumference (optional)',
                   hintText: isImperial ? 'e.g. 32.0' : 'e.g. 81.0',

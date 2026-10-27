@@ -20,7 +20,8 @@ class BodyMeasurementEntry {
   final String notes;
   final DateTime? loggedAt;
 
-  DateTime get timestamp => loggedAt ?? DateTime.tryParse(date) ?? DateTime.now();
+  DateTime get timestamp =>
+      loggedAt ?? DateTime.tryParse(date) ?? DateTime.now();
 
   double weightInUnits(String units) {
     if (units.toLowerCase() == 'imperial') {
@@ -59,26 +60,25 @@ class BodyMeasurementEntry {
     double? bodyFatPercentage,
     String? notes,
     DateTime? loggedAt,
-  }) =>
-      BodyMeasurementEntry(
-        id: id ?? this.id,
-        date: date ?? this.date,
-        weightKg: weightKg ?? this.weightKg,
-        waistCm: waistCm ?? this.waistCm,
-        bodyFatPercentage: bodyFatPercentage ?? this.bodyFatPercentage,
-        notes: notes ?? this.notes,
-        loggedAt: loggedAt ?? this.loggedAt,
-      );
+  }) => BodyMeasurementEntry(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    weightKg: weightKg ?? this.weightKg,
+    waistCm: waistCm ?? this.waistCm,
+    bodyFatPercentage: bodyFatPercentage ?? this.bodyFatPercentage,
+    notes: notes ?? this.notes,
+    loggedAt: loggedAt ?? this.loggedAt,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'date': date,
-        'weightKg': weightKg,
-        if (waistCm != null) 'waistCm': waistCm,
-        if (bodyFatPercentage != null) 'bodyFatPercentage': bodyFatPercentage,
-        'notes': notes,
-        if (loggedAt != null) 'loggedAt': loggedAt!.toIso8601String(),
-      };
+    'id': id,
+    'date': date,
+    'weightKg': weightKg,
+    if (waistCm != null) 'waistCm': waistCm,
+    if (bodyFatPercentage != null) 'bodyFatPercentage': bodyFatPercentage,
+    'notes': notes,
+    if (loggedAt != null) 'loggedAt': loggedAt!.toIso8601String(),
+  };
 
   factory BodyMeasurementEntry.fromJson(Map<String, dynamic> json) =>
       BodyMeasurementEntry(

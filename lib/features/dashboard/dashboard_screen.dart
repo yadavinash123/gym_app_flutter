@@ -19,14 +19,15 @@ class DashboardScreen extends ConsumerWidget {
     final sessions = ref.watch(workoutSessionsProvider).value ?? [];
     final health = ref.watch(todayHealthSummaryProvider);
 
-    return ref.watch(profileProvider).when(
+    return ref
+        .watch(profileProvider)
+        .when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => PageBody(
             children: [
               const InfoCard(
                 title: 'Your profile could not be read',
-                message:
-                    'Your files have been preserved. Retry loading before making changes.',
+                message: 'Your files have been preserved. Retry loading before making changes.',
                 icon: Icons.folder_off_outlined,
               ),
               TextButton(
@@ -119,8 +120,7 @@ class DashboardScreen extends ConsumerWidget {
                     final catalog =
                         ref.read(exerciseCatalogProvider).value ?? [];
                     if (catalog.isNotEmpty) {
-                      final routine =
-                          WorkoutGenerator.generateRoutineForDay(
+                      final routine = WorkoutGenerator.generateRoutineForDay(
                         profile: profile,
                         sessionKind: kind,
                         catalog: catalog,
@@ -189,7 +189,8 @@ class DashboardScreen extends ConsumerWidget {
                                 Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFB6FF3B).withValues(alpha: 0.15),
+                                    color: const Color(0xFFB6FF3B)
+                                        .withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: const Icon(
@@ -370,8 +371,7 @@ class DashboardScreen extends ConsumerWidget {
               ] else ...[
                 const InfoCard(
                   title: 'A fresh start',
-                  message:
-                      'No activity recorded yet. Workout and nutrition logging will arrive in the next development phases.',
+                  message: 'No activity recorded yet. Workout and nutrition logging will arrive in the next development phases.',
                   icon: Icons.insights_outlined,
                 ),
                 const SizedBox(height: 16),
@@ -386,14 +386,20 @@ class DashboardScreen extends ConsumerWidget {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFF00D4FF).withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: const Color(0xFF00D4FF).withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.auto_awesome, color: Color(0xFF00D4FF), size: 20),
+                        const Icon(
+                          Icons.auto_awesome,
+                          color: Color(0xFF00D4FF),
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         const Text(
                           'AI COACH & ADVISOR',
@@ -423,7 +429,11 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(height: 6),
                     const Text(
                       'Ask about optimal set volume, daily macro distribution, or check your recovery status with evidence-based offline rules or BYOK AI.',
-                      style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 13, height: 1.3),
+                      style: TextStyle(
+                        color: Color(0xFFA7B0BF),
+                        fontSize: 13,
+                        height: 1.3,
+                      ),
                     ),
                   ],
                 ),
@@ -431,8 +441,7 @@ class DashboardScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               const InfoCard(
                 title: 'On your phone. Under your control.',
-                message:
-                    'Your profile is saved as a private JSON file. No account or database server is required.',
+                message: 'Your profile is saved as a private JSON file. No account or database server is required.',
                 icon: Icons.phone_android_outlined,
               ),
             ],
@@ -453,7 +462,7 @@ String _nutritionSummary(
   final proteinText = protein != null
       ? '${protein.round()} g protein/day (personal target)'
       : estimate.proteinLow == null
-          ? 'Protein: not set'
-          : '${estimate.proteinLow!.round()}–${estimate.proteinHigh!.round()} g protein/day (general adult range)';
+      ? 'Protein: not set'
+      : '${estimate.proteinLow!.round()}–${estimate.proteinHigh!.round()} g protein/day (general adult range)';
   return '$calorieText\n$proteinText\nThese are planning targets, not logged intake.';
 }

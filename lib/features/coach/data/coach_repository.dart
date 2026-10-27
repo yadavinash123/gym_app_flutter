@@ -83,8 +83,9 @@ class CoachRepository {
       'updatedAt': DateTime.now().toIso8601String(),
       'conversations': conversations.map((c) => c.toJson()).toList(),
     };
-    final result =
-        _tail.then((_) => store.write(conversationsStorageKey, payload));
+    final result = _tail.then(
+      (_) => store.write(conversationsStorageKey, payload),
+    );
     _tail = result.catchError((_) {});
     return result;
   }
@@ -101,8 +102,9 @@ class CoachRepository {
   }
 
   Future<void> savePreferences(CoachPreferences prefs) {
-    final result =
-        _tail.then((_) => store.write(preferencesStorageKey, prefs.toJson()));
+    final result = _tail.then(
+      (_) => store.write(preferencesStorageKey, prefs.toJson()),
+    );
     _tail = result.catchError((_) {});
     return result;
   }
@@ -118,7 +120,9 @@ class CoachRepository {
       return _initialWelcomeMessage();
     }
     final raw = data['messages'] as List;
-    final list = raw.map((e) => CoachMessage.fromJson(e as Map<String, dynamic>)).toList();
+    final list = raw
+        .map((e) => CoachMessage.fromJson(e as Map<String, dynamic>))
+        .toList();
     return list.isEmpty ? _initialWelcomeMessage() : list;
   }
 
@@ -142,7 +146,8 @@ class CoachRepository {
       CoachMessage(
         id: 'welcome_1',
         role: MessageRole.assistant,
-        content: '👋 Welcome to FitForge AI Coach!\n\n'
+        content:
+            '👋 Welcome to FitForge AI Coach!\n\n'
             'I am your intelligent fitness companion. I can analyze your workout volume, '
             'review daily macros against ISSN guidelines, assess your recovery from sleep/heart rate biomarkers, '
             'and guide your progressive overload.\n\n'
@@ -173,7 +178,8 @@ class CoachRepository {
   }
 
   Future<void> savePersona(CoachPersona persona) async {
-    final data = await store.read(chatStorageKey) ?? {'version': 1, 'messages': []};
+    final data =
+        await store.read(chatStorageKey) ?? {'version': 1, 'messages': []};
     data['persona'] = persona.name;
     final result = _tail.then((_) => store.write(chatStorageKey, data));
     _tail = result.catchError((_) {});
@@ -191,7 +197,9 @@ class CoachRepository {
   }
 
   Future<void> saveConsent(CoachConsent consent) {
-    final result = _tail.then((_) => store.write(consentStorageKey, consent.toJson()));
+    final result = _tail.then(
+      (_) => store.write(consentStorageKey, consent.toJson()),
+    );
     _tail = result.catchError((_) {});
     return result;
   }
@@ -238,20 +246,28 @@ class CoachRepository {
     // 1. Profile & Goals (strictly no personal identifiers: name, email omitted)
     if (consent.shareProfile && profile != null) {
       buffer.writeln('BODY METRICS & GOALS:');
-      buffer.writeln('- Age: ${profile.age ?? "Not set"} | Gender: ${profile.gender}');
-      buffer.writeln('- Height: ${profile.heightCm?.round() ?? "Not set"} cm | Weight: ${profile.weightKg?.toStringAsFixed(1) ?? "Not set"} kg');
+      buffer.writeln(
+        '- Age: ${profile.age ?? "Not set"} | Gender: ${profile.gender}',
+      );
+      buffer.writeln(
+        '- Height: ${profile.heightCm?.round() ?? "Not set"} cm | Weight: ${profile.weightKg?.toStringAsFixed(1) ?? "Not set"} kg',
+      );
       buffer.writeln('- Primary Fitness Goal: ${profile.goal}');
       buffer.writeln('- Experience Level: ${profile.level}');
       buffer.writeln('- Training Environment: ${profile.environment}');
       buffer.writeln('- Scheduled Training Days: ${profile.days} days/week');
       if (profile.calorieTarget != null) {
-        buffer.writeln('- Daily Energy Target: ${profile.calorieTarget!.round()} kcal');
+        buffer.writeln(
+          '- Daily Energy Target: ${profile.calorieTarget!.round()} kcal',
+        );
       }
       if (profile.proteinTarget != null) {
         buffer.writeln('- Target Protein: ${profile.proteinTarget!.round()} g');
       }
       if (profile.hasLimitations && profile.limitations.isNotEmpty) {
-        buffer.writeln('- Recorded Physical Limitations: ${profile.limitations}');
+        buffer.writeln(
+          '- Recorded Physical Limitations: ${profile.limitations}',
+        );
       }
     } else {
       buffer.writeln('BODY METRICS: [Redacted by user privacy choice]');
@@ -260,7 +276,9 @@ class CoachRepository {
     // 2. Nutrition
     if (consent.shareNutrition && todayNutrition != null) {
       buffer.writeln('\nTODAY\'S NUTRITION LOG:');
-      buffer.writeln('- Calories Consumed: ${todayNutrition.totalCalories.round()} kcal');
+      buffer.writeln(
+        '- Calories Consumed: ${todayNutrition.totalCalories.round()} kcal',
+      );
       buffer.writeln('- Protein: ${todayNutrition.totalProtein.round()} g');
       buffer.writeln('- Carbohydrates: ${todayNutrition.totalCarbs.round()} g');
       buffer.writeln('- Fats: ${todayNutrition.totalFat.round()} g');
@@ -273,7 +291,9 @@ class CoachRepository {
     if (consent.shareWorkouts && recentWorkouts.isNotEmpty) {
       buffer.writeln('\nRECENT WORKOUT HISTORY:');
       for (final w in recentWorkouts.take(3)) {
-        buffer.writeln('- "${w.routineName}" on ${w.startedAt.toIso8601String().substring(0, 10)}: ${w.totalCompletedSets} sets, ${w.totalVolumeKg.round()} kg tonnage');
+        buffer.writeln(
+          '- "${w.routineName}" on ${w.startedAt.toIso8601String().substring(0, 10)}: ${w.totalCompletedSets} sets, ${w.totalVolumeKg.round()} kg tonnage',
+        );
       }
     } else {
       buffer.writeln('\nWORKOUT HISTORY: [Redacted by user privacy choice]');
@@ -284,10 +304,15 @@ class CoachRepository {
       buffer.writeln('\nDAILY HEALTH BIOMARKERS:');
       buffer.writeln('- Steps: ${todayHealth.steps}');
       if (todayHealth.restingHeartRateBpm != null) {
-        buffer.writeln('- Resting Heart Rate: ${todayHealth.restingHeartRateBpm} bpm');
+        buffer.writeln(
+          '- Resting Heart Rate: ${todayHealth.restingHeartRateBpm} bpm',
+        );
       }
-      if (todayHealth.sleepDurationMinutes != null && todayHealth.sleepDurationMinutes! > 0) {
-        buffer.writeln('- Sleep Duration: ${(todayHealth.sleepDurationMinutes! / 60.0).toStringAsFixed(1)} hours (${todayHealth.sleepFormatted})');
+      if (todayHealth.sleepDurationMinutes != null &&
+          todayHealth.sleepDurationMinutes! > 0) {
+        buffer.writeln(
+          '- Sleep Duration: ${(todayHealth.sleepDurationMinutes! / 60.0).toStringAsFixed(1)} hours (${todayHealth.sleepFormatted})',
+        );
       }
     } else {
       buffer.writeln('\nHEALTH BIOMARKERS: [Redacted by user privacy choice]');
@@ -308,18 +333,24 @@ class CoachRepository {
     final buffer = StringBuffer();
     buffer.writeln(persona.systemDirective);
     buffer.writeln('\nCRITICAL GUIDELINES:');
-    buffer.writeln('1. You are FitForge AI Coach, a supportive fitness educator. You provide evidence-based guidance.');
-    buffer.writeln('2. Medical Disclaimer: You are NOT a doctor or registered dietitian. Remind user to seek professional clinical advice for pain, injury, or severe symptoms.');
-    buffer.writeln('3. Format responses in clean GitHub markdown with bullet points (•) and bold headers for readability on mobile screens. DO NOT use ASCII or pipe tables (| col | col |); always present structured comparisons, nutrition targets, and workout plans as clean bullet points, exactly like ChatGPT.');
-    buffer.writeln('4. Keep advice actionable, direct, and under 350 words unless specifically asked for an in-depth essay.');
-    buffer.writeln('5. NEVER include raw unformatted markdown asterisks or stray "**" characters. For emphasis, properly wrap text like "**keyword**". Never output lonely or dangling "**".');
-    buffer.writeln('\n${buildPromptContext(
-      consent: consent,
-      profile: profile,
-      todayNutrition: todayNutrition,
-      todayHealth: todayHealth,
-      recentWorkouts: recentWorkouts,
-    )}');
+    buffer.writeln(
+      '1. You are FitForge AI Coach, a supportive fitness educator. You provide evidence-based guidance.',
+    );
+    buffer.writeln(
+      '2. Medical Disclaimer: You are NOT a doctor or registered dietitian. Remind user to seek professional clinical advice for pain, injury, or severe symptoms.',
+    );
+    buffer.writeln(
+      '3. Format responses in clean GitHub markdown with bullet points (•) and bold headers for readability on mobile screens. DO NOT use ASCII or pipe tables (| col | col |); always present structured comparisons, nutrition targets, and workout plans as clean bullet points, exactly like ChatGPT.',
+    );
+    buffer.writeln(
+      '4. Keep advice actionable, direct, and under 350 words unless specifically asked for an in-depth essay.',
+    );
+    buffer.writeln(
+      '5. NEVER include raw unformatted markdown asterisks or stray "**" characters. For emphasis, properly wrap text like "**keyword**". Never output lonely or dangling "**".',
+    );
+    buffer.writeln(
+      '\n${buildPromptContext(consent: consent, profile: profile, todayNutrition: todayNutrition, todayHealth: todayHealth, recentWorkouts: recentWorkouts)}',
+    );
     return buffer.toString();
   }
 
@@ -354,7 +385,8 @@ class CoachRepository {
 
     CoachMessage assistantMessage;
 
-    if (!credentials.isConfigured || credentials.provider == AiProvider.offline) {
+    if (!credentials.isConfigured ||
+        credentials.provider == AiProvider.offline) {
       // 100% Offline execution
       assistantMessage = offlineEngine.generateResponse(
         userQuery: trimmed,
@@ -392,7 +424,8 @@ class CoachRepository {
           recentWorkouts: recentWorkouts,
         );
         assistantMessage = fallback.copyWith(
-          content: '⚠️ *Could not reach ${credentials.provider.displayName} (${e.toString()}). Falling back to Offline Rule Engine:*\n\n${fallback.content}',
+          content:
+              '⚠️ *Could not reach ${credentials.provider.displayName} (${e.toString()}). Falling back to Offline Rule Engine:*\n\n${fallback.content}',
         );
       }
     }
@@ -425,8 +458,8 @@ final coachRepositoryProvider = Provider<CoachRepository>((ref) {
 
 final activeConversationIdProvider =
     NotifierProvider<ActiveConversationIdNotifier, String>(
-  ActiveConversationIdNotifier.new,
-);
+      ActiveConversationIdNotifier.new,
+    );
 
 class ActiveConversationIdNotifier extends Notifier<String> {
   @override
@@ -437,10 +470,11 @@ class ActiveConversationIdNotifier extends Notifier<String> {
 
 final coachConversationsProvider =
     AsyncNotifierProvider<CoachConversationsNotifier, List<CoachConversation>>(
-  CoachConversationsNotifier.new,
-);
+      CoachConversationsNotifier.new,
+    );
 
-class CoachConversationsNotifier extends AsyncNotifier<List<CoachConversation>> {
+class CoachConversationsNotifier
+    extends AsyncNotifier<List<CoachConversation>> {
   @override
   Future<List<CoachConversation>> build() {
     return ref.watch(coachRepositoryProvider).loadConversations();
@@ -468,7 +502,8 @@ class CoachConversationsNotifier extends AsyncNotifier<List<CoachConversation>> 
     final id = 'conv_${DateTime.now().millisecondsSinceEpoch}';
     final newConv = CoachConversation(
       id: id,
-      title: title ??
+      title:
+          title ??
           (initialPrompt != null && initialPrompt.length > 25
               ? '${initialPrompt.substring(0, 25)}...'
               : 'New Conversation'),
@@ -506,7 +541,9 @@ class CoachConversationsNotifier extends AsyncNotifier<List<CoachConversation>> 
     state = AsyncData(updated);
     await repo.saveConversations(updated);
     if (ref.read(activeConversationIdProvider) == id && updated.isNotEmpty) {
-      ref.read(activeConversationIdProvider.notifier).setActive(updated.first.id);
+      ref
+          .read(activeConversationIdProvider.notifier)
+          .setActive(updated.first.id);
       ref.invalidate(coachMessagesProvider);
     }
   }
@@ -522,8 +559,8 @@ class CoachConversationsNotifier extends AsyncNotifier<List<CoachConversation>> 
 
 final coachMessagesProvider =
     AsyncNotifierProvider<CoachMessagesNotifier, List<CoachMessage>>(
-  CoachMessagesNotifier.new,
-);
+      CoachMessagesNotifier.new,
+    );
 
 class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
   @override
@@ -552,7 +589,9 @@ class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
 
     DailyHealthSummary? todayHealth;
     try {
-      todayHealth = await ref.read(healthRepositoryProvider).getSummaryForDate(todayIsoDate());
+      todayHealth = await ref
+          .read(healthRepositoryProvider)
+          .getSummaryForDate(todayIsoDate());
     } catch (_) {}
 
     List<WorkoutSession> sessions = const [];
@@ -575,7 +614,8 @@ class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
     final consent = await repo.loadConsent();
 
     CoachMessage assistantMessage;
-    if (!credentials.isConfigured || credentials.provider == AiProvider.offline) {
+    if (!credentials.isConfigured ||
+        credentials.provider == AiProvider.offline) {
       assistantMessage = repo.offlineEngine.generateResponse(
         userQuery: text,
         persona: persona,
@@ -609,7 +649,8 @@ class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
           recentWorkouts: sessions,
         );
         assistantMessage = fallback.copyWith(
-          content: '⚠️ *Could not reach ${credentials.provider.displayName} (${e.toString()}). Falling back to Offline Engine:*\n\n${fallback.content}',
+          content:
+              '⚠️ *Could not reach ${credentials.provider.displayName} (${e.toString()}). Falling back to Offline Engine:*\n\n${fallback.content}',
         );
       }
     }
@@ -622,7 +663,10 @@ class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
     final updatedConvs = convs.map((c) {
       if (c.id == activeId) {
         final cleanContent = assistantMessage.content
-            .replaceAll(RegExp(r'<think>[\s\S]*?</think>', caseSensitive: false), '')
+            .replaceAll(
+              RegExp(r'<think>[\s\S]*?</think>', caseSensitive: false),
+              '',
+            )
             .replaceAll(RegExp(r'</?think>', caseSensitive: false), '')
             .replaceAll('**', '')
             .replaceAll(RegExp(r'^#+\s*', multiLine: true), '')
@@ -683,8 +727,8 @@ class CoachMessagesNotifier extends AsyncNotifier<List<CoachMessage>> {
 
 final coachPreferencesProvider =
     AsyncNotifierProvider<CoachPreferencesNotifier, CoachPreferences>(
-  CoachPreferencesNotifier.new,
-);
+      CoachPreferencesNotifier.new,
+    );
 
 class CoachPreferencesNotifier extends AsyncNotifier<CoachPreferences> {
   @override
@@ -701,8 +745,8 @@ class CoachPreferencesNotifier extends AsyncNotifier<CoachPreferences> {
 
 final coachPersonaProvider =
     AsyncNotifierProvider<CoachPersonaNotifier, CoachPersona>(
-  CoachPersonaNotifier.new,
-);
+      CoachPersonaNotifier.new,
+    );
 
 class CoachPersonaNotifier extends AsyncNotifier<CoachPersona> {
   @override
@@ -719,8 +763,8 @@ class CoachPersonaNotifier extends AsyncNotifier<CoachPersona> {
 
 final coachConsentProvider =
     AsyncNotifierProvider<CoachConsentNotifier, CoachConsent>(
-  CoachConsentNotifier.new,
-);
+      CoachConsentNotifier.new,
+    );
 
 class CoachConsentNotifier extends AsyncNotifier<CoachConsent> {
   @override
@@ -737,8 +781,8 @@ class CoachConsentNotifier extends AsyncNotifier<CoachConsent> {
 
 final coachCredentialsProvider =
     AsyncNotifierProvider<CoachCredentialsNotifier, AiCredentials>(
-  CoachCredentialsNotifier.new,
-);
+      CoachCredentialsNotifier.new,
+    );
 
 class CoachCredentialsNotifier extends AsyncNotifier<AiCredentials> {
   @override

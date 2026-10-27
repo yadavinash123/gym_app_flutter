@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../models/coach_conversation.dart';
 
 class ConversationCard extends StatelessWidget {
@@ -44,7 +45,10 @@ class ConversationCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70),
+            ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -58,7 +62,10 @@ class ConversationCard extends StatelessWidget {
               }
               Navigator.pop(ctx);
             },
-            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Save',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -74,9 +81,7 @@ class ConversationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF141A22),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -180,9 +185,16 @@ class ConversationCard extends StatelessWidget {
                       value: 'rename',
                       child: Row(
                         children: [
-                          Icon(Icons.edit_outlined, size: 16, color: Colors.white70),
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
                           SizedBox(width: 8),
-                          Text('Rename', style: TextStyle(color: Colors.white, fontSize: 13)),
+                          Text(
+                            'Rename',
+                            style: TextStyle(color: Colors.white, fontSize: 13),
+                          ),
                         ],
                       ),
                     ),
@@ -190,9 +202,19 @@ class ConversationCard extends StatelessWidget {
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
+                          Icon(
+                            Icons.delete_outline,
+                            size: 16,
+                            color: Colors.redAccent,
+                          ),
                           SizedBox(width: 8),
-                          Text('Delete', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
+                          Text(
+                            'Delete',
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),

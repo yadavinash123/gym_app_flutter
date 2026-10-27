@@ -1,12 +1,9 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class ChartDataPoint {
-  const ChartDataPoint({
-    required this.date,
-    required this.value,
-    this.label,
-  });
+  const ChartDataPoint({required this.date, required this.value, this.label});
 
   final DateTime date;
   final double value;
@@ -72,7 +69,8 @@ class _InteractiveLineChartState extends State<InteractiveLineChart> {
     minY -= padding;
     maxY += padding;
 
-    final selected = _selectedIndex != null && _selectedIndex! < widget.points.length
+    final selected =
+        _selectedIndex != null && _selectedIndex! < widget.points.length
         ? widget.points[_selectedIndex!]
         : widget.points.last;
 
@@ -132,7 +130,10 @@ class _InteractiveLineChartState extends State<InteractiveLineChart> {
               ),
               if (widget.targetValue != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
@@ -156,8 +157,14 @@ class _InteractiveLineChartState extends State<InteractiveLineChart> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return GestureDetector(
-                  onPanDown: (details) => _handleTouch(details.localPosition.dx, constraints.maxWidth),
-                  onPanUpdate: (details) => _handleTouch(details.localPosition.dx, constraints.maxWidth),
+                  onPanDown: (details) => _handleTouch(
+                    details.localPosition.dx,
+                    constraints.maxWidth,
+                  ),
+                  onPanUpdate: (details) => _handleTouch(
+                    details.localPosition.dx,
+                    constraints.maxWidth,
+                  ),
                   onPanEnd: (_) => setState(() => _selectedIndex = null),
                   onPanCancel: () => setState(() => _selectedIndex = null),
                   child: CustomPaint(
@@ -191,8 +198,18 @@ class _InteractiveLineChartState extends State<InteractiveLineChart> {
 
   String _formatDate(DateTime dt) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
   }
@@ -235,7 +252,8 @@ class _LineChartPainter extends CustomPainter {
 
     // Draw target line if available
     if (targetValue != null) {
-      final targetY = size.height - ((targetValue! - minY) / yRange * size.height);
+      final targetY =
+          size.height - ((targetValue! - minY) / yRange * size.height);
       final targetPaint = Paint()
         ..color = const Color(0xFF00D4FF).withOpacity(0.4)
         ..strokeWidth = 1.5
@@ -257,7 +275,8 @@ class _LineChartPainter extends CustomPainter {
 
     // If single point, render centered dot
     if (count == 1) {
-      final y = size.height - ((points.first.value - minY) / yRange * size.height);
+      final y =
+          size.height - ((points.first.value - minY) / yRange * size.height);
       canvas.drawCircle(
         Offset(size.width / 2, y),
         6,
@@ -297,10 +316,7 @@ class _LineChartPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [
-          lineColor.withOpacity(0.25),
-          lineColor.withOpacity(0.0),
-        ],
+        colors: [lineColor.withOpacity(0.25), lineColor.withOpacity(0.0)],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
     canvas.drawPath(fillPath, fillPaint);
 
@@ -331,7 +347,11 @@ class _LineChartPainter extends CustomPainter {
             ..strokeWidth = 1,
         );
         // Highlighted active dot
-        canvas.drawCircle(offset, 8, Paint()..color = lineColor.withOpacity(0.3));
+        canvas.drawCircle(
+          offset,
+          8,
+          Paint()..color = lineColor.withOpacity(0.3),
+        );
         canvas.drawCircle(offset, 5, dotPaint);
         canvas.drawCircle(offset, 5, dotOuterPaint);
       } else {

@@ -108,91 +108,316 @@ class WorkoutRepository {
   }
 
   static List<PlannedRoutine> _defaultTemplates() => [
-        const PlannedRoutine(
-          id: 'tmpl-full-body',
-          name: 'Classic Full Body',
-          category: 'Full-body strength',
-          targetDurationMinutes: 30,
-          isCustom: false,
-          exercises: [
-            PlannedExercise(
-              exerciseId: 'squat',
-              exerciseName: 'Bodyweight squat',
-              primaryMuscles: ['Quadriceps', 'Glutes'],
-              sets: [
-                PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
-                PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
-                PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
-              ],
-            ),
-            PlannedExercise(
-              exerciseId: 'push-up',
-              exerciseName: 'Push-up',
-              primaryMuscles: ['Chest', 'Triceps'],
-              sets: [
-                PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
-                PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
-                PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
-              ],
-            ),
-            PlannedExercise(
-              exerciseId: 'bridge',
-              exerciseName: 'Bridge',
-              primaryMuscles: ['Glutes', 'Hamstrings'],
-              sets: [
-                PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 45),
-                PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 45),
-                PlannedSet(setNumber: 3, targetReps: 12, targetRestSeconds: 45),
-              ],
-            ),
-            PlannedExercise(
-              exerciseId: 'plank',
-              exerciseName: 'Plank',
-              primaryMuscles: ['Abdominals'],
-              sets: [
-                PlannedSet(setNumber: 1, targetReps: 30, targetRestSeconds: 45),
-                PlannedSet(setNumber: 2, targetReps: 30, targetRestSeconds: 45),
-              ],
-            ),
+    const PlannedRoutine(
+      id: 'tmpl-push',
+      name: 'Push Power',
+      category: 'Push',
+      targetDurationMinutes: 35,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'push-up',
+          exerciseName: 'Push-up',
+          primaryMuscles: ['Chest', 'Triceps'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
           ],
         ),
-        const PlannedRoutine(
-          id: 'tmpl-core-mobility',
-          name: 'Core & Mobility Reset',
-          category: 'Mobility',
-          targetDurationMinutes: 20,
-          isCustom: false,
-          exercises: [
-            PlannedExercise(
-              exerciseId: 'bird-dog',
-              exerciseName: 'Bird dog',
-              primaryMuscles: ['Back', 'Glutes'],
-              sets: [
-                PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 30),
-                PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 30),
-              ],
-            ),
-            PlannedExercise(
-              exerciseId: 'dead-bug',
-              exerciseName: 'Dead bug',
-              primaryMuscles: ['Abdominals'],
-              sets: [
-                PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 30),
-                PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 30),
-              ],
-            ),
-            PlannedExercise(
-              exerciseId: 'chest-stretch',
-              exerciseName: 'Chest stretch',
-              primaryMuscles: ['Chest', 'Shoulders'],
-              sets: [
-                PlannedSet(setNumber: 1, targetReps: 5, targetRestSeconds: 30),
-                PlannedSet(setNumber: 2, targetReps: 5, targetRestSeconds: 30),
-              ],
-            ),
+        PlannedExercise(
+          exerciseId: 'dip',
+          exerciseName: 'Bench dip',
+          primaryMuscles: ['Triceps', 'Chest'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
           ],
         ),
-      ];
+        PlannedExercise(
+          exerciseId: 'plank',
+          exerciseName: 'Plank',
+          primaryMuscles: ['Abdominals'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 30, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 30, targetRestSeconds: 45),
+          ],
+        ),
+      ],
+    ),
+    const PlannedRoutine(
+      id: 'tmpl-pull',
+      name: 'Pull Strength',
+      category: 'Pull',
+      targetDurationMinutes: 35,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'bird-dog',
+          exerciseName: 'Bird dog',
+          primaryMuscles: ['Back', 'Glutes'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 3, targetReps: 12, targetRestSeconds: 45),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'dead-bug',
+          exerciseName: 'Dead bug',
+          primaryMuscles: ['Abdominals'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 3, targetReps: 12, targetRestSeconds: 45),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'chest-stretch',
+          exerciseName: 'Chest stretch',
+          primaryMuscles: ['Chest', 'Shoulders'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 5, targetRestSeconds: 30),
+            PlannedSet(setNumber: 2, targetReps: 5, targetRestSeconds: 30),
+          ],
+        ),
+      ],
+    ),
+    const PlannedRoutine(
+      id: 'tmpl-legs',
+      name: 'Legs & Lower Body',
+      category: 'Legs',
+      targetDurationMinutes: 40,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'squat',
+          exerciseName: 'Bodyweight squat',
+          primaryMuscles: ['Quadriceps', 'Glutes'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 12, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'lunge',
+          exerciseName: 'Lunge',
+          primaryMuscles: ['Quadriceps', 'Hamstrings'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'bridge',
+          exerciseName: 'Bridge',
+          primaryMuscles: ['Glutes', 'Hamstrings'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 15, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 15, targetRestSeconds: 45),
+            PlannedSet(setNumber: 3, targetReps: 15, targetRestSeconds: 45),
+          ],
+        ),
+      ],
+    ),
+    const PlannedRoutine(
+      id: 'tmpl-upper',
+      name: 'Upper Body Power',
+      category: 'Upper',
+      targetDurationMinutes: 30,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'push-up',
+          exerciseName: 'Push-up',
+          primaryMuscles: ['Chest', 'Triceps'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'dip',
+          exerciseName: 'Bench dip',
+          primaryMuscles: ['Triceps', 'Chest'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'chest-stretch',
+          exerciseName: 'Chest stretch',
+          primaryMuscles: ['Chest', 'Shoulders'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 5, targetRestSeconds: 30),
+          ],
+        ),
+      ],
+    ),
+    const PlannedRoutine(
+      id: 'tmpl-lower',
+      name: 'Lower Body Strength',
+      category: 'Lower',
+      targetDurationMinutes: 30,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'squat',
+          exerciseName: 'Bodyweight squat',
+          primaryMuscles: ['Quadriceps', 'Glutes'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 12, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'bridge',
+          exerciseName: 'Bridge',
+          primaryMuscles: ['Glutes', 'Hamstrings'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 3, targetReps: 12, targetRestSeconds: 45),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'plank',
+          exerciseName: 'Plank',
+          primaryMuscles: ['Abdominals'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 30, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 30, targetRestSeconds: 45),
+          ],
+        ),
+      ],
+    ),
+    const PlannedRoutine(
+      id: 'tmpl-full-body',
+      name: 'Classic Full Body',
+      category: 'Full-body strength',
+      targetDurationMinutes: 30,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'squat',
+          exerciseName: 'Bodyweight squat',
+          primaryMuscles: ['Quadriceps', 'Glutes'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'push-up',
+          exerciseName: 'Push-up',
+          primaryMuscles: ['Chest', 'Triceps'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
+            PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'bridge',
+          exerciseName: 'Bridge',
+          primaryMuscles: ['Glutes', 'Hamstrings'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 12, targetRestSeconds: 45),
+            PlannedSet(setNumber: 3, targetReps: 12, targetRestSeconds: 45),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'plank',
+          exerciseName: 'Plank',
+          primaryMuscles: ['Abdominals'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 30, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 30, targetRestSeconds: 45),
+          ],
+        ),
+      ],
+    ),
+    const PlannedRoutine(
+      id: 'tmpl-beginner-strength',
+      name: 'Beginner Strength Foundation',
+      category: 'Beginner strength',
+      targetDurationMinutes: 25,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'squat',
+          exerciseName: 'Bodyweight squat',
+          primaryMuscles: ['Quadriceps', 'Glutes'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 8, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 8, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'push-up',
+          exerciseName: 'Push-up',
+          primaryMuscles: ['Chest', 'Triceps'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 8, targetRestSeconds: 60),
+            PlannedSet(setNumber: 2, targetReps: 8, targetRestSeconds: 60),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'bridge',
+          exerciseName: 'Bridge',
+          primaryMuscles: ['Glutes', 'Hamstrings'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 45),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 45),
+          ],
+        ),
+      ],
+    ),
+    const PlannedRoutine(
+      id: 'tmpl-core-mobility',
+      name: 'Core & Mobility Reset',
+      category: 'Mobility',
+      targetDurationMinutes: 20,
+      isCustom: false,
+      exercises: [
+        PlannedExercise(
+          exerciseId: 'bird-dog',
+          exerciseName: 'Bird dog',
+          primaryMuscles: ['Back', 'Glutes'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 30),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 30),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'dead-bug',
+          exerciseName: 'Dead bug',
+          primaryMuscles: ['Abdominals'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 30),
+            PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 30),
+          ],
+        ),
+        PlannedExercise(
+          exerciseId: 'chest-stretch',
+          exerciseName: 'Chest stretch',
+          primaryMuscles: ['Chest', 'Shoulders'],
+          sets: [
+            PlannedSet(setNumber: 1, targetReps: 5, targetRestSeconds: 30),
+            PlannedSet(setNumber: 2, targetReps: 5, targetRestSeconds: 30),
+          ],
+        ),
+      ],
+    ),
+  ];
 }
 
 final workoutRepositoryProvider = Provider<WorkoutRepository>(
@@ -201,48 +426,48 @@ final workoutRepositoryProvider = Provider<WorkoutRepository>(
 
 final workoutSessionsProvider =
     AsyncNotifierProvider<WorkoutSessionsController, List<WorkoutSession>>(
-  WorkoutSessionsController.new,
-);
+      WorkoutSessionsController.new,
+    );
 
-class WorkoutSessionsController
-    extends AsyncNotifier<List<WorkoutSession>> {
+class WorkoutSessionsController extends AsyncNotifier<List<WorkoutSession>> {
   @override
   Future<List<WorkoutSession>> build() =>
       ref.watch(workoutRepositoryProvider).loadSessions();
 
   Future<void> addSession(WorkoutSession session) async {
-    final updated =
-        await ref.read(workoutRepositoryProvider).saveSession(session);
+    final updated = await ref
+        .read(workoutRepositoryProvider)
+        .saveSession(session);
     if (ref.mounted) state = AsyncData(updated);
   }
 
   Future<void> removeSession(String id) async {
-    final updated =
-        await ref.read(workoutRepositoryProvider).deleteSession(id);
+    final updated = await ref.read(workoutRepositoryProvider).deleteSession(id);
     if (ref.mounted) state = AsyncData(updated);
   }
 }
 
 final workoutTemplatesProvider =
     AsyncNotifierProvider<WorkoutTemplatesController, List<PlannedRoutine>>(
-  WorkoutTemplatesController.new,
-);
+      WorkoutTemplatesController.new,
+    );
 
-class WorkoutTemplatesController
-    extends AsyncNotifier<List<PlannedRoutine>> {
+class WorkoutTemplatesController extends AsyncNotifier<List<PlannedRoutine>> {
   @override
   Future<List<PlannedRoutine>> build() =>
       ref.watch(workoutRepositoryProvider).loadTemplates();
 
   Future<void> saveTemplate(PlannedRoutine template) async {
-    final updated =
-        await ref.read(workoutRepositoryProvider).saveTemplate(template);
+    final updated = await ref
+        .read(workoutRepositoryProvider)
+        .saveTemplate(template);
     if (ref.mounted) state = AsyncData(updated);
   }
 
   Future<void> removeTemplate(String id) async {
-    final updated =
-        await ref.read(workoutRepositoryProvider).deleteTemplate(id);
+    final updated = await ref
+        .read(workoutRepositoryProvider)
+        .deleteTemplate(id);
     if (ref.mounted) state = AsyncData(updated);
   }
 }

@@ -99,7 +99,8 @@ class CoachMessage {
       id: (json['id'] as String?) ?? '',
       role: MessageRole.fromString(json['role'] as String?),
       content: (json['content'] as String?) ?? '',
-      timestamp: DateTime.tryParse((json['timestamp'] as String?) ?? '') ??
+      timestamp:
+          DateTime.tryParse((json['timestamp'] as String?) ?? '') ??
           DateTime.now(),
       offlineGenerated: (json['offlineGenerated'] as bool?) ?? false,
       provider: json['provider'] != null
@@ -107,13 +108,15 @@ class CoachMessage {
           : null,
       modelName: json['modelName'] as String?,
       tokensUsed: (json['tokensUsed'] as num?)?.toInt(),
-      suggestedActions: (json['suggestedActions'] as List?)
+      suggestedActions:
+          (json['suggestedActions'] as List?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],
       workoutPlan: json['workoutPlan'] != null
           ? WorkoutPlanCardData.fromJson(
-              json['workoutPlan'] as Map<String, dynamic>)
+              json['workoutPlan'] as Map<String, dynamic>,
+            )
           : null,
       isLiked: json['isLiked'] as bool?,
     );
@@ -131,11 +134,6 @@ class CoachMessage {
           offlineGenerated == other.offlineGenerated;
 
   @override
-  int get hashCode => Object.hash(
-        id,
-        role,
-        content,
-        timestamp,
-        offlineGenerated,
-      );
+  int get hashCode =>
+      Object.hash(id, role, content, timestamp, offlineGenerated);
 }

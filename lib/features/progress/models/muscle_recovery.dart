@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 enum MuscleRecoveryState {
-  fresh,       // 90% - 100% recovered
-  recovering,  // 60% - 89% recovered
-  fatigued,    // 30% - 59% recovered
-  overreaching // 0% - 29% heavily fatigued
+  fresh, // 90% - 100% recovered
+  recovering, // 60% - 89% recovered
+  fatigued, // 30% - 59% recovered
+  overreaching, // 0% - 29% heavily fatigued
 }
 
 @immutable
@@ -43,28 +43,27 @@ class MuscleGroupRecovery {
   }
 
   Map<String, dynamic> toJson() => {
-        'muscleGroup': muscleGroup,
-        'recoveryPercentage': recoveryPercentage,
-        'state': state.name,
-        'hoursSinceLastTrained': hoursSinceLastTrained,
-        if (lastTrainedAt != null)
-          'lastTrainedAt': lastTrainedAt!.toIso8601String(),
-        'estimatedHoursToFullRecovery': estimatedHoursToFullRecovery,
-        'setsInLast48Hours': setsInLast48Hours,
-        'totalVolumeInLast48Hours': totalVolumeInLast48Hours,
-      };
+    'muscleGroup': muscleGroup,
+    'recoveryPercentage': recoveryPercentage,
+    'state': state.name,
+    'hoursSinceLastTrained': hoursSinceLastTrained,
+    if (lastTrainedAt != null)
+      'lastTrainedAt': lastTrainedAt!.toIso8601String(),
+    'estimatedHoursToFullRecovery': estimatedHoursToFullRecovery,
+    'setsInLast48Hours': setsInLast48Hours,
+    'totalVolumeInLast48Hours': totalVolumeInLast48Hours,
+  };
 
   factory MuscleGroupRecovery.fromJson(Map<String, dynamic> json) =>
       MuscleGroupRecovery(
         muscleGroup: json['muscleGroup'] as String,
-        recoveryPercentage:
-            (json['recoveryPercentage'] as num).toDouble(),
+        recoveryPercentage: (json['recoveryPercentage'] as num).toDouble(),
         state: MuscleRecoveryState.values.firstWhere(
           (e) => e.name == json['state'],
           orElse: () => MuscleRecoveryState.fresh,
         ),
-        hoursSinceLastTrained:
-            (json['hoursSinceLastTrained'] as num).toDouble(),
+        hoursSinceLastTrained: (json['hoursSinceLastTrained'] as num)
+            .toDouble(),
         lastTrainedAt: json['lastTrainedAt'] != null
             ? DateTime.tryParse(json['lastTrainedAt'] as String)
             : null,

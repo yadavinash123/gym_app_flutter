@@ -55,13 +55,15 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
           .toLowerCase()
           .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
           .replaceAll(RegExp(r'^-+|-+$'), '');
-      final id = 'custom-${slug.isEmpty ? "item" : slug}-${DateTime.now().millisecondsSinceEpoch % 10000}';
+      final id =
+          'custom-${slug.isEmpty ? "item" : slug}-${DateTime.now().millisecondsSinceEpoch % 10000}';
 
       final servingSize = double.parse(_servingSizeController.text.trim());
       final portionName = _portionNameController.text.trim().isEmpty
           ? '1 serving'
           : _portionNameController.text.trim();
-      final portionGrams = double.tryParse(_portionGramsController.text.trim()) ?? servingSize;
+      final portionGrams =
+          double.tryParse(_portionGramsController.text.trim()) ?? servingSize;
 
       final calories = double.parse(_caloriesController.text.trim());
       final protein = double.parse(_proteinController.text.trim());
@@ -80,7 +82,10 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
         portions: [
           PortionUnit(name: portionName, grams: portionGrams),
           if (portionGrams != servingSize)
-            PortionUnit(name: '${servingSize.toStringAsFixed(0)}$_servingUnit', grams: servingSize),
+            PortionUnit(
+              name: '${servingSize.toStringAsFixed(0)}$_servingUnit',
+              grams: servingSize,
+            ),
         ],
         calories: calories,
         protein: protein,
@@ -102,9 +107,8 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving food: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error saving food: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -119,7 +123,13 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
         actions: [
           TextButton(
             onPressed: _isSaving ? null : _save,
-            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFB6FF3B))),
+            child: const Text(
+              'Save',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFB6FF3B),
+              ),
+            ),
           ),
         ],
       ),
@@ -135,8 +145,9 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                 labelText: 'Food Name *',
                 hintText: 'e.g. Homemade Protein Oats',
               ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Please enter a name' : null,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Please enter a name'
+                  : null,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
@@ -152,7 +163,9 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _selectedDiet,
-              decoration: const InputDecoration(labelText: 'Dietary Preference'),
+              decoration: const InputDecoration(
+                labelText: 'Dietary Preference',
+              ),
               items: FoodItem.diets
                   .map((d) => DropdownMenuItem(value: d, child: Text(d)))
                   .toList(),
@@ -166,8 +179,12 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _servingSizeController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Serving Size *'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Serving Size *',
+                    ),
                     validator: (v) {
                       final num = double.tryParse(v ?? '');
                       if (num == null || num <= 0) return 'Invalid size';
@@ -182,7 +199,10 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                     decoration: const InputDecoration(labelText: 'Unit'),
                     items: const [
                       DropdownMenuItem(value: 'g', child: Text('Grams (g)')),
-                      DropdownMenuItem(value: 'ml', child: Text('Milliliters (ml)')),
+                      DropdownMenuItem(
+                        value: 'ml',
+                        child: Text('Milliliters (ml)'),
+                      ),
                     ],
                     onChanged: (v) {
                       if (v != null) setState(() => _servingUnit = v);
@@ -207,7 +227,9 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _portionGramsController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: const InputDecoration(
                       labelText: 'Portion Weight (g/ml)',
                     ),
@@ -231,8 +253,12 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                   child: TextFormField(
                     key: const ValueKey('custom_calories'),
                     controller: _caloriesController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Calories (kcal) *'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Calories (kcal) *',
+                    ),
                     validator: (v) {
                       final n = double.tryParse(v ?? '');
                       if (n == null || n < 0) return 'Required';
@@ -245,8 +271,12 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                   child: TextFormField(
                     key: const ValueKey('custom_protein'),
                     controller: _proteinController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Protein (g) *'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Protein (g) *',
+                    ),
                     validator: (v) {
                       final n = double.tryParse(v ?? '');
                       if (n == null || n < 0) return 'Required';
@@ -263,8 +293,12 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                   child: TextFormField(
                     key: const ValueKey('custom_carbs'),
                     controller: _carbsController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Carbohydrates (g) *'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Carbohydrates (g) *',
+                    ),
                     validator: (v) {
                       final n = double.tryParse(v ?? '');
                       if (n == null || n < 0) return 'Required';
@@ -277,8 +311,12 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                   child: TextFormField(
                     key: const ValueKey('custom_fat'),
                     controller: _fatController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Total Fat (g) *'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Total Fat (g) *',
+                    ),
                     validator: (v) {
                       final n = double.tryParse(v ?? '');
                       if (n == null || n < 0) return 'Required';
@@ -294,15 +332,21 @@ class _CustomFoodScreenState extends ConsumerState<CustomFoodScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _fiberController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Dietary Fiber (g)'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Dietary Fiber (g)',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: TextFormField(
                     controller: _brandController,
-                    decoration: const InputDecoration(labelText: 'Brand / Recipe (Optional)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Brand / Recipe (Optional)',
+                    ),
                   ),
                 ),
               ],

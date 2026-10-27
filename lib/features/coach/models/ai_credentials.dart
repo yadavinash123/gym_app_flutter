@@ -94,11 +94,11 @@ class AiCredentials {
 
   @override
   int get hashCode => Object.hash(
-        provider,
-        apiKey,
-        modelName,
-        customEndpointUrl,
-        temperature,
-        maxTokens,
-      );
+    provider,
+    apiKey,
+    modelName,
+    customEndpointUrl,
+    temperature,
+    maxTokens,
+  );
 }

@@ -59,36 +59,36 @@ class LoggedFoodItem {
   }
 
   factory LoggedFoodItem.fromJson(Map<String, dynamic> json) => LoggedFoodItem(
-        id: json['id'] as String,
-        foodId: json['foodId'] as String,
-        name: json['name'] as String,
-        portionName: json['portionName'] as String,
-        grams: (json['grams'] as num).toDouble(),
-        quantity: (json['quantity'] as num).toDouble(),
-        calories: (json['calories'] as num).toDouble(),
-        protein: (json['protein'] as num).toDouble(),
-        carbs: (json['carbs'] as num).toDouble(),
-        fat: (json['fat'] as num).toDouble(),
-        fiber: (json['fiber'] as num).toDouble(),
-        loggedAt: json['loggedAt'] != null
-            ? DateTime.parse(json['loggedAt'] as String)
-            : null,
-      );
+    id: json['id'] as String,
+    foodId: json['foodId'] as String,
+    name: json['name'] as String,
+    portionName: json['portionName'] as String,
+    grams: (json['grams'] as num).toDouble(),
+    quantity: (json['quantity'] as num).toDouble(),
+    calories: (json['calories'] as num).toDouble(),
+    protein: (json['protein'] as num).toDouble(),
+    carbs: (json['carbs'] as num).toDouble(),
+    fat: (json['fat'] as num).toDouble(),
+    fiber: (json['fiber'] as num).toDouble(),
+    loggedAt: json['loggedAt'] != null
+        ? DateTime.parse(json['loggedAt'] as String)
+        : null,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'foodId': foodId,
-        'name': name,
-        'portionName': portionName,
-        'grams': grams,
-        'quantity': quantity,
-        'calories': calories,
-        'protein': protein,
-        'carbs': carbs,
-        'fat': fat,
-        'fiber': fiber,
-        'loggedAt': loggedAt.toIso8601String(),
-      };
+    'id': id,
+    'foodId': foodId,
+    'name': name,
+    'portionName': portionName,
+    'grams': grams,
+    'quantity': quantity,
+    'calories': calories,
+    'protein': protein,
+    'carbs': carbs,
+    'fat': fat,
+    'fiber': fiber,
+    'loggedAt': loggedAt.toIso8601String(),
+  };
 }
 
 class MealType {
@@ -101,33 +101,29 @@ class MealType {
 }
 
 class Meal {
-  Meal({
-    required this.type,
-    List<LoggedFoodItem>? items,
-  }) : items = items ?? [];
+  Meal({required this.type, List<LoggedFoodItem>? items}) : items = items ?? [];
 
   final String type;
   final List<LoggedFoodItem> items;
 
   double get totalCalories =>
       items.fold(0.0, (sum, item) => sum + item.calories);
-  double get totalProtein =>
-      items.fold(0.0, (sum, item) => sum + item.protein);
+  double get totalProtein => items.fold(0.0, (sum, item) => sum + item.protein);
   double get totalCarbs => items.fold(0.0, (sum, item) => sum + item.carbs);
   double get totalFat => items.fold(0.0, (sum, item) => sum + item.fat);
   double get totalFiber => items.fold(0.0, (sum, item) => sum + item.fiber);
 
   factory Meal.fromJson(Map<String, dynamic> json) => Meal(
-        type: json['type'] as String,
-        items: (json['items'] as List? ?? [])
-            .map((i) => LoggedFoodItem.fromJson(i as Map<String, dynamic>))
-            .toList(),
-      );
+    type: json['type'] as String,
+    items: (json['items'] as List? ?? [])
+        .map((i) => LoggedFoodItem.fromJson(i as Map<String, dynamic>))
+        .toList(),
+  );
 
   Map<String, dynamic> toJson() => {
-        'type': type,
-        'items': items.map((i) => i.toJson()).toList(),
-      };
+    'type': type,
+    'items': items.map((i) => i.toJson()).toList(),
+  };
 }
 
 class DailyNutritionLog {
@@ -137,12 +133,14 @@ class DailyNutritionLog {
     this.waterMl = 0,
     this.waterTargetMl = 2500,
     this.notes = '',
-  }) : meals = meals ?? {
-          MealType.breakfast: Meal(type: MealType.breakfast),
-          MealType.lunch: Meal(type: MealType.lunch),
-          MealType.dinner: Meal(type: MealType.dinner),
-          MealType.snacks: Meal(type: MealType.snacks),
-        };
+  }) : meals =
+           meals ??
+           {
+             MealType.breakfast: Meal(type: MealType.breakfast),
+             MealType.lunch: Meal(type: MealType.lunch),
+             MealType.dinner: Meal(type: MealType.dinner),
+             MealType.snacks: Meal(type: MealType.snacks),
+           };
 
   final String date; // YYYY-MM-DD
   final Map<String, Meal> meals;
@@ -156,8 +154,7 @@ class DailyNutritionLog {
       meals.values.fold(0.0, (sum, m) => sum + m.totalProtein);
   double get totalCarbs =>
       meals.values.fold(0.0, (sum, m) => sum + m.totalCarbs);
-  double get totalFat =>
-      meals.values.fold(0.0, (sum, m) => sum + m.totalFat);
+  double get totalFat => meals.values.fold(0.0, (sum, m) => sum + m.totalFat);
   double get totalFiber =>
       meals.values.fold(0.0, (sum, m) => sum + m.totalFiber);
 
@@ -172,14 +169,13 @@ class DailyNutritionLog {
     int? waterMl,
     int? waterTargetMl,
     String? notes,
-  }) =>
-      DailyNutritionLog(
-        date: date ?? this.date,
-        meals: meals ?? this.meals,
-        waterMl: waterMl ?? this.waterMl,
-        waterTargetMl: waterTargetMl ?? this.waterTargetMl,
-        notes: notes ?? this.notes,
-      );
+  }) => DailyNutritionLog(
+    date: date ?? this.date,
+    meals: meals ?? this.meals,
+    waterMl: waterMl ?? this.waterMl,
+    waterTargetMl: waterTargetMl ?? this.waterTargetMl,
+    notes: notes ?? this.notes,
+  );
 
   factory DailyNutritionLog.empty(String date, {int waterTarget = 2500}) =>
       DailyNutritionLog(
@@ -215,10 +211,10 @@ class DailyNutritionLog {
   }
 
   Map<String, dynamic> toJson() => {
-        'date': date,
-        'meals': meals.map((k, v) => MapEntry(k, v.toJson())),
-        'waterMl': waterMl,
-        'waterTargetMl': waterTargetMl,
-        'notes': notes,
-      };
+    'date': date,
+    'meals': meals.map((k, v) => MapEntry(k, v.toJson())),
+    'waterMl': waterMl,
+    'waterTargetMl': waterTargetMl,
+    'notes': notes,
+  };
 }

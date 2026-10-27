@@ -12,7 +12,8 @@ class ReminderSettingsScreen extends ConsumerStatefulWidget {
       _ReminderSettingsScreenState();
 }
 
-class _ReminderSettingsScreenState extends ConsumerState<ReminderSettingsScreen> {
+class _ReminderSettingsScreenState
+    extends ConsumerState<ReminderSettingsScreen> {
   List<ReminderPreference>? _reminders;
   bool _hasChanges = false;
   String? _statusBanner;
@@ -98,16 +99,24 @@ class _ReminderSettingsScreenState extends ConsumerState<ReminderSettingsScreen>
               if (_statusBanner != null) ...[
                 const SizedBox(height: 14),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFB6FF3B).withOpacity(0.15),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFB6FF3B).withOpacity(0.3)),
+                    border: Border.all(
+                      color: const Color(0xFFB6FF3B).withOpacity(0.3),
+                    ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle_rounded,
-                          color: Color(0xFFB6FF3B), size: 16),
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: Color(0xFFB6FF3B),
+                        size: 16,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -148,8 +157,11 @@ class _ReminderSettingsScreenState extends ConsumerState<ReminderSettingsScreen>
                       backgroundColor: const Color(0xFF151B23),
                       content: Row(
                         children: [
-                          const Icon(Icons.fitness_center_rounded,
-                              color: Color(0xFFB6FF3B), size: 20),
+                          const Icon(
+                            Icons.fitness_center_rounded,
+                            color: Color(0xFFB6FF3B),
+                            size: 20,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -164,8 +176,11 @@ class _ReminderSettingsScreenState extends ConsumerState<ReminderSettingsScreen>
                                   ),
                                 ),
                                 Text(
-                                  _reminders!.firstWhere((r) => r.isEnabled,
-                                          orElse: () => _reminders!.first)
+                                  _reminders!
+                                      .firstWhere(
+                                        (r) => r.isEnabled,
+                                        orElse: () => _reminders!.first,
+                                      )
                                       .title,
                                   style: const TextStyle(
                                     fontSize: 12,
@@ -255,10 +270,7 @@ class _ReminderSettingsScreenState extends ConsumerState<ReminderSettingsScreen>
           const SizedBox(height: 6),
           Text(
             reminder.description,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFFA7B0BF),
-            ),
+            style: const TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
           ),
           const SizedBox(height: 14),
           // Time Picker button
@@ -274,20 +286,28 @@ class _ReminderSettingsScreenState extends ConsumerState<ReminderSettingsScreen>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.access_time_rounded,
-                      size: 16, color: Color(0xFF00D4FF)),
+                  const Icon(
+                    Icons.access_time_rounded,
+                    size: 16,
+                    color: Color(0xFF00D4FF),
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     reminder.timeFormatted,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: reminder.isEnabled ? Colors.white : const Color(0xFFA7B0BF),
+                      color: reminder.isEnabled
+                          ? Colors.white
+                          : const Color(0xFFA7B0BF),
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Icon(Icons.arrow_drop_down,
-                      size: 18, color: Color(0xFFA7B0BF)),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    size: 18,
+                    color: Color(0xFFA7B0BF),
+                  ),
                 ],
               ),
             ),

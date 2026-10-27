@@ -18,11 +18,30 @@ class RecoveryCalculator {
   static String mapToCanonicalGroup(String muscleTag) {
     final lower = muscleTag.toLowerCase().trim();
     if (lower.contains('chest') || lower.contains('pectoral')) return 'Chest';
-    if (lower.contains('back') || lower.contains('lat') || lower.contains('rhomboid') || lower.contains('trapezius')) return 'Back';
-    if (lower.contains('leg') || lower.contains('quad') || lower.contains('hamstring') || lower.contains('glute') || lower.contains('calf') || lower.contains('calves')) return 'Legs';
-    if (lower.contains('shoulder') || lower.contains('deltoid')) return 'Shoulders';
-    if (lower.contains('bicep') || lower.contains('tricep') || lower.contains('arm') || lower.contains('forearm')) return 'Arms';
-    if (lower.contains('core') || lower.contains('ab') || lower.contains('oblique') || lower.contains('spine')) return 'Core';
+    if (lower.contains('back') ||
+        lower.contains('lat') ||
+        lower.contains('rhomboid') ||
+        lower.contains('trapezius'))
+      return 'Back';
+    if (lower.contains('leg') ||
+        lower.contains('quad') ||
+        lower.contains('hamstring') ||
+        lower.contains('glute') ||
+        lower.contains('calf') ||
+        lower.contains('calves'))
+      return 'Legs';
+    if (lower.contains('shoulder') || lower.contains('deltoid'))
+      return 'Shoulders';
+    if (lower.contains('bicep') ||
+        lower.contains('tricep') ||
+        lower.contains('arm') ||
+        lower.contains('forearm'))
+      return 'Arms';
+    if (lower.contains('core') ||
+        lower.contains('ab') ||
+        lower.contains('oblique') ||
+        lower.contains('spine'))
+      return 'Core';
     return 'Core';
   }
 
@@ -62,7 +81,8 @@ class RecoveryCalculator {
 
         for (final group in groups) {
           final stats = muscleHistory[group] ??= _MuscleTrainingStats();
-          if (stats.lastTrainedAt == null || session.completedAt.isAfter(stats.lastTrainedAt!)) {
+          if (stats.lastTrainedAt == null ||
+              session.completedAt.isAfter(stats.lastTrainedAt!)) {
             stats.lastTrainedAt = session.completedAt;
             stats.hoursSinceLastTrained = hoursAgo;
           }
@@ -91,7 +111,7 @@ class RecoveryCalculator {
       if (sleepMinutes >= 450) {
         sleepFactor = 1.05; // >7.5h sleep promotes supercompensation
       } else if (sleepMinutes >= 390) {
-        sleepFactor = 1.0;  // 6.5 - 7.5h
+        sleepFactor = 1.0; // 6.5 - 7.5h
       } else if (sleepMinutes >= 300) {
         sleepFactor = 0.88; // 5 - 6.5h
       } else {
@@ -116,7 +136,8 @@ class RecoveryCalculator {
     // Compute average muscle recovery score
     final avgMuscleRecovery = recoveries.isEmpty
         ? 100.0
-        : recoveries.map((m) => m.recoveryPercentage).reduce((a, b) => a + b) / recoveries.length;
+        : recoveries.map((m) => m.recoveryPercentage).reduce((a, b) => a + b) /
+              recoveries.length;
 
     // Modulate system readiness with autonomic recovery factors
     final autonomicScore = (sleepFactor * hrFactor * 100).clamp(50.0, 110.0);
@@ -124,14 +145,25 @@ class RecoveryCalculator {
     final finalReadiness = rawSystemScore.round().clamp(0, 100);
 
     // Generate actionable physiological advice
-    final freshGroups = recoveries.where((r) => r.state == MuscleRecoveryState.fresh).map((r) => r.muscleGroup).toList();
-    final fatiguedGroups = recoveries.where((r) => r.state == MuscleRecoveryState.fatigued || r.state == MuscleRecoveryState.overreaching).map((r) => r.muscleGroup).toList();
+    final freshGroups = recoveries
+        .where((r) => r.state == MuscleRecoveryState.fresh)
+        .map((r) => r.muscleGroup)
+        .toList();
+    final fatiguedGroups = recoveries
+        .where(
+          (r) =>
+              r.state == MuscleRecoveryState.fatigued ||
+              r.state == MuscleRecoveryState.overreaching,
+        )
+        .map((r) => r.muscleGroup)
+        .toList();
 
     String advice;
     if (fatiguedGroups.isEmpty) {
       advice = 'All major muscle groups are fully recovered and primed for progressive overload.';
     } else if (freshGroups.isNotEmpty) {
-      advice = '${freshGroups.join(", ")} are fresh and ready for high-intensity stimulus. Allow ${fatiguedGroups.join(", ")} more recovery time.';
+      advice =
+          '${freshGroups.join(", ")} are fresh and ready for high-intensity stimulus. Allow ${fatiguedGroups.join(", ")} more recovery time.';
     } else {
       advice = 'Systemic fatigue is elevated across trained muscle groups. Consider an active recovery or rest day.';
     }
@@ -163,7 +195,7 @@ class RecoveryCalculator {
     }
 
     final hours = math.max(0.0, stats.hoursSinceLastTrained);
-    
+
     // Recovery curve calculation:
     // Immediate fatigue floor drops with volume
     final volumeSets = stats.setsInLast72Hours;
@@ -172,15 +204,28 @@ class RecoveryCalculator {
 
     // Exponential decay recovery coefficient
     // Light session recovers in ~36h, moderate in ~48h, heavy in ~72h
-    final halfLifeHours = volumeSets > 10 ? 30.0 : (volumeSets > 5 ? 24.0 : 18.0);
+    final halfLifeHours = volumeSets > 10
+        ? 30.0
+        : (volumeSets > 5 ? 24.0 : 18.0);
     final k = math.ln2 / halfLifeHours;
 
-    final currentRecovery = (initialRecovery + (100.0 - initialRecovery) * (1.0 - math.exp(-k * hours)))
-        .clamp(0.0, 100.0);
+    final currentRecovery =
+        (initialRecovery +
+                (100.0 - initialRecovery) * (1.0 - math.exp(-k * hours)))
+            .clamp(0.0, 100.0);
 
     final hoursRemaining = currentRecovery >= 95.0
         ? 0
-        : math.max(0, ((math.log((100.0 - initialRecovery) / math.max(0.1, 100.0 - 95.0)) / k) - hours).ceil());
+        : math.max(
+            0,
+            ((math.log(
+                          (100.0 - initialRecovery) /
+                              math.max(0.1, 100.0 - 95.0),
+                        ) /
+                        k) -
+                    hours)
+                .ceil(),
+          );
 
     final state = _classifyState(currentRecovery);
 

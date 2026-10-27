@@ -174,7 +174,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   }
 
   Widget _buildDateBar() {
-    final isToday = _dateIso ==
+    final isToday =
+        _dateIso ==
         '${DateTime.now().year.toString().padLeft(4, '0')}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}';
 
     return Container(
@@ -229,7 +230,10 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     );
   }
 
-  Widget _buildSyncHeroCard(DailyHealthSummary summary, StepTrackingState? stepState) {
+  Widget _buildSyncHeroCard(
+    DailyHealthSummary summary,
+    StepTrackingState? stepState,
+  ) {
     final isWalking = stepState?.isWalking ?? false;
 
     return Container(
@@ -314,8 +318,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     isWalking
                         ? '🚶 Walking detected · Counting footsteps live'
                         : (stepState?.hasHardwareSensor ?? true)
-                            ? '⚡ Auto-step counter active · Hardware sensor continuous'
-                            : 'Step tracking ready (sensor listening)',
+                        ? '⚡ Auto-step counter active · Hardware sensor continuous'
+                        : 'Step tracking ready (sensor listening)',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
@@ -360,7 +364,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () => context.push('/health/log?date=$_dateIso'),
+                      onPressed: () =>
+                          context.push('/health/log?date=$_dateIso'),
                       icon: const Icon(Icons.edit_note, size: 18),
                       label: const Text('Manual Log'),
                     ),
@@ -398,7 +403,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () => context.push('/health/log?date=$_dateIso'),
+                      onPressed: () =>
+                          context.push('/health/log?date=$_dateIso'),
                       icon: const Icon(Icons.edit_note, size: 18),
                       label: const FittedBox(
                         fit: BoxFit.scaleDown,
@@ -531,11 +537,23 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           const SizedBox(height: 14),
           Row(
             children: [
-              _stageChip('Deep Sleep', '${deep ~/ 60}h ${deep % 60}m', const Color(0xFF6366F1)),
+              _stageChip(
+                'Deep Sleep',
+                '${deep ~/ 60}h ${deep % 60}m',
+                const Color(0xFF6366F1),
+              ),
               const SizedBox(width: 8),
-              _stageChip('REM Sleep', '${rem ~/ 60}h ${rem % 60}m', const Color(0xFFA78BFA)),
+              _stageChip(
+                'REM Sleep',
+                '${rem ~/ 60}h ${rem % 60}m',
+                const Color(0xFFA78BFA),
+              ),
               const SizedBox(width: 8),
-              _stageChip('Light Sleep', '${light ~/ 60}h ${light % 60}m', const Color(0xFF00D4FF)),
+              _stageChip(
+                'Light Sleep',
+                '${light ~/ 60}h ${light % 60}m',
+                const Color(0xFF00D4FF),
+              ),
             ],
           ),
         ],
@@ -597,7 +615,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.history_rounded, color: Color(0xFFA7B0BF), size: 20),
+              const Icon(
+                Icons.history_rounded,
+                color: Color(0xFFA7B0BF),
+                size: 20,
+              ),
               const SizedBox(width: 8),
               const Expanded(
                 child: Text(
@@ -628,7 +650,9 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     Icon(
                       log.isSuccess ? Icons.check_circle : Icons.error,
                       size: 16,
-                      color: log.isSuccess ? const Color(0xFFB6FF3B) : Colors.redAccent,
+                      color: log.isSuccess
+                          ? const Color(0xFFB6FF3B)
+                          : Colors.redAccent,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -637,7 +661,10 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                         children: [
                           Text(
                             log.details,
-                            style: const TextStyle(fontSize: 12, color: Colors.white),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                            ),
                           ),
                           Text(
                             '${log.source.shortBadge} • ${log.timestamp.hour.toString().padLeft(2, '0')}:${log.timestamp.minute.toString().padLeft(2, '0')}',

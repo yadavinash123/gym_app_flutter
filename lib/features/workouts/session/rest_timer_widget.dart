@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,9 +24,10 @@ class RestTimerWidget extends StatefulWidget {
 }
 
 class _RestTimerWidgetState extends State<RestTimerWidget>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late int _totalSeconds;
   late int _remainingSeconds;
+  DateTime? _targetEndTime;
   Timer? _timer;
   bool _isRunning = true;
   late AnimationController _pulseController;
@@ -33,6 +35,7 @@ class _RestTimerWidgetState extends State<RestTimerWidget>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _totalSeconds = widget.initialSeconds;
     _remainingSeconds = widget.initialSeconds;
     _pulseController = AnimationController(
@@ -42,8 +45,31 @@ class _RestTimerWidgetState extends State<RestTimerWidget>
     _startTimer();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        _isRunning &&
+        _targetEndTime != null) {
+      final remaining = _targetEndTime!.difference(DateTime.now()).inSeconds;
+      if (remaining <= 0) {
+        _timer?.cancel();
+        setState(() {
+          _remainingSeconds = 0;
+          _isRunning = false;
+        });
+        HapticFeedback.heavyImpact();
+        widget.onComplete();
+      } else {
+        setState(() {
+          _remainingSeconds = remaining;
+        });
+      }
+    }
+  }
+
   void _startTimer() {
     _timer?.cancel();
+    _targetEndTime = DateTime.now().add(Duration(seconds: _remainingSeconds));
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       if (_remainingSeconds > 1) {
@@ -70,6 +96,7 @@ class _RestTimerWidgetState extends State<RestTimerWidget>
       if (_isRunning) {
         _timer?.cancel();
         _isRunning = false;
+        _targetEndTime = null;
       } else {
         if (_remainingSeconds > 0) {
           _isRunning = true;
@@ -85,7 +112,11 @@ class _RestTimerWidgetState extends State<RestTimerWidget>
       if (_remainingSeconds > _totalSeconds) {
         _totalSeconds = _remainingSeconds;
       }
-      if (!_isRunning) {
+      if (_isRunning) {
+        _targetEndTime = DateTime.now().add(
+          Duration(seconds: _remainingSeconds),
+        );
+      } else {
         _isRunning = true;
         _startTimer();
       }
@@ -103,6 +134,7 @@ class _RestTimerWidgetState extends State<RestTimerWidget>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _pulseController.dispose();
     super.dispose();
@@ -171,120 +203,120 @@ class _RestTimerWidgetState extends State<RestTimerWidget>
               ],
             ),
             const SizedBox(height: 16),
-          if (widget.nextExerciseName != null) ...[
-            Text(
-              'Up Next: ${widget.nextExerciseName}${widget.nextSetNumber != null ? ' (Set ${widget.nextSetNumber})' : ''}',
-              style: const TextStyle(
-                color: Color(0xFFA7B0BF),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+            if (widget.nextExerciseName != null) ...[
+              Text(
+                'Up Next: ${widget.nextExerciseName}${widget.nextSetNumber != null ? ' (Set ${widget.nextSetNumber})' : ''}',
+                style: const TextStyle(
+                  color: Color(0xFFA7B0BF),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-          ],
-          SizedBox(
-            width: 170,
-            height: 170,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 160,
-                  height: 160,
-                  child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: 10,
-                    strokeCap: StrokeCap.round,
-                    backgroundColor: const Color(0xFF1C2430),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      _remainingSeconds <= 5
-                          ? const Color(0xFFFFB547)
-                          : const Color(0xFFB6FF3B),
+              const SizedBox(height: 16),
+            ],
+            SizedBox(
+              width: 170,
+              height: 170,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 160,
+                    height: 160,
+                    child: CircularProgressIndicator(
+                      value: progress,
+                      strokeWidth: 10,
+                      strokeCap: StrokeCap.round,
+                      backgroundColor: const Color(0xFF1C2430),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        _remainingSeconds <= 5
+                            ? const Color(0xFFFFB547)
+                            : const Color(0xFFB6FF3B),
+                      ),
                     ),
                   ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        timeStr,
+                        style: const TextStyle(
+                          fontSize: 38,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        _isRunning ? 'RECOVER' : 'PAUSED',
+                        style: TextStyle(
+                          fontSize: 12,
+                          letterSpacing: 2,
+                          color: _isRunning
+                              ? const Color(0xFFA7B0BF)
+                              : const Color(0xFFFFB547),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Interval preset chips
+            Wrap(
+              spacing: 8,
+              children: [30, 60, 90, 120].map((s) {
+                final isCurrent = _totalSeconds == s;
+                return ChoiceChip(
+                  label: Text('${s}s'),
+                  selected: isCurrent,
+                  onSelected: (_) => _setDuration(s),
+                  selectedColor: const Color(0xFFB6FF3B).withAlpha(40),
+                  labelStyle: TextStyle(
+                    color: isCurrent ? const Color(0xFFB6FF3B) : Colors.white70,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 12,
+              runSpacing: 10,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _addSeconds(15),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('+15s'),
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      timeStr,
-                      style: const TextStyle(
-                        fontSize: 38,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      _isRunning ? 'RECOVER' : 'PAUSED',
-                      style: TextStyle(
-                        fontSize: 12,
-                        letterSpacing: 2,
-                        color: _isRunning
-                            ? const Color(0xFFA7B0BF)
-                            : const Color(0xFFFFB547),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _isRunning
+                        ? const Color(0xFF1C2430)
+                        : const Color(0xFFB6FF3B),
+                    foregroundColor: _isRunning ? Colors.white : Colors.black,
+                  ),
+                  onPressed: _togglePause,
+                  icon: Icon(
+                    _isRunning ? Icons.pause : Icons.play_arrow,
+                    size: 20,
+                  ),
+                  label: Text(_isRunning ? 'Pause' : 'Resume'),
+                ),
+                OutlinedButton(
+                  onPressed: widget.onSkip,
+                  child: const Text('Skip'),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 20),
-          // Interval preset chips
-          Wrap(
-            spacing: 8,
-            children: [30, 60, 90, 120].map((s) {
-              final isCurrent = _totalSeconds == s;
-              return ChoiceChip(
-                label: Text('${s}s'),
-                selected: isCurrent,
-                onSelected: (_) => _setDuration(s),
-                selectedColor: const Color(0xFFB6FF3B).withAlpha(40),
-                labelStyle: TextStyle(
-                  color: isCurrent ? const Color(0xFFB6FF3B) : Colors.white70,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 20),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 12,
-            runSpacing: 10,
-            children: [
-              OutlinedButton.icon(
-                onPressed: () => _addSeconds(15),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('+15s'),
-              ),
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: _isRunning
-                      ? const Color(0xFF1C2430)
-                      : const Color(0xFFB6FF3B),
-                  foregroundColor: _isRunning ? Colors.white : Colors.black,
-                ),
-                onPressed: _togglePause,
-                icon: Icon(
-                  _isRunning ? Icons.pause : Icons.play_arrow,
-                  size: 20,
-                ),
-                label: Text(_isRunning ? 'Pause' : 'Resume'),
-              ),
-              OutlinedButton(
-                onPressed: widget.onSkip,
-                child: const Text('Skip'),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 }

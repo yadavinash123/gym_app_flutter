@@ -91,8 +91,13 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                         },
                       )
                     : null,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 16,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
             ),
           ),
@@ -107,14 +112,16 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                   onSelected: (_) => setState(() => _selectedCategory = 'All'),
                 ),
                 const SizedBox(width: 8),
-                ...FoodItem.categories.map((c) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(c),
-                        selected: _selectedCategory == c,
-                        onSelected: (_) => setState(() => _selectedCategory = c),
-                      ),
-                    )),
+                ...FoodItem.categories.map(
+                  (c) => Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(c),
+                      selected: _selectedCategory == c,
+                      onSelected: (_) => setState(() => _selectedCategory = c),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -132,7 +139,8 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                 FilterChip(
                   label: const Text('Vegetarian'),
                   selected: _selectedDiet == 'Vegetarian',
-                  onSelected: (_) => setState(() => _selectedDiet = 'Vegetarian'),
+                  onSelected: (_) =>
+                      setState(() => _selectedDiet = 'Vegetarian'),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
@@ -163,12 +171,14 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
               data: (foods) {
                 final query = _searchController.text;
                 final filtered = foods
-                    .where((f) => f.matches(
-                          query: query,
-                          categoryFilter: _selectedCategory,
-                          dietFilter: _selectedDiet,
-                          highProteinOnly: _highProteinOnly,
-                        ))
+                    .where(
+                      (f) => f.matches(
+                        query: query,
+                        categoryFilter: _selectedCategory,
+                        dietFilter: _selectedDiet,
+                        highProteinOnly: _highProteinOnly,
+                      ),
+                    )
                     .toList();
 
                 if (filtered.isEmpty) {
@@ -176,11 +186,18 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.search_off, size: 48, color: Color(0xFFA7B0BF)),
+                        const Icon(
+                          Icons.search_off,
+                          size: 48,
+                          color: Color(0xFFA7B0BF),
+                        ),
                         const SizedBox(height: 12),
                         const Text(
                           'No matching foods found',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         const Text(
@@ -190,9 +207,12 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                         const SizedBox(height: 16),
                         OutlinedButton.icon(
                           onPressed: () async {
-                            final newFood = await Navigator.of(context).push<FoodItem>(
-                              MaterialPageRoute(builder: (_) => const CustomFoodScreen()),
-                            );
+                            final newFood = await Navigator.of(context)
+                                .push<FoodItem>(
+                                  MaterialPageRoute(
+                                    builder: (_) => const CustomFoodScreen(),
+                                  ),
+                                );
                             if (newFood != null && mounted) {
                               _openPortionDialog(newFood);
                             }
@@ -216,12 +236,17 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                           Expanded(
                             child: Text(
                               food.name,
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                           if (food.isCustom)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF1C2430),
                                 borderRadius: BorderRadius.circular(6),
@@ -243,17 +268,26 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                           const SizedBox(height: 4),
                           Text(
                             '${food.calories.toStringAsFixed(0)} kcal • ${food.protein.toStringAsFixed(1)}g P • ${food.carbs.toStringAsFixed(1)}g C • ${food.fat.toStringAsFixed(1)}g F (per ${food.servingSize.toStringAsFixed(0)}${food.servingUnit})',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFA7B0BF),
+                            ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             '${food.category} • ${food.diet} • ${food.source}',
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF6E7681)),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF6E7681),
+                            ),
                           ),
                         ],
                       ),
                       trailing: IconButton(
-                        icon: const Icon(Icons.add_circle, color: Color(0xFFB6FF3B)),
+                        icon: const Icon(
+                          Icons.add_circle,
+                          color: Color(0xFFB6FF3B),
+                        ),
                         onPressed: () => _openPortionDialog(food),
                       ),
                       onTap: () => _openPortionDialog(food),
@@ -281,7 +315,8 @@ class _PortionLoggerSheet extends ConsumerStatefulWidget {
   final String initialMealType;
 
   @override
-  ConsumerState<_PortionLoggerSheet> createState() => _PortionLoggerSheetState();
+  ConsumerState<_PortionLoggerSheet> createState() =>
+      _PortionLoggerSheetState();
 }
 
 class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
@@ -329,17 +364,17 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
       fiber: nutrition.fiber,
     );
 
-    await ref.read(nutritionLogsProvider.notifier).addFood(
-          date: widget.date,
-          mealType: _selectedMeal,
-          item: item,
-        );
+    await ref
+        .read(nutritionLogsProvider.notifier)
+        .addFood(date: widget.date, mealType: _selectedMeal, item: item);
 
     if (mounted) {
       Navigator.of(context).pop(); // close bottom sheet
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Logged ${item.quantity} × ${item.portionName} to $_selectedMeal'),
+          content: Text(
+            'Logged ${item.quantity} × ${item.portionName} to $_selectedMeal',
+          ),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -368,7 +403,10 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
               Expanded(
                 child: Text(
                   widget.food.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
               IconButton(
@@ -380,21 +418,27 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
           const SizedBox(height: 12),
           const Text(
             'Target Meal',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFFA7B0BF)),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: Color(0xFFA7B0BF),
+            ),
           ),
           const SizedBox(height: 6),
           Row(
             children: MealType.all
-                .map((m) => Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                        child: ChoiceChip(
-                          label: Text(m, style: const TextStyle(fontSize: 11)),
-                          selected: _selectedMeal == m,
-                          onSelected: (_) => setState(() => _selectedMeal = m),
-                        ),
+                .map(
+                  (m) => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      child: ChoiceChip(
+                        label: Text(m, style: const TextStyle(fontSize: 11)),
+                        selected: _selectedMeal == m,
+                        onSelected: (_) => setState(() => _selectedMeal = m),
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
           const SizedBox(height: 16),
@@ -408,21 +452,35 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
                   children: [
                     const Text(
                       'Portion Measure',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFFA7B0BF)),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: Color(0xFFA7B0BF),
+                      ),
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<PortionUnit>(
                       initialValue: _selectedPortion,
                       isExpanded: true,
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       items: widget.food.portions
-                          .map((p) => DropdownMenuItem(
-                                value: p,
-                                child: Text('${p.name} (${p.grams.toStringAsFixed(0)}g)', style: const TextStyle(fontSize: 13)),
-                              ))
+                          .map(
+                            (p) => DropdownMenuItem(
+                              value: p,
+                              child: Text(
+                                '${p.name} (${p.grams.toStringAsFixed(0)}g)',
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
+                          )
                           .toList(),
                       onChanged: (p) {
                         if (p != null) setState(() => _selectedPortion = p);
@@ -439,7 +497,11 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
                   children: [
                     const Text(
                       'Quantity',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFFA7B0BF)),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: Color(0xFFA7B0BF),
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Row(
@@ -454,7 +516,9 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
                           child: TextField(
                             controller: _qtyController,
                             textAlign: TextAlign.center,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                             onChanged: (val) {
                               final num = double.tryParse(val);
                               if (num != null && num > 0) {
@@ -491,10 +555,26 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _macroMetric(nutrition.calories.toStringAsFixed(0), 'Calories', const Color(0xFFB6FF3B)),
-                _macroMetric('${nutrition.protein.toStringAsFixed(1)}g', 'Protein', const Color(0xFFB6FF3B)),
-                _macroMetric('${nutrition.carbs.toStringAsFixed(1)}g', 'Carbs', const Color(0xFF00D4FF)),
-                _macroMetric('${nutrition.fat.toStringAsFixed(1)}g', 'Fat', const Color(0xFFFFB800)),
+                _macroMetric(
+                  nutrition.calories.toStringAsFixed(0),
+                  'Calories',
+                  const Color(0xFFB6FF3B),
+                ),
+                _macroMetric(
+                  '${nutrition.protein.toStringAsFixed(1)}g',
+                  'Protein',
+                  const Color(0xFFB6FF3B),
+                ),
+                _macroMetric(
+                  '${nutrition.carbs.toStringAsFixed(1)}g',
+                  'Carbs',
+                  const Color(0xFF00D4FF),
+                ),
+                _macroMetric(
+                  '${nutrition.fat.toStringAsFixed(1)}g',
+                  'Fat',
+                  const Color(0xFFFFB800),
+                ),
               ],
             ),
           ),
@@ -523,7 +603,11 @@ class _PortionLoggerSheetState extends ConsumerState<_PortionLoggerSheet> {
       children: [
         Text(
           value,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: color),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: color,
+          ),
         ),
         const SizedBox(height: 2),
         Text(

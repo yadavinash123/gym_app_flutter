@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'coach_message.dart';
 
 class WorkoutPlanExercise {
@@ -15,10 +16,10 @@ class WorkoutPlanExercise {
   final IconData icon;
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'setsReps': setsReps,
-        'targetMuscle': targetMuscle,
-      };
+    'name': name,
+    'setsReps': setsReps,
+    'targetMuscle': targetMuscle,
+  };
 
   factory WorkoutPlanExercise.fromJson(Map<String, dynamic> json) =>
       WorkoutPlanExercise(
@@ -42,20 +43,23 @@ class WorkoutPlanCardData {
   final List<WorkoutPlanExercise> exercises;
 
   Map<String, dynamic> toJson() => {
-        'title': title,
-        'duration': duration,
-        'targetMuscles': targetMuscles,
-        'exercises': exercises.map((e) => e.toJson()).toList(),
-      };
+    'title': title,
+    'duration': duration,
+    'targetMuscles': targetMuscles,
+    'exercises': exercises.map((e) => e.toJson()).toList(),
+  };
 
   factory WorkoutPlanCardData.fromJson(Map<String, dynamic> json) =>
       WorkoutPlanCardData(
         title: (json['title'] as String?) ?? 'Workout Routine',
         duration: (json['duration'] as String?) ?? '~60 min',
         targetMuscles: (json['targetMuscles'] as String?) ?? 'Full Body',
-        exercises: (json['exercises'] as List?)
-                ?.map((e) =>
-                    WorkoutPlanExercise.fromJson(e as Map<String, dynamic>))
+        exercises:
+            (json['exercises'] as List?)
+                ?.map(
+                  (e) =>
+                      WorkoutPlanExercise.fromJson(e as Map<String, dynamic>),
+                )
                 .toList() ??
             const [],
       );
@@ -188,8 +192,18 @@ class CoachConversation {
       return 'Yesterday';
     } else {
       const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
       return '${months[updatedAt.month - 1]} ${updatedAt.day}';
     }
@@ -216,26 +230,29 @@ class CoachConversation {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'lastMessageSnippet': lastMessageSnippet,
-        'updatedAt': updatedAt.toIso8601String(),
-        'createdAt': createdAt.toIso8601String(),
-        'category': category.name,
-        'messages': messages.map((m) => m.toJson()).toList(),
-      };
+    'id': id,
+    'title': title,
+    'lastMessageSnippet': lastMessageSnippet,
+    'updatedAt': updatedAt.toIso8601String(),
+    'createdAt': createdAt.toIso8601String(),
+    'category': category.name,
+    'messages': messages.map((m) => m.toJson()).toList(),
+  };
 
   factory CoachConversation.fromJson(Map<String, dynamic> json) {
     return CoachConversation(
       id: (json['id'] as String?) ?? '',
       title: (json['title'] as String?) ?? 'New Conversation',
       lastMessageSnippet: (json['lastMessageSnippet'] as String?) ?? '',
-      updatedAt: DateTime.tryParse((json['updatedAt'] as String?) ?? '') ??
+      updatedAt:
+          DateTime.tryParse((json['updatedAt'] as String?) ?? '') ??
           DateTime.now(),
-      createdAt: DateTime.tryParse((json['createdAt'] as String?) ?? '') ??
+      createdAt:
+          DateTime.tryParse((json['createdAt'] as String?) ?? '') ??
           DateTime.now(),
       category: ConversationCategory.fromString(json['category'] as String?),
-      messages: (json['messages'] as List?)
+      messages:
+          (json['messages'] as List?)
               ?.map((e) => CoachMessage.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
@@ -286,15 +303,13 @@ class CoachConversation {
           CoachMessage(
             id: 'm1',
             role: MessageRole.user,
-            content:
-                'Can you create a 4-day upper lower workout plan for muscle gain?',
+            content: 'Can you create a 4-day upper lower workout plan for muscle gain?',
             timestamp: DateTime(now.year, now.month, now.day, 9, 41),
           ),
           CoachMessage(
             id: 'm2',
             role: MessageRole.assistant,
-            content:
-                'Absolutely! Here\'s a 4-day upper/lower workout plan designed for muscle gain. It focuses on compound movements, progressive overload, and balanced volume.',
+            content: 'Absolutely! Here\'s a 4-day upper/lower workout plan designed for muscle gain. It focuses on compound movements, progressive overload, and balanced volume.',
             timestamp: DateTime(now.year, now.month, now.day, 9, 41),
             workoutPlan: sampleWorkoutPlan,
             suggestedActions: const [
@@ -316,14 +331,14 @@ class CoachConversation {
           CoachMessage(
             id: 'rec_1',
             role: MessageRole.user,
-            content: 'What are the best recovery strategies after intense leg day?',
+            content:
+                'What are the best recovery strategies after intense leg day?',
             timestamp: DateTime(now.year, now.month, now.day, 7, 15),
           ),
           CoachMessage(
             id: 'rec_2',
             role: MessageRole.assistant,
-            content:
-                'For optimal lower-body recovery: prioritize 8+ hours of sleep for growth hormone release, consume 25-35g protein within 2 hours, and perform 10 minutes of low-intensity walking to clear metabolic waste.',
+            content: 'For optimal lower-body recovery: prioritize 8+ hours of sleep for growth hormone release, consume 25-35g protein within 2 hours, and perform 10 minutes of low-intensity walking to clear metabolic waste.',
             timestamp: DateTime(now.year, now.month, now.day, 7, 20),
             suggestedActions: const [
               'Hydration tips',
@@ -350,8 +365,7 @@ class CoachConversation {
           CoachMessage(
             id: 'nut_2',
             role: MessageRole.assistant,
-            content:
-                'Based on ISSN guidelines, aim for 1.6 to 2.2 grams of protein per kilogram of bodyweight per day, distributed across 3 to 4 meals.',
+            content: 'Based on ISSN guidelines, aim for 1.6 to 2.2 grams of protein per kilogram of bodyweight per day, distributed across 3 to 4 meals.',
             timestamp: now.subtract(const Duration(days: 1)),
             suggestedActions: const [
               'High protein snacks',
@@ -371,7 +385,8 @@ class CoachConversation {
           CoachMessage(
             id: 'ch_1',
             role: MessageRole.user,
-            content: 'What are the most effective chest exercises for hypertrophy?',
+            content:
+                'What are the most effective chest exercises for hypertrophy?',
             timestamp: now.subtract(const Duration(days: 3)),
           ),
         ],
@@ -387,7 +402,8 @@ class CoachConversation {
           CoachMessage(
             id: 'fl_1',
             role: MessageRole.user,
-            content: 'Create a beginner-friendly fat loss plan with 3 gym days.',
+            content:
+                'Create a beginner-friendly fat loss plan with 3 gym days.',
             timestamp: now.subtract(const Duration(days: 5)),
           ),
         ],
@@ -403,7 +419,8 @@ class CoachConversation {
           CoachMessage(
             id: 'sl_1',
             role: MessageRole.user,
-            content: 'Tips for improving sleep quality and deep sleep percentage.',
+            content:
+                'Tips for improving sleep quality and deep sleep percentage.',
             timestamp: now.subtract(const Duration(days: 10)),
           ),
         ],
@@ -419,7 +436,8 @@ class CoachConversation {
           CoachMessage(
             id: 'sup_1',
             role: MessageRole.user,
-            content: 'Tell me about essential supplements with proven evidence.',
+            content:
+                'Tell me about essential supplements with proven evidence.',
             timestamp: now.subtract(const Duration(days: 14)),
           ),
         ],

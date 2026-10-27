@@ -23,7 +23,8 @@ class HeartRateZone {
   final Color color;
 
   String get rangeLabel => '$minBpm–$maxBpm bpm';
-  String get percentLabel => '${(minPercent * 100).round()}%–${(maxPercent * 100).round()}% HRmax';
+  String get percentLabel =>
+      '${(minPercent * 100).round()}%–${(maxPercent * 100).round()}% HRmax';
 
   /// Tanaka et al. (2001) age-predicted maximal heart rate:
   /// HRmax = 208 - (0.7 * age)

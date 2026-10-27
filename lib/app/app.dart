@@ -16,7 +16,7 @@ import '../features/nutrition/screens/food_search_screen.dart';
 import '../features/nutrition/screens/nutrition_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/profile/profile_repository.dart';
-import '../features/planning/plan_screen.dart';
+import '../features/workouts/workout_home_screen.dart';
 import '../features/progress/presentation/progress_screen.dart';
 import '../features/progress/presentation/reminder_settings_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -96,19 +96,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             AppShell(path: state.uri.path, child: child),
         routes: [
           GoRoute(path: '/home', builder: (_, _) => const DashboardScreen()),
-          GoRoute(path: '/workouts', builder: (_, _) => const PlanScreen()),
+          GoRoute(
+            path: '/workouts',
+            builder: (_, _) => const WorkoutHomeScreen(),
+          ),
           GoRoute(
             path: '/nutrition',
             builder: (_, _) => const NutritionScreen(),
           ),
-          GoRoute(
-            path: '/progress',
-            builder: (_, _) => const ProgressScreen(),
-          ),
-          GoRoute(
-            path: '/coach',
-            builder: (_, state) => const CoachScreen(),
-          ),
+          GoRoute(path: '/progress', builder: (_, _) => const ProgressScreen()),
+          GoRoute(path: '/coach', builder: (_, state) => const CoachScreen()),
         ],
       ),
     ],
@@ -226,7 +223,9 @@ class AppShell extends StatelessWidget {
         selectedIndex: selectedIndex >= 0 ? selectedIndex : 2,
         onDestinationSelected: (index) => context.go(destinations[index].path),
         destinations: destinations
-            .map((d) => NavigationDestination(icon: Icon(d.icon), label: d.label))
+            .map(
+              (d) => NavigationDestination(icon: Icon(d.icon), label: d.label),
+            )
             .toList(),
       ),
     );

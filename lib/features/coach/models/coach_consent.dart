@@ -63,10 +63,6 @@ class CoachConsent {
           shareHealth == other.shareHealth;
 
   @override
-  int get hashCode => Object.hash(
-        shareProfile,
-        shareWorkouts,
-        shareNutrition,
-        shareHealth,
-      );
+  int get hashCode =>
+      Object.hash(shareProfile, shareWorkouts, shareNutrition, shareHealth);
 }

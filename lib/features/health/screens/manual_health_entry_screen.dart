@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/health_repository.dart';
 import '../models/health_metric_type.dart';
 
@@ -13,7 +14,8 @@ class ManualHealthEntryScreen extends ConsumerStatefulWidget {
       _ManualHealthEntryScreenState();
 }
 
-class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScreen> {
+class _ManualHealthEntryScreenState
+    extends ConsumerState<ManualHealthEntryScreen> {
   final _formKey = GlobalKey<FormState>();
   HealthMetricType _selectedMetric = HealthMetricType.steps;
   final _valueController = TextEditingController();
@@ -54,7 +56,8 @@ class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScree
         if (val > 10000) return 'Active calories cannot exceed 10,000 kcal';
         break;
       case HealthMetricType.restingHeartRate:
-        if (val < 30 || val > 220) return 'Resting HR must be between 30 and 220 bpm';
+        if (val < 30 || val > 220)
+          return 'Resting HR must be between 30 and 220 bpm';
         break;
       case HealthMetricType.sleep:
         if (val > 1440) return 'Sleep cannot exceed 24 hours (1440 minutes)';
@@ -72,7 +75,9 @@ class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScree
     setState(() => _isSaving = true);
     try {
       final value = double.parse(_valueController.text.trim());
-      await ref.read(dailyHealthSummariesProvider.notifier).logManual(
+      await ref
+          .read(dailyHealthSummariesProvider.notifier)
+          .logManual(
             date: widget.date,
             metric: _selectedMetric,
             value: value,
@@ -112,9 +117,7 @@ class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manual Health Log'),
-      ),
+      appBar: AppBar(title: const Text('Manual Health Log')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -131,7 +134,11 @@ class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScree
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.edit_note, color: Color(0xFFB6FF3B), size: 24),
+                    const Icon(
+                      Icons.edit_note,
+                      color: Color(0xFFB6FF3B),
+                      size: 24,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -193,7 +200,9 @@ class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScree
                     backgroundColor: const Color(0xFF151B23),
                     labelStyle: TextStyle(
                       color: isSelected ? Colors.black : Colors.white,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   );
                 }).toList(),
@@ -201,19 +210,23 @@ class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScree
               const SizedBox(height: 24),
               TextFormField(
                 controller: _valueController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: InputDecoration(
                   labelText:
                       'Value (${_selectedMetric == HealthMetricType.sleep ? 'minutes, e.g. 480 for 8h' : _selectedMetric.unitLabel})',
                   hintText: _selectedMetric == HealthMetricType.steps
                       ? 'e.g. 8500'
                       : _selectedMetric == HealthMetricType.restingHeartRate
-                          ? 'e.g. 62'
-                          : _selectedMetric == HealthMetricType.sleep
-                              ? 'e.g. 450 (7.5 hours)'
-                              : 'e.g. 350',
-                  prefixIcon: Icon(_selectedMetric.icon, color: _selectedMetric.color),
+                      ? 'e.g. 62'
+                      : _selectedMetric == HealthMetricType.sleep
+                      ? 'e.g. 450 (7.5 hours)'
+                      : 'e.g. 350',
+                  prefixIcon: Icon(
+                    _selectedMetric.icon,
+                    color: _selectedMetric.color,
+                  ),
                   filled: true,
                   fillColor: const Color(0xFF151B23),
                   border: OutlineInputBorder(
@@ -255,7 +268,10 @@ class _ManualHealthEntryScreenState extends ConsumerState<ManualHealthEntryScree
                     : const Icon(Icons.check_circle_outline),
                 label: Text(
                   _isSaving ? 'Saving...' : 'Record Metric',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],

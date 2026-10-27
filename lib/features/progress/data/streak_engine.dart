@@ -32,7 +32,8 @@ class StreakEngine {
     final activeDates = <String>{};
 
     for (final entry in logs.entries) {
-      if (entry.value.totalCalories > 0 || entry.value.totalFoodItemsCount > 0) {
+      if (entry.value.totalCalories > 0 ||
+          entry.value.totalFoodItemsCount > 0) {
         activeDates.add(entry.key);
       }
     }
@@ -53,7 +54,8 @@ class StreakEngine {
     final activeDates = <String>{};
 
     for (final entry in logs.entries) {
-      if (entry.value.waterMl >= entry.value.waterTargetMl && entry.value.waterTargetMl > 0) {
+      if (entry.value.waterMl >= entry.value.waterTargetMl &&
+          entry.value.waterTargetMl > 0) {
         activeDates.add(entry.key);
       }
     }
@@ -106,7 +108,9 @@ class StreakEngine {
     }
 
     final todayStr = _formatDate(referenceDate);
-    final yesterdayStr = _formatDate(referenceDate.subtract(const Duration(days: 1)));
+    final yesterdayStr = _formatDate(
+      referenceDate.subtract(const Duration(days: 1)),
+    );
 
     // Calculate current streak
     int current = 0;
@@ -131,13 +135,14 @@ class StreakEngine {
     }
 
     // Calculate longest historical streak
-    final sortedDates = activeDates
-        .map((d) => DateTime.tryParse(d))
-        .whereType<DateTime>()
-        .map((d) => DateTime(d.year, d.month, d.day))
-        .toSet()
-        .toList()
-      ..sort();
+    final sortedDates =
+        activeDates
+            .map((d) => DateTime.tryParse(d))
+            .whereType<DateTime>()
+            .map((d) => DateTime(d.year, d.month, d.day))
+            .toSet()
+            .toList()
+          ..sort();
 
     int longest = 0;
     int running = 0;

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pedometer/pedometer.dart';
@@ -109,10 +110,7 @@ class StepTrackingService {
 
     await initialize();
 
-    _emitState(_state.copyWith(
-      isTracking: true,
-      errorMessage: null,
-    ));
+    _emitState(_state.copyWith(isTracking: true, errorMessage: null));
 
     // Listen to pedometer step counter stream
     try {
@@ -128,7 +126,8 @@ class StepTrackingService {
 
     // Listen to pedestrian status stream (walking / stopped)
     try {
-      final statusStream = customStatusStream ?? Pedometer.pedestrianStatusStream;
+      final statusStream =
+          customStatusStream ?? Pedometer.pedestrianStatusStream;
       _statusSubscription = statusStream.listen(
         _onPedestrianStatus,
         onError: (e) {
@@ -161,11 +160,13 @@ class StepTrackingService {
       _todayAccumulated = effectiveToday;
     }
 
-    _emitState(_state.copyWith(
-      todaySteps: _todayAccumulated,
-      hasHardwareSensor: true,
-      lastUpdated: event.timeStamp,
-    ));
+    _emitState(
+      _state.copyWith(
+        todaySteps: _todayAccumulated,
+        hasHardwareSensor: true,
+        lastUpdated: event.timeStamp,
+      ),
+    );
 
     // Persist baseline snapshot
     await store.write(_storageKey, {
@@ -193,19 +194,20 @@ class StepTrackingService {
     final status = event.status.toLowerCase();
     final isWalking = status == 'walking';
 
-    _emitState(_state.copyWith(
-      isWalking: isWalking,
-      pedestrianStatus: status,
-      lastUpdated: event.timeStamp,
-    ));
+    _emitState(
+      _state.copyWith(
+        isWalking: isWalking,
+        pedestrianStatus: status,
+        lastUpdated: event.timeStamp,
+      ),
+    );
   }
 
   void _onStepError(dynamic error) {
     debugPrint('Hardware pedometer unavailable or error: $error');
-    _emitState(_state.copyWith(
-      hasHardwareSensor: false,
-      errorMessage: error.toString(),
-    ));
+    _emitState(
+      _state.copyWith(hasHardwareSensor: false, errorMessage: error.toString()),
+    );
   }
 
   /// Simulate footsteps when walking on emulators, desktop, or automated test runners.
@@ -214,12 +216,14 @@ class StepTrackingService {
     _todayAccumulated += count;
     final now = DateTime.now();
 
-    _emitState(_state.copyWith(
-      todaySteps: _todayAccumulated,
-      isWalking: true,
-      pedestrianStatus: 'walking',
-      lastUpdated: now,
-    ));
+    _emitState(
+      _state.copyWith(
+        todaySteps: _todayAccumulated,
+        isWalking: true,
+        pedestrianStatus: 'walking',
+        lastUpdated: now,
+      ),
+    );
 
     await store.write(_storageKey, {
       'version': 1,
@@ -239,10 +243,9 @@ class StepTrackingService {
     // Reset walking indicator after a brief period
     Future.delayed(const Duration(seconds: 4), () {
       if (_state.isTracking) {
-        _emitState(_state.copyWith(
-          isWalking: false,
-          pedestrianStatus: 'stopped',
-        ));
+        _emitState(
+          _state.copyWith(isWalking: false, pedestrianStatus: 'stopped'),
+        );
       }
     });
   }
@@ -260,11 +263,13 @@ class StepTrackingService {
     _stepSubscription = null;
     await _statusSubscription?.cancel();
     _statusSubscription = null;
-    _emitState(_state.copyWith(
-      isTracking: false,
-      isWalking: false,
-      pedestrianStatus: 'stopped',
-    ));
+    _emitState(
+      _state.copyWith(
+        isTracking: false,
+        isWalking: false,
+        pedestrianStatus: 'stopped',
+      ),
+    );
   }
 
   void dispose() {
@@ -281,10 +286,7 @@ final stepTrackingServiceProvider = Provider<StepTrackingService>((ref) {
   final store = ref.watch(storeProvider);
   final repo = ref.watch(healthRepositoryProvider);
 
-  final service = StepTrackingService(
-    store: store,
-    repository: repo,
-  );
+  final service = StepTrackingService(store: store, repository: repo);
 
   // Automatically start continuous hardware step tracking when provider mounts
   service.startTracking();
@@ -296,8 +298,7 @@ final stepTrackingServiceProvider = Provider<StepTrackingService>((ref) {
   return service;
 });
 
-final stepTrackingStateProvider =
-    StreamProvider<StepTrackingState>((ref) {
+final stepTrackingStateProvider = StreamProvider<StepTrackingState>((ref) {
   final service = ref.watch(stepTrackingServiceProvider);
   return service.stateStream;
 });

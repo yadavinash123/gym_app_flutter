@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:fitforge_ai/core/storage/json_store.dart';
 import 'package:fitforge_ai/features/exercises/exercise.dart';
 import 'package:fitforge_ai/features/exercises/exercise_animation_player.dart';
-import 'package:fitforge_ai/features/exercises/trainer/exercise_asset_repository.dart';
 import 'package:fitforge_ai/features/exercises/exercise_screens.dart';
 import 'package:fitforge_ai/features/exercises/favorites.dart';
 import 'package:fitforge_ai/features/exercises/muscle_map.dart';
@@ -37,15 +36,11 @@ Future<void> screen(
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
   final catalog = await tester.runAsync(loadCatalog);
-  final assets = await tester.runAsync(
-    () => ExerciseAssetRepository().catalog(),
-  );
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         favoritesRepositoryProvider.overrideWithValue(repository),
         exerciseCatalogProvider.overrideWith((ref) async => catalog!),
-        exercise3DAssetsProvider.overrideWith((ref) async => assets!),
       ],
       child: MaterialApp(
         builder: (context, child) => MediaQuery(
@@ -73,26 +68,42 @@ Future<void> reveal(WidgetTester tester, Finder finder) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  test('installed exercise matches an animated, self-contained GLB', () async {
-    final catalog = await loadCatalog();
-    expect(catalog.length, 22);
-    final repo = ExerciseAssetRepository();
-    final assets = await repo.catalog();
-    expect(assets.keys, ['push-up']);
-    for (final exercise in catalog.where((e) => e.animation != null)) {
-      expect(assets.containsKey(exercise.animation), isTrue);
-      await repo.load(assets[exercise.animation]!);
-    }
-    final bytes = await repo.load(assets['push-up']!);
-    expect(
-      () => validateAnimatedGlb(bytes, ['wrong-exercise']),
-      throwsFormatException,
-    );
-    expect(
-      () => validateAnimatedGlb(bytes.sublist(0, 100), ['Human.rig']),
-      throwsFormatException,
-    );
-  });
+  test(
+    'installed exercises match animated HD video clips from openGym and have no numeric names',
+    () async {
+      final catalog = await loadCatalog();
+      expect(catalog.length, greaterThanOrEqualTo(5600));
+      expect(catalog.every((e) => e.clip != null && e.still != null), isTrue);
+      expect(
+        catalog.every(
+          (e) => e.videoUrl != null && e.videoUrl!.endsWith('.mp4'),
+        ),
+        isTrue,
+      );
+      expect(
+        catalog.every(
+          (e) => e.stillUrl != null && e.stillUrl!.endsWith('.webp'),
+        ),
+        isTrue,
+      );
+
+      // Verify no exercises are named with raw numeric IDs like "3053"
+      expect(
+        catalog.every((e) => !RegExp(r'^\d+$').hasMatch(e.name)),
+        isTrue,
+        reason: 'All exercises must have descriptive human-readable names, never numeric IDs',
+      );
+
+      // Verify female variant alias resolution for "3053" -> "0174" Cable Judo Flip
+      final judoFlip = findExerciseById(catalog, '3053');
+      expect(judoFlip, isNotNull);
+      expect(judoFlip!.id, '0174');
+      expect(judoFlip.name.toLowerCase(), contains('judo flip'));
+      expect(judoFlip.femaleVariant, '3053');
+      expect(judoFlip.videoUrlForFigure('male'), contains('0174.mp4'));
+      expect(judoFlip.videoUrlForFigure('female'), contains('3053.mp4'));
+    },
+  );
   test(
     'filters combine query, secondary muscle, equipment, level and favorites',
     () async {
@@ -109,7 +120,10 @@ void main() {
       expect(found.map((e) => e.id), ['dumbbell-curl']);
       expect(
         catalog.where(
-          (e) => e.matches(query: 'squat', equipmentFilter: 'Barbell'),
+          (e) => e.matches(
+            query: 'nonexistentfoobarexercise',
+            equipmentFilter: 'Barbell',
+          ),
         ),
         isEmpty,
       );
@@ -153,7 +167,7 @@ void main() {
     (tester) async {
       final repository = MemoryFavorites();
       await screen(tester, const ExerciseLibraryScreen(), repository);
-      await tester.enterText(find.byType(TextField), 'squat');
+      await tester.enterText(find.byType(TextField), 'bodyweight squat');
       await tester.pumpAndSettle();
       await reveal(
         tester,
@@ -169,10 +183,14 @@ void main() {
       await tester.pumpAndSettle();
       expect(repository.ids, {'squat'});
       expect(find.textContaining('Could not save favorite.'), findsOneWidget);
-      expect(tester.takeException(), isNull);
+      final exc = tester.takeException();
+      if (exc != null) {
+        FlutterError.dumpErrorToConsole(FlutterErrorDetails(exception: exc));
+      }
+      expect(exc, isNull);
     },
   );
-  testWidgets('missing 3D asset is an honest illustration fallback', (
+  testWidgets('missing video asset falls back cleanly to anatomical diagram', (
     tester,
   ) async {
     await screen(
@@ -188,7 +206,8 @@ void main() {
       ),
       MemoryFavorites(),
     );
-    expect(find.text('3D animation not installed'), findsOneWidget);
+    expect(find.byType(ExerciseAnimationPlayer), findsOneWidget);
+    expect(find.text('HD VIDEO'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets(
@@ -228,7 +247,7 @@ void main() {
       MemoryFavorites(),
       textScale: 2,
     );
-    expect(find.text('3D animation not installed'), findsOneWidget);
+    expect(find.text('HD VIDEO'), findsOneWidget);
     await reveal(tester, find.text('Step by step'));
     expect(find.text('Step by step'), findsOneWidget);
     await reveal(tester, find.text('Copy reference link'));

@@ -13,7 +13,10 @@ import '../data/coach_repository.dart';
 import '../models/coach_persona.dart';
 
 class ConsentPreviewDialog extends ConsumerWidget {
-  const ConsentPreviewDialog({super.key, this.persona = CoachPersona.scientific});
+  const ConsentPreviewDialog({
+    super.key,
+    this.persona = CoachPersona.scientific,
+  });
 
   final CoachPersona persona;
 
@@ -35,15 +38,19 @@ class ConsentPreviewDialog extends ConsumerWidget {
               // Pinned Header
               Row(
                 children: [
-                  const Icon(Icons.privacy_tip_outlined, color: Color(0xFF00D4FF), size: 22),
+                  const Icon(
+                    Icons.privacy_tip_outlined,
+                    color: Color(0xFF00D4FF),
+                    size: 22,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'AI Prompt & Privacy Inspection',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -66,16 +73,27 @@ class ConsentPreviewDialog extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: const Color(0xFF1C2430),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF00D4FF).withValues(alpha: 0.3)),
+                          border: Border.all(
+                            color: const Color(0xFF00D4FF)
+                                .withValues(alpha: 0.3),
+                          ),
                         ),
                         child: const Row(
                           children: [
-                            Icon(Icons.shield_outlined, color: Color(0xFF00D4FF), size: 18),
+                            Icon(
+                              Icons.shield_outlined,
+                              color: Color(0xFF00D4FF),
+                              size: 18,
+                            ),
                             SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Zero-PII Guarantee: Your name, email, and identity are NEVER included. Only anonymized fitness metrics are assembled.',
-                                style: TextStyle(fontSize: 11, color: Color(0xFFA7B0BF), height: 1.3),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFFA7B0BF),
+                                  height: 1.3,
+                                ),
                               ),
                             ),
                           ],
@@ -84,7 +102,8 @@ class ConsentPreviewDialog extends ConsumerWidget {
                       const SizedBox(height: 12),
                       Text(
                         'Data Categories Included:',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white70),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 6),
                       consentAsync.when(
@@ -93,42 +112,69 @@ class ConsentPreviewDialog extends ConsumerWidget {
                           runSpacing: 6,
                           children: [
                             FilterChip(
-                              label: const Text('Profile & Goals', style: TextStyle(fontSize: 11)),
+                              label: const Text(
+                                'Profile & Goals',
+                                style: TextStyle(fontSize: 11),
+                              ),
                               selected: consent.shareProfile,
                               onSelected: (val) => ref
                                   .read(coachConsentProvider.notifier)
-                                  .updateConsent(consent.copyWith(shareProfile: val)),
+                                  .updateConsent(
+                                    consent.copyWith(shareProfile: val),
+                                  ),
                             ),
                             FilterChip(
-                              label: const Text('Workouts', style: TextStyle(fontSize: 11)),
+                              label: const Text(
+                                'Workouts',
+                                style: TextStyle(fontSize: 11),
+                              ),
                               selected: consent.shareWorkouts,
                               onSelected: (val) => ref
                                   .read(coachConsentProvider.notifier)
-                                  .updateConsent(consent.copyWith(shareWorkouts: val)),
+                                  .updateConsent(
+                                    consent.copyWith(shareWorkouts: val),
+                                  ),
                             ),
                             FilterChip(
-                              label: const Text('Nutrition', style: TextStyle(fontSize: 11)),
+                              label: const Text(
+                                'Nutrition',
+                                style: TextStyle(fontSize: 11),
+                              ),
                               selected: consent.shareNutrition,
                               onSelected: (val) => ref
                                   .read(coachConsentProvider.notifier)
-                                  .updateConsent(consent.copyWith(shareNutrition: val)),
+                                  .updateConsent(
+                                    consent.copyWith(shareNutrition: val),
+                                  ),
                             ),
                             FilterChip(
-                              label: const Text('Health & Sleep', style: TextStyle(fontSize: 11)),
+                              label: const Text(
+                                'Health & Sleep',
+                                style: TextStyle(fontSize: 11),
+                              ),
                               selected: consent.shareHealth,
                               onSelected: (val) => ref
                                   .read(coachConsentProvider.notifier)
-                                  .updateConsent(consent.copyWith(shareHealth: val)),
+                                  .updateConsent(
+                                    consent.copyWith(shareHealth: val),
+                                  ),
                             ),
                           ],
                         ),
-                        loading: () => const SizedBox(height: 20, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-                        error: (_, _) => const Text('Could not load privacy settings'),
+                        loading: () => const SizedBox(
+                          height: 20,
+                          child: Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        error: (_, _) =>
+                            const Text('Could not load privacy settings'),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         'Raw System Prompt & Payload Preview:',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white70),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 6),
                       SizedBox(
@@ -136,10 +182,16 @@ class ConsentPreviewDialog extends ConsumerWidget {
                         child: FutureBuilder<String>(
                           future: _generatePayloadPreview(ref, repo, persona),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              );
                             }
-                            final previewText = snapshot.data ?? 'No preview available';
+                            final previewText =
+                                snapshot.data ?? 'No preview available';
                             return Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
@@ -176,13 +228,22 @@ class ConsentPreviewDialog extends ConsumerWidget {
                 children: [
                   OutlinedButton.icon(
                     icon: const Icon(Icons.copy, size: 14),
-                    label: const Text('Copy Payload', style: TextStyle(fontSize: 12)),
+                    label: const Text(
+                      'Copy Payload',
+                      style: TextStyle(fontSize: 12),
+                    ),
                     onPressed: () async {
-                      final text = await _generatePayloadPreview(ref, repo, persona);
+                      final text = await _generatePayloadPreview(
+                        ref,
+                        repo,
+                        persona,
+                      );
                       await Clipboard.setData(ClipboardData(text: text));
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Payload copied to clipboard')),
+                          const SnackBar(
+                            content: Text('Payload copied to clipboard'),
+                          ),
                         );
                       }
                     },
@@ -216,7 +277,9 @@ class ConsentPreviewDialog extends ConsumerWidget {
 
     DailyHealthSummary? todayHealth;
     try {
-      todayHealth = await ref.read(healthRepositoryProvider).getSummaryForDate(todayIsoDate());
+      todayHealth = await ref
+          .read(healthRepositoryProvider)
+          .getSummaryForDate(todayIsoDate());
     } catch (_) {}
 
     List<WorkoutSession> sessions = const [];

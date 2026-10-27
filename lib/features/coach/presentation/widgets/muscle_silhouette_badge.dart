@@ -18,7 +18,9 @@ class MuscleSilhouetteBadge extends StatelessWidget {
       highlightColor = const Color(0xFFF87171); // Coral red
     } else if (lower.contains('shoulder')) {
       highlightColor = const Color(0xFFFB923C); // Orange
-    } else if (lower.contains('tricep') || lower.contains('arm') || lower.contains('bicep')) {
+    } else if (lower.contains('tricep') ||
+        lower.contains('arm') ||
+        lower.contains('bicep')) {
       highlightColor = const Color(0xFF38BDF8); // Cyan
     } else if (lower.contains('back') || lower.contains('lat')) {
       highlightColor = const Color(0xFFA78BFA); // Purple
@@ -45,7 +47,9 @@ class MuscleSilhouetteBadge extends StatelessWidget {
           ),
           // Highlight dot/accent indicating active muscle group
           Positioned(
-            top: lower.contains('shoulder') ? 7 : (lower.contains('chest') ? 9 : 12),
+            top: lower.contains('shoulder')
+                ? 7
+                : (lower.contains('chest') ? 9 : 12),
             child: Container(
               width: 5,
               height: 5,

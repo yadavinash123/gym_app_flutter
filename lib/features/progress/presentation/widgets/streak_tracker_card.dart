@@ -38,7 +38,10 @@ class StreakTrackerCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF9500).withOpacity(0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFFF9500), width: 1.5),
+                  border: Border.all(
+                    color: const Color(0xFFFF9500),
+                    width: 1.5,
+                  ),
                 ),
                 child: const Icon(
                   Icons.local_fire_department_rounded,
@@ -109,7 +112,9 @@ class StreakTrackerCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
-                      color: isToday ? const Color(0xFFB6FF3B) : const Color(0xFFA7B0BF),
+                      color: isToday
+                          ? const Color(0xFFB6FF3B)
+                          : const Color(0xFFA7B0BF),
                     ),
                   ),
                   const SizedBox(height: 8),

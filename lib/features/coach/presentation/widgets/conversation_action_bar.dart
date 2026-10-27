@@ -41,9 +41,11 @@ class _ConversationActionBarState extends State<ConversationActionBar> {
     widget.onLikeChanged?.call(_liked);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_liked == true
-            ? 'Thank you for your feedback!'
-            : (_liked == false ? 'Feedback recorded' : 'Feedback cleared')),
+        content: Text(
+          _liked == true
+              ? 'Thank you for your feedback!'
+              : (_liked == false ? 'Feedback recorded' : 'Feedback cleared'),
+        ),
         duration: const Duration(seconds: 1),
       ),
     );
@@ -86,9 +88,13 @@ class _ConversationActionBarState extends State<ConversationActionBar> {
             constraints: const BoxConstraints(),
             tooltip: 'Good response',
             icon: Icon(
-              _liked == true ? Icons.thumb_up_alt_rounded : Icons.thumb_up_alt_outlined,
+              _liked == true
+                  ? Icons.thumb_up_alt_rounded
+                  : Icons.thumb_up_alt_outlined,
               size: 15,
-              color: _liked == true ? const Color(0xFFB6FF3B) : const Color(0xFFA7B0BF),
+              color: _liked == true
+                  ? const Color(0xFFB6FF3B)
+                  : const Color(0xFFA7B0BF),
             ),
             onPressed: () => _toggleLike(true),
           ),
@@ -101,9 +107,13 @@ class _ConversationActionBarState extends State<ConversationActionBar> {
             constraints: const BoxConstraints(),
             tooltip: 'Needs improvement',
             icon: Icon(
-              _liked == false ? Icons.thumb_down_alt_rounded : Icons.thumb_down_alt_outlined,
+              _liked == false
+                  ? Icons.thumb_down_alt_rounded
+                  : Icons.thumb_down_alt_outlined,
               size: 15,
-              color: _liked == false ? Colors.redAccent : const Color(0xFFA7B0BF),
+              color: _liked == false
+                  ? Colors.redAccent
+                  : const Color(0xFFA7B0BF),
             ),
             onPressed: () => _toggleLike(false),
           ),

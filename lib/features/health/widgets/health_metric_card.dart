@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/health_metric_type.dart';
 import '../models/health_source.dart';
 
@@ -74,10 +75,7 @@ class HealthMetricCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    _SourceBadge(
-                      source: source,
-                      maxTextWidth: maxBadgeWidth,
-                    ),
+                    _SourceBadge(source: source, maxTextWidth: maxBadgeWidth),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -171,10 +169,7 @@ class HealthMetricCard extends StatelessWidget {
 }
 
 class _SourceBadge extends StatelessWidget {
-  const _SourceBadge({
-    required this.source,
-    this.maxTextWidth = 64.0,
-  });
+  const _SourceBadge({required this.source, this.maxTextWidth = 64.0});
 
   final HealthSource source;
   final double maxTextWidth;
@@ -186,9 +181,7 @@ class _SourceBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: source.badgeColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: source.badgeColor.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: source.badgeColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

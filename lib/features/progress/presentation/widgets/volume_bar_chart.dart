@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class VolumeBarData {
@@ -56,7 +57,8 @@ class _VolumeBarChartState extends State<VolumeBarChart> {
     }
 
     final maxVolume = widget.bars.map((b) => b.volumeKg).fold(0.0, math.max);
-    final selectedBar = _hoveredIndex != null && _hoveredIndex! < widget.bars.length
+    final selectedBar =
+        _hoveredIndex != null && _hoveredIndex! < widget.bars.length
         ? widget.bars[_hoveredIndex!]
         : widget.bars.last;
 
@@ -70,8 +72,11 @@ class _VolumeBarChartState extends State<VolumeBarChart> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,6 +91,7 @@ class _VolumeBarChartState extends State<VolumeBarChart> {
                   ),
                   const SizedBox(height: 2),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         _formatNumber(selectedBar.volumeKg),
@@ -109,7 +115,10 @@ class _VolumeBarChartState extends State<VolumeBarChart> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12),
@@ -165,7 +174,7 @@ class _VolumeBarChartState extends State<VolumeBarChart> {
                                                   .withOpacity(0.4),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
-                                            )
+                                            ),
                                           ]
                                         : null,
                                   ),
@@ -178,8 +187,12 @@ class _VolumeBarChartState extends State<VolumeBarChart> {
                             bar.label,
                             style: TextStyle(
                               fontSize: 10,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                              color: isSelected ? Colors.white : const Color(0xFFA7B0BF),
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white
+                                  : const Color(0xFFA7B0BF),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

@@ -34,19 +34,23 @@ class HealthRepository {
       throw const FormatException('Invalid health permissions storage');
     }
     final raw = data['permissions'] as List;
-    final list = raw.map((e) => HealthPermission.fromJson(e as Map<String, dynamic>)).toList();
+    final list = raw
+        .map((e) => HealthPermission.fromJson(e as Map<String, dynamic>))
+        .toList();
 
     // Ensure all metric types exist
     final existingMetrics = list.map((p) => p.metric).toSet();
     for (final metric in HealthMetricType.values) {
       if (!existingMetrics.contains(metric)) {
-        list.add(HealthPermission(
-          metric: metric,
-          mode: metric == HealthMetricType.workouts
-              ? HealthAccessMode.readWrite
-              : HealthAccessMode.read,
-          status: HealthPermissionStatus.notDetermined,
-        ));
+        list.add(
+          HealthPermission(
+            metric: metric,
+            mode: metric == HealthMetricType.workouts
+                ? HealthAccessMode.readWrite
+                : HealthAccessMode.read,
+            status: HealthPermissionStatus.notDetermined,
+          ),
+        );
       }
     }
     return list;
@@ -147,7 +151,8 @@ class HealthRepository {
     }
     final raw = data['summaries'] as Map<String, dynamic>;
     return raw.map(
-      (k, v) => MapEntry(k, DailyHealthSummary.fromJson(v as Map<String, dynamic>)),
+      (k, v) =>
+          MapEntry(k, DailyHealthSummary.fromJson(v as Map<String, dynamic>)),
     );
   }
 
@@ -192,7 +197,9 @@ class HealthRepository {
         errorMessage: 'Permissions not granted',
       );
       await _appendAuditLog(audit);
-      throw StateError('No health permissions granted. Please enable permissions.');
+      throw StateError(
+        'No health permissions granted. Please enable permissions.',
+      );
     }
 
     try {
@@ -201,16 +208,30 @@ class HealthRepository {
 
       // Merge fetched metrics with existing, respecting granted metrics
       final merged = current.copyWith(
-        steps: grantedMetrics.contains(HealthMetricType.steps) ? fetched.steps : current.steps,
-        stepSource: grantedMetrics.contains(HealthMetricType.steps) ? fetched.stepSource : current.stepSource,
-        distanceKm: grantedMetrics.contains(HealthMetricType.distance) ? fetched.distanceKm : current.distanceKm,
-        distanceSource: grantedMetrics.contains(HealthMetricType.distance) ? fetched.distanceSource : current.distanceSource,
-        activeKcal: grantedMetrics.contains(HealthMetricType.activeEnergy) ? fetched.activeKcal : current.activeKcal,
-        activeKcalSource: grantedMetrics.contains(HealthMetricType.activeEnergy) ? fetched.activeKcalSource : current.activeKcalSource,
-        restingHeartRateBpm: grantedMetrics.contains(HealthMetricType.restingHeartRate)
+        steps: grantedMetrics.contains(HealthMetricType.steps)
+            ? fetched.steps
+            : current.steps,
+        stepSource: grantedMetrics.contains(HealthMetricType.steps)
+            ? fetched.stepSource
+            : current.stepSource,
+        distanceKm: grantedMetrics.contains(HealthMetricType.distance)
+            ? fetched.distanceKm
+            : current.distanceKm,
+        distanceSource: grantedMetrics.contains(HealthMetricType.distance)
+            ? fetched.distanceSource
+            : current.distanceSource,
+        activeKcal: grantedMetrics.contains(HealthMetricType.activeEnergy)
+            ? fetched.activeKcal
+            : current.activeKcal,
+        activeKcalSource: grantedMetrics.contains(HealthMetricType.activeEnergy)
+            ? fetched.activeKcalSource
+            : current.activeKcalSource,
+        restingHeartRateBpm:
+            grantedMetrics.contains(HealthMetricType.restingHeartRate)
             ? fetched.restingHeartRateBpm
             : current.restingHeartRateBpm,
-        restingHeartRateSource: grantedMetrics.contains(HealthMetricType.restingHeartRate)
+        restingHeartRateSource:
+            grantedMetrics.contains(HealthMetricType.restingHeartRate)
             ? fetched.restingHeartRateSource
             : current.restingHeartRateSource,
         sleepDurationMinutes: grantedMetrics.contains(HealthMetricType.sleep)
@@ -228,7 +249,8 @@ class HealthRepository {
         sleepSource: grantedMetrics.contains(HealthMetricType.sleep)
             ? fetched.sleepSource
             : current.sleepSource,
-        externalWorkoutsCount: grantedMetrics.contains(HealthMetricType.workouts)
+        externalWorkoutsCount:
+            grantedMetrics.contains(HealthMetricType.workouts)
             ? fetched.externalWorkoutsCount
             : current.externalWorkoutsCount,
         syncedAt: DateTime.now(),
@@ -243,7 +265,8 @@ class HealthRepository {
         source: fetched.stepSource,
         status: 'success',
         recordsImported: grantedMetrics.length,
-        details: 'Synced ${merged.steps} steps, '
+        details:
+            'Synced ${merged.steps} steps, '
             '${merged.restingHeartRateBpm ?? 0} bpm resting HR, '
             '${merged.sleepDurationMinutes ?? 0}m sleep, '
             '${merged.activeKcal.toStringAsFixed(0)} active kcal.',
@@ -342,7 +365,8 @@ class HealthRepository {
       source: HealthSource.manual,
       status: 'success',
       recordsImported: 1,
-      details: 'User manually recorded ${metric.label}: $value ${metric.unitLabel}',
+      details:
+          'User manually recorded ${metric.label}: $value ${metric.unitLabel}',
     );
     await _appendAuditLog(audit);
 
@@ -390,7 +414,9 @@ class HealthRepository {
       throw const FormatException('Invalid health audit logs storage');
     }
     final raw = data['logs'] as List;
-    return raw.map((e) => SyncAuditLog.fromJson(e as Map<String, dynamic>)).toList();
+    return raw
+        .map((e) => SyncAuditLog.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> _appendAuditLog(SyncAuditLog log) {
@@ -425,8 +451,8 @@ final healthRepositoryProvider = Provider<HealthRepository>((ref) {
 
 final healthPermissionsProvider =
     AsyncNotifierProvider<HealthPermissionsNotifier, List<HealthPermission>>(
-  HealthPermissionsNotifier.new,
-);
+      HealthPermissionsNotifier.new,
+    );
 
 class HealthPermissionsNotifier extends AsyncNotifier<List<HealthPermission>> {
   @override
@@ -461,9 +487,10 @@ class HealthPermissionsNotifier extends AsyncNotifier<List<HealthPermission>> {
 }
 
 final dailyHealthSummariesProvider =
-    AsyncNotifierProvider<DailyHealthSummariesNotifier, Map<String, DailyHealthSummary>>(
-  DailyHealthSummariesNotifier.new,
-);
+    AsyncNotifierProvider<
+      DailyHealthSummariesNotifier,
+      Map<String, DailyHealthSummary>
+    >(DailyHealthSummariesNotifier.new);
 
 class DailyHealthSummariesNotifier
     extends AsyncNotifier<Map<String, DailyHealthSummary>> {
@@ -515,8 +542,10 @@ class DailyHealthSummariesNotifier
   }
 }
 
-final dailyHealthSummaryProvider =
-    Provider.family<DailyHealthSummary, String>((ref, date) {
+final dailyHealthSummaryProvider = Provider.family<DailyHealthSummary, String>((
+  ref,
+  date,
+) {
   final summaries = ref.watch(dailyHealthSummariesProvider).value ?? {};
   return summaries[date] ?? DailyHealthSummary.empty(date);
 });

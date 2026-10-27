@@ -36,8 +36,7 @@ class PlanScreen extends ConsumerWidget {
                 const SizedBox(height: 20),
                 const InfoCard(
                   title: 'Start with your preferences',
-                  message:
-                      'Create a profile to build your weekly training outline offline.',
+                  message: 'Create a profile to build your weekly training outline offline.',
                   icon: Icons.calendar_month_outlined,
                 ),
                 const SizedBox(height: 20),
@@ -115,84 +114,81 @@ class PlanScreen extends ConsumerWidget {
               if (profile.hasLimitations)
                 const InfoCard(
                   title: 'Review movement first',
-                  message:
-                      'You reported limitations. Active slots are time to review suitable movement with a qualified professional, not clearance to exercise.',
+                  message: 'You reported limitations. Active slots are time to review suitable movement with a qualified professional, not clearance to exercise.',
                   icon: Icons.health_and_safety_outlined,
                 ),
 
-              ...List.generate(
-                7,
-                (i) {
-                  final isToday = i == todayIndex;
-                  final kind = schedule[i];
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Card(
-                      color: isToday
-                          ? const Color(0xFF1B2A1E)
-                          : const Color(0xFF151B23),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(
-                          color: isToday
-                              ? const Color(0xFFB6FF3B)
-                              : const Color(0xFF1C2430),
-                          width: isToday ? 1.5 : 1,
-                        ),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        leading: Icon(
-                          kind == 'Recovery'
-                              ? Icons.spa_outlined
-                              : Icons.fitness_center,
-                          color: isToday
-                              ? const Color(0xFFB6FF3B)
-                              : Colors.white70,
-                        ),
-                        title: Text(
-                          Profile.weekdays[i],
-                          style: TextStyle(
-                            fontWeight:
-                                isToday ? FontWeight.w900 : FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Text(kind),
-                        trailing: isToday
-                            ? Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFB6FF3B),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  'Today',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              )
-                            : const Icon(Icons.chevron_right, size: 20),
-                        onTap: () => _previewOrStartRoutine(
-                          context,
-                          ref,
-                          profile,
-                          kind,
-                          i,
-                        ),
+              ...List.generate(7, (i) {
+                final isToday = i == todayIndex;
+                final kind = schedule[i];
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Card(
+                    color: isToday
+                        ? const Color(0xFF1B2A1E)
+                        : const Color(0xFF151B23),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(
+                        color: isToday
+                            ? const Color(0xFFB6FF3B)
+                            : const Color(0xFF1C2430),
+                        width: isToday ? 1.5 : 1,
                       ),
                     ),
-                  );
-                },
-              ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      leading: Icon(
+                        kind == 'Recovery'
+                            ? Icons.spa_outlined
+                            : Icons.fitness_center,
+                        color: isToday
+                            ? const Color(0xFFB6FF3B)
+                            : Colors.white70,
+                      ),
+                      title: Text(
+                        Profile.weekdays[i],
+                        style: TextStyle(
+                          fontWeight: isToday
+                              ? FontWeight.w900
+                              : FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(kind),
+                      trailing: isToday
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFB6FF3B),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                'Today',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            )
+                          : const Icon(Icons.chevron_right, size: 20),
+                      onTap: () => _previewOrStartRoutine(
+                        context,
+                        ref,
+                        profile,
+                        kind,
+                        i,
+                      ),
+                    ),
+                  ),
+                );
+              }),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () => context.push('/profile?step=9'),
@@ -201,8 +197,7 @@ class PlanScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               const InfoCard(
                 title: 'A starting structure',
-                message:
-                    'This outline is a planning aid. Explore the exercise library for movement guides. Automatic exercise selection, session timers and workout logging are planned for the next phase.',
+                message: 'This outline is a planning aid. Explore the exercise library for movement guides. Automatic exercise selection, session timers and workout logging are planned for the next phase.',
                 icon: Icons.info_outline,
               ),
             ],
@@ -353,7 +348,8 @@ class PlanScreen extends ConsumerWidget {
                       Navigator.of(ctx).pop();
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => WorkoutSessionScreen(routine: routine),
+                          builder: (_) =>
+                              WorkoutSessionScreen(routine: routine),
                         ),
                       );
                     },
@@ -397,9 +393,7 @@ class PlanScreen extends ConsumerWidget {
     );
 
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => WorkoutSessionScreen(routine: routine),
-      ),
+      MaterialPageRoute(builder: (_) => WorkoutSessionScreen(routine: routine)),
     );
   }
 }

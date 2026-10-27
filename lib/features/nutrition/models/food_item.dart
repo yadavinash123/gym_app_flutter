@@ -5,14 +5,11 @@ class PortionUnit {
   final double grams;
 
   factory PortionUnit.fromJson(Map<String, dynamic> json) => PortionUnit(
-        name: json['name'] as String,
-        grams: (json['grams'] as num).toDouble(),
-      );
+    name: json['name'] as String,
+    grams: (json['grams'] as num).toDouble(),
+  );
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'grams': grams,
-      };
+  Map<String, dynamic> toJson() => {'name': name, 'grams': grams};
 }
 
 class FoodItem {
@@ -115,31 +112,26 @@ class FoodItem {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'category': category,
-        'diet': diet,
-        'servingSize': servingSize,
-        'servingUnit': servingUnit,
-        'portions': portions.map((p) => p.toJson()).toList(),
-        'calories': calories,
-        'protein': protein,
-        'carbs': carbs,
-        'fat': fat,
-        'fiber': fiber,
-        'micronutrients': micronutrients,
-        'source': source,
-        'url': url,
-        'isCustom': isCustom,
-      };
+    'id': id,
+    'name': name,
+    'category': category,
+    'diet': diet,
+    'servingSize': servingSize,
+    'servingUnit': servingUnit,
+    'portions': portions.map((p) => p.toJson()).toList(),
+    'calories': calories,
+    'protein': protein,
+    'carbs': carbs,
+    'fat': fat,
+    'fiber': fiber,
+    'micronutrients': micronutrients,
+    'source': source,
+    'url': url,
+    'isCustom': isCustom,
+  };
 
-  ({
-    double calories,
-    double protein,
-    double carbs,
-    double fat,
-    double fiber,
-  }) nutritionForGrams(double grams) {
+  ({double calories, double protein, double carbs, double fat, double fiber})
+  nutritionForGrams(double grams) {
     final factor = grams / servingSize;
     return (
       calories: calories * factor,

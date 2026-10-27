@@ -108,7 +108,10 @@ class WorkoutDetailScreen extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _DetailStat(label: 'TIME', value: '${minutes}m ${seconds}s'),
+                    _DetailStat(
+                      label: 'TIME',
+                      value: '${minutes}m ${seconds}s',
+                    ),
                     _DetailStat(
                       label: 'VOLUME',
                       value: '${session.totalVolumeKg.toStringAsFixed(0)} kg',
@@ -218,10 +221,34 @@ class WorkoutDetailScreen extends ConsumerWidget {
                     children: [
                       const TableRow(
                         children: [
-                          Text('SET', style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 11)),
-                          Text('WEIGHT', style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 11)),
-                          Text('REPS', style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 11)),
-                          Text('RPE', style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 11)),
+                          Text(
+                            'SET',
+                            style: TextStyle(
+                              color: Color(0xFFA7B0BF),
+                              fontSize: 11,
+                            ),
+                          ),
+                          Text(
+                            'WEIGHT',
+                            style: TextStyle(
+                              color: Color(0xFFA7B0BF),
+                              fontSize: 11,
+                            ),
+                          ),
+                          Text(
+                            'REPS',
+                            style: TextStyle(
+                              color: Color(0xFFA7B0BF),
+                              fontSize: 11,
+                            ),
+                          ),
+                          Text(
+                            'RPE',
+                            style: TextStyle(
+                              color: Color(0xFFA7B0BF),
+                              fontSize: 11,
+                            ),
+                          ),
                         ],
                       ),
                       ...ex.sets.map((set) {
@@ -229,18 +256,26 @@ class WorkoutDetailScreen extends ConsumerWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text('${set.setNumber}', style: const TextStyle(color: Colors.white)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Text(
-                                set.weightKg > 0 ? '${set.weightKg} kg' : 'Bodyweight',
+                                '${set.setNumber}',
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text('${set.actualReps}', style: const TextStyle(color: Colors.white)),
+                              child: Text(
+                                set.weightKg > 0
+                                    ? '${set.weightKg} kg'
+                                    : 'Bodyweight',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                '${set.actualReps}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),

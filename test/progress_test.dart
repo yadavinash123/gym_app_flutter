@@ -1,14 +1,11 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:fitforge_ai/core/storage/json_store.dart';
-import 'package:fitforge_ai/features/health/data/health_platform_adapter.dart';
-import 'package:fitforge_ai/features/health/data/health_repository.dart';
 import 'package:fitforge_ai/features/health/models/daily_health_summary.dart';
-import 'package:fitforge_ai/features/nutrition/data/nutrition_repository.dart';
-import 'package:fitforge_ai/features/nutrition/models/meal_log.dart';
 import 'package:fitforge_ai/features/profile/profile.dart';
 import 'package:fitforge_ai/features/profile/profile_repository.dart';
 import 'package:fitforge_ai/features/progress/data/milestone_engine.dart';
@@ -27,7 +24,6 @@ import 'package:fitforge_ai/features/progress/presentation/widgets/muscle_recove
 import 'package:fitforge_ai/features/progress/presentation/widgets/streak_tracker_card.dart';
 import 'package:fitforge_ai/features/progress/presentation/widgets/volume_bar_chart.dart';
 import 'package:fitforge_ai/features/progress/presentation/widgets/weight_entry_dialog.dart';
-import 'package:fitforge_ai/features/workouts/data/workout_repository.dart';
 import 'package:fitforge_ai/features/workouts/models/progressive_overload.dart';
 import 'package:fitforge_ai/features/workouts/models/workout_session.dart';
 
@@ -71,17 +67,11 @@ void main() {
   late Directory tempDir;
   late JsonStore store;
   late ProgressRepository progressRepo;
-  late WorkoutRepository workoutRepo;
-  late NutritionRepository nutritionRepo;
-  late HealthRepository healthRepo;
 
   setUp(() {
     tempDir = Directory.systemTemp.createTempSync('progress_test_');
     store = JsonStore(tempDir);
     progressRepo = ProgressRepository(store);
-    workoutRepo = WorkoutRepository(store);
-    nutritionRepo = NutritionRepository(store);
-    healthRepo = HealthRepository(store, SimulatedHealthAdapter());
   });
 
   tearDown(() {
@@ -146,68 +136,91 @@ void main() {
       }
     });
 
-    test('applies fatigue drop immediately post-workout and recovers over time', () {
-      final now = DateTime(2026, 10, 23, 12, 0);
-      // Session finished 1 hour ago
-      final sessionJustDone = createTestSession(
-        id: 's_recent',
-        completedAt: now.subtract(const Duration(hours: 1)),
-        setsCount: 8,
-        muscles: const ['Chest', 'Arms'],
-      );
+    test(
+      'applies fatigue drop immediately post-workout and recovers over time',
+      () {
+        final now = DateTime(2026, 10, 23, 12, 0);
+        // Session finished 1 hour ago
+        final sessionJustDone = createTestSession(
+          id: 's_recent',
+          completedAt: now.subtract(const Duration(hours: 1)),
+          setsCount: 8,
+          muscles: const ['Chest', 'Arms'],
+        );
 
-      final immediateReadiness = RecoveryCalculator.calculateReadiness(
-        sessions: [sessionJustDone],
-        currentTime: now,
-      );
+        final immediateReadiness = RecoveryCalculator.calculateReadiness(
+          sessions: [sessionJustDone],
+          currentTime: now,
+        );
 
-      final chest = immediateReadiness.muscles.firstWhere((m) => m.muscleGroup == 'Chest');
-      expect(chest.recoveryPercentage, lessThan(65.0));
-      expect(chest.state, anyOf(MuscleRecoveryState.fatigued, MuscleRecoveryState.overreaching));
-      expect(chest.estimatedHoursToFullRecovery, greaterThan(20));
+        final chest = immediateReadiness.muscles.firstWhere(
+          (m) => m.muscleGroup == 'Chest',
+        );
+        expect(chest.recoveryPercentage, lessThan(65.0));
+        expect(
+          chest.state,
+          anyOf(MuscleRecoveryState.fatigued, MuscleRecoveryState.overreaching),
+        );
+        expect(chest.estimatedHoursToFullRecovery, greaterThan(20));
 
-      // After 48 hours, recovery should reach >= 80%
-      final fortyEightHoursLater = now.add(const Duration(hours: 48));
-      final recoveredReadiness = RecoveryCalculator.calculateReadiness(
-        sessions: [sessionJustDone],
-        currentTime: fortyEightHoursLater,
-      );
+        // After 48 hours, recovery should reach >= 80%
+        final fortyEightHoursLater = now.add(const Duration(hours: 48));
+        final recoveredReadiness = RecoveryCalculator.calculateReadiness(
+          sessions: [sessionJustDone],
+          currentTime: fortyEightHoursLater,
+        );
 
-      final chestRecovered = recoveredReadiness.muscles.firstWhere((m) => m.muscleGroup == 'Chest');
-      expect(chestRecovered.recoveryPercentage, greaterThan(80.0));
-    });
+        final chestRecovered = recoveredReadiness.muscles.firstWhere(
+          (m) => m.muscleGroup == 'Chest',
+        );
+        expect(chestRecovered.recoveryPercentage, greaterThan(80.0));
+      },
+    );
 
-    test('modulates system readiness with sleep duration and resting heart rate', () {
-      final now = DateTime(2026, 10, 23, 12, 0);
-      final healthPoorSleep = const DailyHealthSummary(
-        date: '2026-10-23',
-        sleepDurationMinutes: 240, // 4 hours severe restriction
-        restingHeartRateBpm: 88,    // elevated HR
-      );
+    test(
+      'modulates system readiness with sleep duration and resting heart rate',
+      () {
+        final now = DateTime(2026, 10, 23, 12, 0);
+        final healthPoorSleep = const DailyHealthSummary(
+          date: '2026-10-23',
+          sleepDurationMinutes: 240, // 4 hours severe restriction
+          restingHeartRateBpm: 88, // elevated HR
+        );
 
-      final poorReadiness = RecoveryCalculator.calculateReadiness(
-        sessions: const [],
-        latestHealth: healthPoorSleep,
-        currentTime: now,
-      );
+        final poorReadiness = RecoveryCalculator.calculateReadiness(
+          sessions: const [],
+          latestHealth: healthPoorSleep,
+          currentTime: now,
+        );
 
-      expect(poorReadiness.sleepFactor, lessThan(1.0));
-      expect(poorReadiness.heartRateFactor, lessThan(1.0));
-      expect(poorReadiness.readinessScore, lessThan(100));
-    });
+        expect(poorReadiness.sleepFactor, lessThan(1.0));
+        expect(poorReadiness.heartRateFactor, lessThan(1.0));
+        expect(poorReadiness.readinessScore, lessThan(100));
+      },
+    );
   });
 
   group('StreakEngine', () {
     test('computes active consecutive streak when today is active', () {
       final ref = DateTime(2026, 10, 23, 10, 0);
-      final s1 = createTestSession(id: '1', completedAt: DateTime(2026, 10, 21));
-      final s2 = createTestSession(id: '2', completedAt: DateTime(2026, 10, 22));
-      final s3 = createTestSession(id: '3', completedAt: DateTime(2026, 10, 23));
-
-      final streak = StreakEngine.computeWorkoutStreak(
-        [s1, s2, s3],
-        referenceDate: ref,
+      final s1 = createTestSession(
+        id: '1',
+        completedAt: DateTime(2026, 10, 21),
       );
+      final s2 = createTestSession(
+        id: '2',
+        completedAt: DateTime(2026, 10, 22),
+      );
+      final s3 = createTestSession(
+        id: '3',
+        completedAt: DateTime(2026, 10, 23),
+      );
+
+      final streak = StreakEngine.computeWorkoutStreak([
+        s1,
+        s2,
+        s3,
+      ], referenceDate: ref);
 
       expect(streak.currentStreak, 3);
       expect(streak.longestStreak, 3);
@@ -215,13 +228,19 @@ void main() {
 
     test('preserves active streak if yesterday was active and today not yet logged', () {
       final ref = DateTime(2026, 10, 23, 8, 0);
-      final s1 = createTestSession(id: '1', completedAt: DateTime(2026, 10, 21));
-      final s2 = createTestSession(id: '2', completedAt: DateTime(2026, 10, 22));
-
-      final streak = StreakEngine.computeWorkoutStreak(
-        [s1, s2],
-        referenceDate: ref,
+      final s1 = createTestSession(
+        id: '1',
+        completedAt: DateTime(2026, 10, 21),
       );
+      final s2 = createTestSession(
+        id: '2',
+        completedAt: DateTime(2026, 10, 22),
+      );
+
+      final streak = StreakEngine.computeWorkoutStreak([
+        s1,
+        s2,
+      ], referenceDate: ref);
 
       expect(streak.currentStreak, 2);
     });
@@ -229,13 +248,19 @@ void main() {
     test('resets current streak to 0 if a gap of 2 or more days occurs', () {
       final ref = DateTime(2026, 10, 23, 8, 0);
       // Active on 18th and 19th, gap on 20th, 21st, 22nd
-      final s1 = createTestSession(id: '1', completedAt: DateTime(2026, 10, 18));
-      final s2 = createTestSession(id: '2', completedAt: DateTime(2026, 10, 19));
-
-      final streak = StreakEngine.computeWorkoutStreak(
-        [s1, s2],
-        referenceDate: ref,
+      final s1 = createTestSession(
+        id: '1',
+        completedAt: DateTime(2026, 10, 18),
       );
+      final s2 = createTestSession(
+        id: '2',
+        completedAt: DateTime(2026, 10, 19),
+      );
+
+      final streak = StreakEngine.computeWorkoutStreak([
+        s1,
+        s2,
+      ], referenceDate: ref);
 
       expect(streak.currentStreak, 0);
       expect(streak.longestStreak, 2);
@@ -246,15 +271,29 @@ void main() {
     test('unlocks first workout and century club milestones', () {
       final catalog = MilestoneBadge.defaultCatalog();
       final sessions = [
-        createTestSession(id: 's1', completedAt: DateTime.now(), setsCount: 50, volumeKg: 3000),
-        createTestSession(id: 's2', completedAt: DateTime.now(), setsCount: 60, volumeKg: 3000),
+        createTestSession(
+          id: 's1',
+          completedAt: DateTime.now(),
+          setsCount: 50,
+          volumeKg: 3000,
+        ),
+        createTestSession(
+          id: 's2',
+          completedAt: DateTime.now(),
+          setsCount: 60,
+          volumeKg: 3000,
+        ),
       ];
 
       final updated = MilestoneEngine.evaluateMilestones(
         existingBadges: catalog,
         sessions: sessions,
         prs: const [],
-        workoutStreak: const HabitStreak(type: HabitType.workouts, currentStreak: 2, longestStreak: 2),
+        workoutStreak: const HabitStreak(
+          type: HabitType.workouts,
+          currentStreak: 2,
+          longestStreak: 2,
+        ),
         nutritionLogs: const {},
         healthSummaries: const {},
       );
@@ -320,77 +359,93 @@ void main() {
   });
 
   group('Progress Widgets', () {
-    testWidgets('InteractiveLineChart renders data points, title, and target line', (tester) async {
-      final points = [
-        ChartDataPoint(date: DateTime(2026, 10, 1), value: 80.0),
-        ChartDataPoint(date: DateTime(2026, 10, 15), value: 78.5),
-        ChartDataPoint(date: DateTime(2026, 10, 23), value: 77.0),
-      ];
+    testWidgets(
+      'InteractiveLineChart renders data points, title, and target line',
+      (tester) async {
+        final points = [
+          ChartDataPoint(date: DateTime(2026, 10, 1), value: 80.0),
+          ChartDataPoint(date: DateTime(2026, 10, 15), value: 78.5),
+          ChartDataPoint(date: DateTime(2026, 10, 23), value: 77.0),
+        ];
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: InteractiveLineChart(
-              points: points,
-              unit: 'kg',
-              targetValue: 75.0,
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: InteractiveLineChart(
+                points: points,
+                unit: 'kg',
+                targetValue: 75.0,
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('77.0'), findsOneWidget);
-      expect(find.text('kg'), findsOneWidget);
-      expect(find.text('Target: 75.0 kg'), findsOneWidget);
-    });
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(find.text('77.0'), findsOneWidget);
+        expect(find.text('kg'), findsOneWidget);
+        expect(find.text('Target: 75.0 kg'), findsOneWidget);
+      },
+    );
 
-    testWidgets('VolumeBarChart renders weekly volume bars and labels', (tester) async {
+    testWidgets('VolumeBarChart renders weekly volume bars and labels', (
+      tester,
+    ) async {
       final bars = [
-        const VolumeBarData(label: 'W1', volumeKg: 5000, setCount: 24, sessionCount: 3),
-        const VolumeBarData(label: 'W2', volumeKg: 7500, setCount: 32, sessionCount: 4),
+        const VolumeBarData(
+          label: 'W1',
+          volumeKg: 5000,
+          setCount: 24,
+          sessionCount: 3,
+        ),
+        const VolumeBarData(
+          label: 'W2',
+          volumeKg: 7500,
+          setCount: 32,
+          sessionCount: 4,
+        ),
       ];
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VolumeBarChart(bars: bars),
-          ),
+          home: Scaffold(body: VolumeBarChart(bars: bars)),
         ),
       );
 
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(find.text('W1'), findsOneWidget);
-      expect(find.text('W2'), findsOneWidget);
+      expect(find.text('W2'), findsWidgets);
       expect(find.text('4 sessions • 32 sets'), findsOneWidget);
     });
 
-    testWidgets('StreakTrackerCard renders flame, streak count and day badges', (tester) async {
-      const streak = HabitStreak(
-        type: HabitType.workouts,
-        currentStreak: 5,
-        longestStreak: 12,
-        weeklyAdherenceRate: 71.4,
-      );
+    testWidgets(
+      'StreakTrackerCard renders flame, streak count and day badges',
+      (tester) async {
+        const streak = HabitStreak(
+          type: HabitType.workouts,
+          currentStreak: 5,
+          longestStreak: 12,
+          weeklyAdherenceRate: 71.4,
+        );
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StreakTrackerCard(workoutStreak: streak),
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(body: StreakTrackerCard(workoutStreak: streak)),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('5'), findsOneWidget);
-      expect(find.text('DAY STREAK'), findsOneWidget);
-      expect(find.textContaining('Personal Best: 12 days'), findsOneWidget);
-    });
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(find.text('5'), findsOneWidget);
+        expect(find.text('DAY STREAK'), findsOneWidget);
+        expect(find.textContaining('Personal Best: 12 days'), findsOneWidget);
+      },
+    );
 
-    testWidgets('MuscleRecoveryCard renders readiness score and muscle rows', (tester) async {
+    testWidgets('MuscleRecoveryCard renders readiness score and muscle rows', (
+      tester,
+    ) async {
       final readiness = OverallSystemReadiness(
         readinessScore: 85,
         sleepFactor: 1.0,
@@ -409,9 +464,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: MuscleRecoveryCard(readiness: readiness),
-          ),
+          home: Scaffold(body: MuscleRecoveryCard(readiness: readiness)),
         ),
       );
 
@@ -426,7 +479,9 @@ void main() {
       expect(find.text('Core'), findsOneWidget);
     });
 
-    testWidgets('WeightEntryDialog validates and saves measurement', (tester) async {
+    testWidgets('WeightEntryDialog validates and saves measurement', (
+      tester,
+    ) async {
       BodyMeasurementEntry? saved;
 
       await tester.pumpWidget(
@@ -468,90 +523,144 @@ void main() {
       expect(saved!.weightKg, 76.8);
     });
 
-    testWidgets('ReminderSettingsScreen renders and toggles notification switch', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            progressRepositoryProvider.overrideWithValue(progressRepo),
-          ],
-          child: const MaterialApp(
-            home: ReminderSettingsScreen(),
+    testWidgets(
+      'ReminderSettingsScreen renders and toggles notification switch',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              progressRepositoryProvider.overrideWithValue(progressRepo),
+              reminderPreferencesProvider.overrideWith(
+                (ref) => ReminderPreference.defaultSchedules(),
+              ),
+            ],
+            child: const MaterialApp(home: ReminderSettingsScreen()),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('Reminders & Alerts'), findsOneWidget);
-      expect(find.text('Daily Training Session'), findsOneWidget);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(tester.takeException(), isNull);
+        expect(find.text('Reminders & Alerts'), findsOneWidget);
+        expect(find.text('Daily Training Session'), findsOneWidget);
 
-      // Toggle first switch
-      final switches = find.byType(Switch);
-      expect(switches, findsWidgets);
-      await tester.tap(switches.first);
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-    });
+        // Toggle first switch
+        final switches = find.byType(Switch);
+        expect(switches, findsWidgets);
+        await tester.tap(switches.first);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(tester.takeException(), isNull);
+      },
+    );
 
-    testWidgets('ProgressScreen renders overview, charts, and recovery tabs without overflow', (tester) async {
-      tester.view.physicalSize = const Size(360, 640);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'ProgressScreen renders overview, charts, and recovery tabs without overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      final testProfile = const Profile(
-        name: 'Test Athlete',
-        level: 'Intermediate',
-        goal: 'Build muscle',
-        days: 4,
-        environment: 'Gym',
-        weightKg: 78.0,
-      );
+        final testProfile = const Profile(
+          name: 'Test Athlete',
+          level: 'Intermediate',
+          goal: 'Build muscle',
+          days: 4,
+          environment: 'Gym',
+          weightKg: 78.0,
+        );
 
-      await store.write('profile', testProfile.toJson());
-      await progressRepo.addMeasurement(const BodyMeasurementEntry(
-        id: 'w1',
-        date: '2026-10-23',
-        weightKg: 78.0,
-      ));
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            storeProvider.overrideWithValue(store),
-            progressRepositoryProvider.overrideWithValue(progressRepo),
-            workoutRepositoryProvider.overrideWithValue(workoutRepo),
-            nutritionRepositoryProvider.overrideWithValue(nutritionRepo),
-            healthRepositoryProvider.overrideWithValue(healthRepo),
+        final dummyDashboard = ProgressDashboardData(
+          profile: testProfile,
+          measurements: const [
+            BodyMeasurementEntry(id: 'w1', date: '2026-10-23', weightKg: 78.0),
           ],
-          child: const MaterialApp(
-            home: ProgressScreen(),
+          sessions: [
+            createTestSession(
+              id: 's1',
+              completedAt: DateTime.now(),
+              volumeKg: 2000,
+              setsCount: 8,
+            ),
+          ],
+          prs: [
+            PersonalRecord(
+              exerciseId: 'bench-press',
+              maxWeightKg: 80.0,
+              maxRepsAtMaxWeight: 8,
+              maxSessionVolumeKg: 2000.0,
+              estimatedOneRepMaxKg: 100.0,
+              achievedAt: DateTime.now(),
+            ),
+          ],
+          readiness: OverallSystemReadiness(
+            readinessScore: 88,
+            sleepFactor: 1.0,
+            heartRateFactor: 1.0,
+            advice: 'All systems ready for progressive overload.',
+            muscles: RecoveryCalculator.canonicalMuscleGroups.map((g) {
+              return MuscleGroupRecovery(
+                muscleGroup: g,
+                recoveryPercentage: 90.0,
+                state: MuscleRecoveryState.fresh,
+                hoursSinceLastTrained: 72.0,
+                estimatedHoursToFullRecovery: 0,
+              );
+            }).toList(),
           ),
-        ),
-      );
+          streaks: const {
+            HabitType.workouts: HabitStreak(
+              type: HabitType.workouts,
+              currentStreak: 3,
+              longestStreak: 5,
+              weeklyAdherenceRate: 42.8,
+            ),
+          },
+          milestones: MilestoneBadge.defaultCatalog(),
+          reminders: ReminderPreference.defaultSchedules(),
+          nutritionLogs: const {},
+          healthSummaries: const {},
+        );
 
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('PROGRESS & ANALYTICS'), findsOneWidget);
-      expect(find.text('BODY WEIGHT'), findsOneWidget);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              storeProvider.overrideWithValue(store),
+              progressRepositoryProvider.overrideWithValue(progressRepo),
+              progressDashboardProvider.overrideWith((ref) => dummyDashboard),
+            ],
+            child: const MaterialApp(home: ProgressScreen()),
+          ),
+        );
 
-      // Tap CHARTS tab
-      await tester.tap(find.text('CHARTS'));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('BODY WEIGHT TREND'), findsOneWidget);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(tester.takeException(), isNull);
+        expect(find.text('PROGRESS & ANALYTICS'), findsOneWidget);
+        expect(find.text('BODY WEIGHT'), findsOneWidget);
 
-      // Tap RECOVERY tab
-      await tester.tap(find.text('RECOVERY'));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('Supercompensation & Recovery Curve'), findsOneWidget);
+        // Tap CHARTS tab
+        await tester.tap(find.text('CHARTS'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        expect(tester.takeException(), isNull);
+        expect(find.text('BODY WEIGHT TREND'), findsOneWidget);
 
-      // Tap BADGES tab
-      await tester.tap(find.text('BADGES'));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.text('MILESTONES & ACHIEVEMENTS'), findsOneWidget);
-    });
+        // Tap RECOVERY tab
+        await tester.tap(find.text('RECOVERY'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        expect(tester.takeException(), isNull);
+        expect(find.text('Supercompensation & Recovery Curve'), findsOneWidget);
+
+        // Tap BADGES tab
+        await tester.tap(find.text('BADGES'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        expect(tester.takeException(), isNull);
+        expect(find.text('MILESTONES & ACHIEVEMENTS'), findsOneWidget);
+      },
+    );
   });
 }

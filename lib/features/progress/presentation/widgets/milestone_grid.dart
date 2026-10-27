@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/milestone_badge.dart';
 
 class MilestoneGrid extends StatelessWidget {
-  const MilestoneGrid({
-    super.key,
-    required this.milestones,
-  });
+  const MilestoneGrid({super.key, required this.milestones});
 
   final List<MilestoneBadge> milestones;
 
@@ -20,13 +17,15 @@ class MilestoneGrid extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'MILESTONES & ACHIEVEMENTS',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.0,
-                color: Color(0xFFA7B0BF),
+            const Expanded(
+              child: Text(
+                'MILESTONES & ACHIEVEMENTS',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                  color: Color(0xFFA7B0BF),
+                ),
               ),
             ),
             Container(
@@ -57,7 +56,7 @@ class MilestoneGrid extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1.05,
+            childAspectRatio: 0.95,
           ),
           itemCount: milestones.length,
           itemBuilder: (context, index) {
@@ -71,7 +70,9 @@ class MilestoneGrid extends StatelessWidget {
 
   Widget _buildMilestoneTile(BuildContext context, MilestoneBadge badge) {
     final isUnlocked = badge.isUnlocked;
-    final primaryColor = isUnlocked ? const Color(0xFFB6FF3B) : const Color(0xFFA7B0BF);
+    final primaryColor = isUnlocked
+        ? const Color(0xFFB6FF3B)
+        : const Color(0xFFA7B0BF);
 
     return InkWell(
       onTap: () => _showBadgeDetailSheet(context, badge),
@@ -87,7 +88,7 @@ class MilestoneGrid extends StatelessWidget {
             width: isUnlocked ? 1.5 : 1,
           ),
         ),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -104,16 +105,16 @@ class MilestoneGrid extends StatelessWidget {
                         : Colors.white.withOpacity(0.05),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    badge.iconData,
-                    size: 20,
-                    color: primaryColor,
-                  ),
+                  child: Icon(badge.iconData, size: 20, color: primaryColor),
                 ),
                 Icon(
-                  isUnlocked ? Icons.check_circle_rounded : Icons.lock_outline_rounded,
+                  isUnlocked
+                      ? Icons.check_circle_rounded
+                      : Icons.lock_outline_rounded,
                   size: 16,
-                  color: isUnlocked ? const Color(0xFFB6FF3B) : const Color(0xFFA7B0BF).withOpacity(0.5),
+                  color: isUnlocked
+                      ? const Color(0xFFB6FF3B)
+                      : const Color(0xFFA7B0BF).withOpacity(0.5),
                 ),
               ],
             ),
@@ -153,7 +154,9 @@ class MilestoneGrid extends StatelessWidget {
                     value: badge.progressPercentage,
                     backgroundColor: Colors.white.withOpacity(0.08),
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      isUnlocked ? const Color(0xFFB6FF3B) : const Color(0xFF00D4FF),
+                      isUnlocked
+                          ? const Color(0xFFB6FF3B)
+                          : const Color(0xFF00D4FF),
                     ),
                     minHeight: 4,
                   ),
@@ -269,7 +272,10 @@ class MilestoneGrid extends StatelessWidget {
                         children: [
                           const Text(
                             'Status',
-                            style: TextStyle(fontSize: 13, color: Color(0xFFA7B0BF)),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFFA7B0BF),
+                            ),
                           ),
                           Text(
                             badge.isUnlocked ? 'Unlocked' : 'In Progress',
@@ -289,7 +295,10 @@ class MilestoneGrid extends StatelessWidget {
                         children: [
                           const Text(
                             'Progress',
-                            style: TextStyle(fontSize: 13, color: Color(0xFFA7B0BF)),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFFA7B0BF),
+                            ),
                           ),
                           Text(
                             '${badge.currentValue.toStringAsFixed(0)} / ${badge.targetValue.toStringAsFixed(0)} ${badge.unit}',
@@ -308,10 +317,16 @@ class MilestoneGrid extends StatelessWidget {
                           children: [
                             const Text(
                               'Achieved Date',
-                              style: TextStyle(fontSize: 13, color: Color(0xFFA7B0BF)),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFFA7B0BF),
+                              ),
                             ),
                             Text(
-                              badge.unlockedAt!.toIso8601String().substring(0, 10),
+                              badge.unlockedAt!.toIso8601String().substring(
+                                0,
+                                10,
+                              ),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,

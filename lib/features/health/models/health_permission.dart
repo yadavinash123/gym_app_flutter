@@ -11,11 +11,7 @@ enum HealthPermissionStatus {
 }
 
 /// Access mode requested for a health metric.
-enum HealthAccessMode {
-  read,
-  write,
-  readWrite,
-}
+enum HealthAccessMode { read, write, readWrite }
 
 /// Represents a permission request and grant record for a specific metric.
 class HealthPermission {
@@ -50,12 +46,12 @@ class HealthPermission {
   }
 
   Map<String, dynamic> toJson() => {
-        'metric': metric.name,
-        'mode': mode.name,
-        'status': status.name,
-        if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
-        if (notes != null) 'notes': notes,
-      };
+    'metric': metric.name,
+    'mode': mode.name,
+    'status': status.name,
+    if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
+    if (notes != null) 'notes': notes,
+  };
 
   factory HealthPermission.fromJson(Map<String, dynamic> json) {
     final metricName = json['metric'] as String? ?? 'steps';

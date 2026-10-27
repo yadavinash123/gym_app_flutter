@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../models/coach_conversation.dart';
 import 'muscle_silhouette_badge.dart';
 
 class WorkoutPlanCard extends StatelessWidget {
-  const WorkoutPlanCard({
-    super.key,
-    required this.data,
-  });
+  const WorkoutPlanCard({super.key, required this.data});
 
   final WorkoutPlanCardData data;
 
@@ -52,7 +50,8 @@ class WorkoutPlanCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFB6FF3B).withValues(alpha: 0.15),
+                              color: const Color(0xFFB6FF3B)
+                                  .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(

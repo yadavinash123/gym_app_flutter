@@ -30,7 +30,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   @override
   void initState() {
     super.initState();
-    final firstSet = widget.routine.exercises.isNotEmpty &&
+    final firstSet =
+        widget.routine.exercises.isNotEmpty &&
             widget.routine.exercises[0].sets.isNotEmpty
         ? widget.routine.exercises[0].sets[0]
         : const PlannedSet(setNumber: 1, targetReps: 10);
@@ -81,8 +82,13 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     final currentSet = sessionState.currentPlannedSet;
 
     // Progression recommendation for current exercise
-    final isLowerBody = currentEx.primaryMuscles.any((m) =>
-        m == 'Quadriceps' || m == 'Glutes' || m == 'Hamstrings' || m == 'Calves');
+    final isLowerBody = currentEx.primaryMuscles.any(
+      (m) =>
+          m == 'Quadriceps' ||
+          m == 'Glutes' ||
+          m == 'Hamstrings' ||
+          m == 'Calves',
+    );
     final isBodyweight = _currentWeightKg <= 0.0;
     final progression = ProgressiveOverloadCalculator.evaluateProgression(
       exerciseId: currentEx.exerciseId,
@@ -95,7 +101,12 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        _confirmExit(context, sessionState, controller, profile?.weightKg ?? 70.0);
+        _confirmExit(
+          context,
+          sessionState,
+          controller,
+          profile?.weightKg ?? 70.0,
+        );
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF0B0F14),
@@ -194,11 +205,13 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: (sessionState.currentExerciseIndex + 1) /
+                      value:
+                          (sessionState.currentExerciseIndex + 1) /
                           widget.routine.exercises.length,
                       backgroundColor: const Color(0xFF1C2430),
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Color(0xFFB6FF3B)),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(0xFFB6FF3B),
+                      ),
                       minHeight: 6,
                     ),
                   ),
@@ -243,8 +256,9 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFF1C2430),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
                                           m,
@@ -297,8 +311,10 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                                   vertical: 8,
                                 ),
                               ),
-                              onPressed: () =>
-                                  _showReplaceExerciseDialog(context, controller),
+                              onPressed: () => _showReplaceExerciseDialog(
+                                context,
+                                controller,
+                              ),
                               icon: const Icon(Icons.swap_horiz, size: 18),
                               label: const Text('Swap Exercise'),
                             ),
@@ -316,18 +332,21 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                   const SizedBox(height: 16),
 
                   // Progressive Overload suggestion card
-                  if (progression.decision != ProgressionDecision.maintainLoad ||
+                  if (progression.decision !=
+                          ProgressionDecision.maintainLoad ||
                       progression.message.contains('Smooth completion'))
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: progression.decision ==
+                        color:
+                            progression.decision ==
                                 ProgressionDecision.painWarning
                             ? const Color(0xFF381519)
                             : const Color(0xFF142C30),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: progression.decision ==
+                          color:
+                              progression.decision ==
                                   ProgressionDecision.painWarning
                               ? const Color(0xFFFF5D73)
                               : const Color(0xFF00D4FF),
@@ -342,7 +361,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                                     ProgressionDecision.painWarning
                                 ? Icons.warning_amber_rounded
                                 : Icons.trending_up,
-                            color: progression.decision ==
+                            color:
+                                progression.decision ==
                                     ProgressionDecision.painWarning
                                 ? const Color(0xFFFF5D73)
                                 : const Color(0xFF00D4FF),
@@ -362,7 +382,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                                     fontSize: 11,
                                     letterSpacing: 1.2,
                                     fontWeight: FontWeight.bold,
-                                    color: progression.decision ==
+                                    color:
+                                        progression.decision ==
                                             ProgressionDecision.painWarning
                                         ? const Color(0xFFFF5D73)
                                         : const Color(0xFF00D4FF),
@@ -437,15 +458,19 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                                   onDecrement: () {
                                     setState(() {
                                       _currentWeightKg =
-                                          (_currentWeightKg - 2.5)
-                                              .clamp(0.0, 500.0);
+                                          (_currentWeightKg - 2.5).clamp(
+                                            0.0,
+                                            500.0,
+                                          );
                                     });
                                   },
                                   onIncrement: () {
                                     setState(() {
                                       _currentWeightKg =
-                                          (_currentWeightKg + 2.5)
-                                              .clamp(0.0, 500.0);
+                                          (_currentWeightKg + 2.5).clamp(
+                                            0.0,
+                                            500.0,
+                                          );
                                     });
                                   },
                                 ),
@@ -458,14 +483,18 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                                   value: '$_currentReps',
                                   onDecrement: () {
                                     setState(() {
-                                      _currentReps =
-                                          (_currentReps - 1).clamp(1, 100);
+                                      _currentReps = (_currentReps - 1).clamp(
+                                        1,
+                                        100,
+                                      );
                                     });
                                   },
                                   onIncrement: () {
                                     setState(() {
-                                      _currentReps =
-                                          (_currentReps + 1).clamp(1, 100);
+                                      _currentReps = (_currentReps + 1).clamp(
+                                        1,
+                                        100,
+                                      );
                                     });
                                   },
                                 ),
@@ -572,51 +601,52 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                           ),
                           const SizedBox(height: 16),
 
-                        // Big Log Set Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: FilledButton.icon(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFFB6FF3B),
-                              foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                          // Big Log Set Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFFB6FF3B),
+                                foregroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                               ),
-                            ),
-                            onPressed: () {
-                              controller.logCurrentSet(
-                                actualReps: _currentReps,
-                                weightKg: _currentWeightKg,
-                                rpe: _currentRpe,
-                                painReported: _painReported,
-                              );
-                              // Sync next set default
-                              final nextSetIndex =
-                                  sessionState.currentSetIndex + 1;
-                              if (nextSetIndex < currentEx.sets.length) {
-                                _syncWithCurrentPlanned(
-                                    currentEx.sets[nextSetIndex]);
-                              }
-                            },
-                            icon: const Icon(Icons.check_circle_outline),
-                            label: const FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                'LOG SET & START REST',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1,
+                              onPressed: () {
+                                controller.logCurrentSet(
+                                  actualReps: _currentReps,
+                                  weightKg: _currentWeightKg,
+                                  rpe: _currentRpe,
+                                  painReported: _painReported,
+                                );
+                                // Sync next set default
+                                final nextSetIndex =
+                                    sessionState.currentSetIndex + 1;
+                                if (nextSetIndex < currentEx.sets.length) {
+                                  _syncWithCurrentPlanned(
+                                    currentEx.sets[nextSetIndex],
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.check_circle_outline),
+                              label: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'LOG SET & START REST',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Completed Sets for this exercise
                   Text(
@@ -706,7 +736,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                   alignment: Alignment.center,
                   child: RestTimerWidget(
                     initialSeconds: sessionState.restSecondsRemaining,
-                    nextExerciseName: sessionState.currentPlannedExercise.exerciseName,
+                    nextExerciseName:
+                        sessionState.currentPlannedExercise.exerciseName,
                     nextSetNumber: sessionState.currentSetIndex + 1,
                     onComplete: controller.dismissRest,
                     onSkip: controller.dismissRest,
@@ -761,7 +792,9 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                     final ex = exercises[index - 1];
                     return ListTile(
                       title: Text(ex.name),
-                      subtitle: Text('${ex.group} • ${ex.equipment.join(', ')}'),
+                      subtitle: Text(
+                        '${ex.group} • ${ex.equipment.join(', ')}',
+                      ),
                       onTap: () {
                         controller.replaceCurrentExercise(ex);
                         Navigator.of(ctx).pop();
@@ -827,9 +860,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     if (session == null) return;
     controller.clearSession();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => WorkoutSummaryScreen(session: session),
-      ),
+      MaterialPageRoute(builder: (_) => WorkoutSummaryScreen(session: session)),
     );
   }
 }

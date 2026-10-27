@@ -55,18 +55,18 @@ class CoachPreferences {
   }
 
   Map<String, dynamic> toJson() => {
-        'aiModel': aiModel,
-        'providerName': providerName,
-        'responseLanguage': responseLanguage,
-        'streamingResponses': streamingResponses,
-        'fitnessGoal': fitnessGoal,
-        'trainingLevel': trainingLevel,
-        'preferredCoachTone': preferredCoachTone,
-        'responseDetail': responseDetail,
-        'saveChatHistory': saveChatHistory,
-        'rememberConversationContext': rememberConversationContext,
-        'voiceResponses': voiceResponses,
-      };
+    'aiModel': aiModel,
+    'providerName': providerName,
+    'responseLanguage': responseLanguage,
+    'streamingResponses': streamingResponses,
+    'fitnessGoal': fitnessGoal,
+    'trainingLevel': trainingLevel,
+    'preferredCoachTone': preferredCoachTone,
+    'responseDetail': responseDetail,
+    'saveChatHistory': saveChatHistory,
+    'rememberConversationContext': rememberConversationContext,
+    'voiceResponses': voiceResponses,
+  };
 
   factory CoachPreferences.fromJson(Map<String, dynamic> json) {
     return CoachPreferences(

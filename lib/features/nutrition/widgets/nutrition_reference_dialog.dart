@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/nutrition_targets.dart';
 
 class NutritionReferenceDialog extends StatelessWidget {

@@ -24,13 +24,18 @@ class NutritionRepository {
     }
     final rawLogs = data['logs'] as Map<String, dynamic>;
     return rawLogs.map(
-      (k, v) => MapEntry(k, DailyNutritionLog.fromJson(v as Map<String, dynamic>)),
+      (k, v) =>
+          MapEntry(k, DailyNutritionLog.fromJson(v as Map<String, dynamic>)),
     );
   }
 
-  Future<DailyNutritionLog> getDailyLog(String date, {int waterTarget = 2500}) async {
+  Future<DailyNutritionLog> getDailyLog(
+    String date, {
+    int waterTarget = 2500,
+  }) async {
     final logs = await loadAllLogs();
-    return logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
+    return logs[date] ??
+        DailyNutritionLog.empty(date, waterTarget: waterTarget);
   }
 
   Future<DailyNutritionLog> saveDailyLog(DailyNutritionLog log) {
@@ -55,8 +60,9 @@ class NutritionRepository {
   }) {
     final result = _tail.then((_) async {
       final logs = await _readAllLogs();
-      final current = logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
-      
+      final current =
+          logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
+
       final meal = current.meals[mealType] ?? Meal(type: mealType);
       final updatedItems = List<LoggedFoodItem>.from(meal.items)..add(item);
       final updatedMeals = Map<String, Meal>.from(current.meals);
@@ -83,8 +89,9 @@ class NutritionRepository {
   }) {
     final result = _tail.then((_) async {
       final logs = await _readAllLogs();
-      final current = logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
-      
+      final current =
+          logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
+
       final meal = current.meals[mealType];
       if (meal == null) return current;
 
@@ -113,7 +120,8 @@ class NutritionRepository {
   }) {
     final result = _tail.then((_) async {
       final logs = await _readAllLogs();
-      final current = logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
+      final current =
+          logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
       final updatedLog = current.copyWith(waterMl: waterMl.clamp(0, 10000));
       logs[date] = updatedLog;
 
@@ -149,7 +157,8 @@ class NutritionRepository {
       final logs = await _readAllLogs();
       final source = logs[fromDate];
       if (source == null) {
-        return logs[toDate] ?? DailyNutritionLog.empty(toDate, waterTarget: waterTarget);
+        return logs[toDate] ??
+            DailyNutritionLog.empty(toDate, waterTarget: waterTarget);
       }
 
       final copiedMeals = <String, Meal>{};
@@ -157,24 +166,28 @@ class NutritionRepository {
         copiedMeals[type] = Meal(
           type: type,
           items: meal.items
-              .map((i) => LoggedFoodItem(
-                    id: '${DateTime.now().millisecondsSinceEpoch}_${i.id}',
-                    foodId: i.foodId,
-                    name: i.name,
-                    portionName: i.portionName,
-                    grams: i.grams,
-                    quantity: i.quantity,
-                    calories: i.calories,
-                    protein: i.protein,
-                    carbs: i.carbs,
-                    fat: i.fat,
-                    fiber: i.fiber,
-                  ))
+              .map(
+                (i) => LoggedFoodItem(
+                  id: '${DateTime.now().millisecondsSinceEpoch}_${i.id}',
+                  foodId: i.foodId,
+                  name: i.name,
+                  portionName: i.portionName,
+                  grams: i.grams,
+                  quantity: i.quantity,
+                  calories: i.calories,
+                  protein: i.protein,
+                  carbs: i.carbs,
+                  fat: i.fat,
+                  fiber: i.fiber,
+                ),
+              )
               .toList(),
         );
       });
 
-      final target = logs[toDate] ?? DailyNutritionLog.empty(toDate, waterTarget: waterTarget);
+      final target =
+          logs[toDate] ??
+          DailyNutritionLog.empty(toDate, waterTarget: waterTarget);
       final updated = target.copyWith(meals: copiedMeals);
       logs[toDate] = updated;
 
@@ -194,9 +207,12 @@ class NutritionRepository {
   }) {
     final result = _tail.then((_) async {
       final logs = await _readAllLogs();
-      final current = logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
-      final updated = DailyNutritionLog.empty(date, waterTarget: current.waterTargetMl)
-          .copyWith(waterMl: current.waterMl);
+      final current =
+          logs[date] ?? DailyNutritionLog.empty(date, waterTarget: waterTarget);
+      final updated = DailyNutritionLog.empty(
+        date,
+        waterTarget: current.waterTargetMl,
+      ).copyWith(waterMl: current.waterMl);
       logs[date] = updated;
 
       await store.write('nutrition_logs', {
@@ -220,9 +236,10 @@ final nutritionTargetsProvider = Provider<NutritionTargets>((ref) {
 });
 
 final nutritionLogsProvider =
-    AsyncNotifierProvider<NutritionLogsController, Map<String, DailyNutritionLog>>(
-  NutritionLogsController.new,
-);
+    AsyncNotifierProvider<
+      NutritionLogsController,
+      Map<String, DailyNutritionLog>
+    >(NutritionLogsController.new);
 
 class NutritionLogsController
     extends AsyncNotifier<Map<String, DailyNutritionLog>> {
@@ -236,13 +253,17 @@ class NutritionLogsController
     required LoggedFoodItem item,
   }) async {
     final targets = ref.read(nutritionTargetsProvider);
-    await ref.read(nutritionRepositoryProvider).addFoodToMeal(
+    await ref
+        .read(nutritionRepositoryProvider)
+        .addFoodToMeal(
           date: date,
           mealType: mealType,
           item: item,
           waterTarget: targets.waterMl,
         );
-    final updatedMap = await ref.read(nutritionRepositoryProvider).loadAllLogs();
+    final updatedMap = await ref
+        .read(nutritionRepositoryProvider)
+        .loadAllLogs();
     if (ref.mounted) state = AsyncData(updatedMap);
   }
 
@@ -252,41 +273,43 @@ class NutritionLogsController
     required String itemId,
   }) async {
     final targets = ref.read(nutritionTargetsProvider);
-    await ref.read(nutritionRepositoryProvider).removeFoodFromMeal(
+    await ref
+        .read(nutritionRepositoryProvider)
+        .removeFoodFromMeal(
           date: date,
           mealType: mealType,
           itemId: itemId,
           waterTarget: targets.waterMl,
         );
-    final updatedMap = await ref.read(nutritionRepositoryProvider).loadAllLogs();
+    final updatedMap = await ref
+        .read(nutritionRepositoryProvider)
+        .loadAllLogs();
     if (ref.mounted) state = AsyncData(updatedMap);
   }
 
-  Future<void> addWater({
-    required String date,
-    required int amountMl,
-  }) async {
+  Future<void> addWater({required String date, required int amountMl}) async {
     final targets = ref.read(nutritionTargetsProvider);
-    await ref.read(nutritionRepositoryProvider).addWater(
-          date: date,
-          amountMl: amountMl,
-          waterTarget: targets.waterMl,
-        );
-    final updatedMap = await ref.read(nutritionRepositoryProvider).loadAllLogs();
+    await ref
+        .read(nutritionRepositoryProvider)
+        .addWater(date: date, amountMl: amountMl, waterTarget: targets.waterMl);
+    final updatedMap = await ref
+        .read(nutritionRepositoryProvider)
+        .loadAllLogs();
     if (ref.mounted) state = AsyncData(updatedMap);
   }
 
-  Future<void> setWater({
-    required String date,
-    required int waterMl,
-  }) async {
+  Future<void> setWater({required String date, required int waterMl}) async {
     final targets = ref.read(nutritionTargetsProvider);
-    await ref.read(nutritionRepositoryProvider).updateWater(
+    await ref
+        .read(nutritionRepositoryProvider)
+        .updateWater(
           date: date,
           waterMl: waterMl,
           waterTarget: targets.waterMl,
         );
-    final updatedMap = await ref.read(nutritionRepositoryProvider).loadAllLogs();
+    final updatedMap = await ref
+        .read(nutritionRepositoryProvider)
+        .loadAllLogs();
     if (ref.mounted) state = AsyncData(updatedMap);
   }
 
@@ -295,24 +318,27 @@ class NutritionLogsController
     required String toDate,
   }) async {
     final targets = ref.read(nutritionTargetsProvider);
-    await ref.read(nutritionRepositoryProvider).copyMeals(
+    await ref
+        .read(nutritionRepositoryProvider)
+        .copyMeals(
           fromDate: fromDate,
           toDate: toDate,
           waterTarget: targets.waterMl,
         );
-    final updatedMap = await ref.read(nutritionRepositoryProvider).loadAllLogs();
+    final updatedMap = await ref
+        .read(nutritionRepositoryProvider)
+        .loadAllLogs();
     if (ref.mounted) state = AsyncData(updatedMap);
   }
 
-  Future<void> clearAllMeals({
-    required String date,
-  }) async {
+  Future<void> clearAllMeals({required String date}) async {
     final targets = ref.read(nutritionTargetsProvider);
-    await ref.read(nutritionRepositoryProvider).clearMeals(
-          date: date,
-          waterTarget: targets.waterMl,
-        );
-    final updatedMap = await ref.read(nutritionRepositoryProvider).loadAllLogs();
+    await ref
+        .read(nutritionRepositoryProvider)
+        .clearMeals(date: date, waterTarget: targets.waterMl);
+    final updatedMap = await ref
+        .read(nutritionRepositoryProvider)
+        .loadAllLogs();
     if (ref.mounted) state = AsyncData(updatedMap);
   }
 }
@@ -322,12 +348,15 @@ String todayIsoDate() {
   return '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 }
 
-final dailyNutritionLogProvider =
-    Provider.family<DailyNutritionLog, String>((ref, date) {
+final dailyNutritionLogProvider = Provider.family<DailyNutritionLog, String>((
+  ref,
+  date,
+) {
   final logsAsync = ref.watch(nutritionLogsProvider);
   final targets = ref.watch(nutritionTargetsProvider);
   final logs = logsAsync.value ?? {};
-  return logs[date] ?? DailyNutritionLog.empty(date, waterTarget: targets.waterMl);
+  return logs[date] ??
+      DailyNutritionLog.empty(date, waterTarget: targets.waterMl);
 });
 
 final todayNutritionLogProvider = Provider<DailyNutritionLog>((ref) {

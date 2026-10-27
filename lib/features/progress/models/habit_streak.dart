@@ -1,11 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-enum HabitType {
-  workouts,
-  nutrition,
-  hydration,
-  overall,
-}
+enum HabitType { workouts, nutrition, hydration, overall }
 
 @immutable
 class HabitStreak {
@@ -47,38 +42,38 @@ class HabitStreak {
     String? lastActiveDate,
     Set<String>? activeDates,
     double? weeklyAdherenceRate,
-  }) =>
-      HabitStreak(
-        type: type ?? this.type,
-        currentStreak: currentStreak ?? this.currentStreak,
-        longestStreak: longestStreak ?? this.longestStreak,
-        lastActiveDate: lastActiveDate ?? this.lastActiveDate,
-        activeDates: activeDates ?? this.activeDates,
-        weeklyAdherenceRate: weeklyAdherenceRate ?? this.weeklyAdherenceRate,
-      );
+  }) => HabitStreak(
+    type: type ?? this.type,
+    currentStreak: currentStreak ?? this.currentStreak,
+    longestStreak: longestStreak ?? this.longestStreak,
+    lastActiveDate: lastActiveDate ?? this.lastActiveDate,
+    activeDates: activeDates ?? this.activeDates,
+    weeklyAdherenceRate: weeklyAdherenceRate ?? this.weeklyAdherenceRate,
+  );
 
   Map<String, dynamic> toJson() => {
-        'type': type.name,
-        'currentStreak': currentStreak,
-        'longestStreak': longestStreak,
-        if (lastActiveDate != null) 'lastActiveDate': lastActiveDate,
-        'activeDates': activeDates.toList(),
-        'weeklyAdherenceRate': weeklyAdherenceRate,
-      };
+    'type': type.name,
+    'currentStreak': currentStreak,
+    'longestStreak': longestStreak,
+    if (lastActiveDate != null) 'lastActiveDate': lastActiveDate,
+    'activeDates': activeDates.toList(),
+    'weeklyAdherenceRate': weeklyAdherenceRate,
+  };
 
   factory HabitStreak.fromJson(Map<String, dynamic> json) => HabitStreak(
-        type: HabitType.values.firstWhere(
-          (e) => e.name == json['type'],
-          orElse: () => HabitType.workouts,
-        ),
-        currentStreak: (json['currentStreak'] as num?)?.toInt() ?? 0,
-        longestStreak: (json['longestStreak'] as num?)?.toInt() ?? 0,
-        lastActiveDate: json['lastActiveDate'] as String?,
-        activeDates: (json['activeDates'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toSet() ??
-            const {},
-        weeklyAdherenceRate:
-            (json['weeklyAdherenceRate'] as num?)?.toDouble() ?? 0.0,
-      );
+    type: HabitType.values.firstWhere(
+      (e) => e.name == json['type'],
+      orElse: () => HabitType.workouts,
+    ),
+    currentStreak: (json['currentStreak'] as num?)?.toInt() ?? 0,
+    longestStreak: (json['longestStreak'] as num?)?.toInt() ?? 0,
+    lastActiveDate: json['lastActiveDate'] as String?,
+    activeDates:
+        (json['activeDates'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toSet() ??
+        const {},
+    weeklyAdherenceRate:
+        (json['weeklyAdherenceRate'] as num?)?.toDouble() ?? 0.0,
+  );
 }

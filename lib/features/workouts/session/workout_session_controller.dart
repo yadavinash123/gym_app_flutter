@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -74,22 +75,19 @@ class WorkoutSessionState {
     List<CompletedExercise>? loggedExercises,
     bool? painReported,
     String? sessionNotes,
-  }) =>
-      WorkoutSessionState(
-        routine: routine ?? this.routine,
-        startedAt: startedAt ?? this.startedAt,
-        currentExerciseIndex:
-            currentExerciseIndex ?? this.currentExerciseIndex,
-        currentSetIndex: currentSetIndex ?? this.currentSetIndex,
-        elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
-        isPaused: isPaused ?? this.isPaused,
-        isResting: isResting ?? this.isResting,
-        restSecondsRemaining:
-            restSecondsRemaining ?? this.restSecondsRemaining,
-        loggedExercises: loggedExercises ?? this.loggedExercises,
-        painReported: painReported ?? this.painReported,
-        sessionNotes: sessionNotes ?? this.sessionNotes,
-      );
+  }) => WorkoutSessionState(
+    routine: routine ?? this.routine,
+    startedAt: startedAt ?? this.startedAt,
+    currentExerciseIndex: currentExerciseIndex ?? this.currentExerciseIndex,
+    currentSetIndex: currentSetIndex ?? this.currentSetIndex,
+    elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
+    isPaused: isPaused ?? this.isPaused,
+    isResting: isResting ?? this.isResting,
+    restSecondsRemaining: restSecondsRemaining ?? this.restSecondsRemaining,
+    loggedExercises: loggedExercises ?? this.loggedExercises,
+    painReported: painReported ?? this.painReported,
+    sessionNotes: sessionNotes ?? this.sessionNotes,
+  );
 }
 
 class WorkoutSessionController extends Notifier<WorkoutSessionState?> {
@@ -235,10 +233,14 @@ class WorkoutSessionController extends Notifier<WorkoutSessionState?> {
       notes: newExercise.cue,
     );
 
-    final updatedExercises = List<PlannedExercise>.from(current.routine.exercises);
+    final updatedExercises = List<PlannedExercise>.from(
+      current.routine.exercises,
+    );
     updatedExercises[curIndex] = updatedPlannedEx;
 
-    final updatedRoutine = current.routine.copyWith(exercises: updatedExercises);
+    final updatedRoutine = current.routine.copyWith(
+      exercises: updatedExercises,
+    );
 
     final updatedLogs = List<CompletedExercise>.from(current.loggedExercises);
     updatedLogs[curIndex] = CompletedExercise(
@@ -307,5 +309,5 @@ class WorkoutSessionController extends Notifier<WorkoutSessionState?> {
 
 final activeWorkoutSessionProvider =
     NotifierProvider<WorkoutSessionController, WorkoutSessionState?>(
-  WorkoutSessionController.new,
-);
+      WorkoutSessionController.new,
+    );

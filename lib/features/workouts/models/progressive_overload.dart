@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import 'workout_session.dart';
 
 @immutable
@@ -20,24 +21,23 @@ class PersonalRecord {
   final DateTime achievedAt;
 
   Map<String, dynamic> toJson() => {
-        'exerciseId': exerciseId,
-        'maxWeightKg': maxWeightKg,
-        'maxRepsAtMaxWeight': maxRepsAtMaxWeight,
-        'maxSessionVolumeKg': maxSessionVolumeKg,
-        'estimatedOneRepMaxKg': estimatedOneRepMaxKg,
-        'achievedAt': achievedAt.toIso8601String(),
-      };
+    'exerciseId': exerciseId,
+    'maxWeightKg': maxWeightKg,
+    'maxRepsAtMaxWeight': maxRepsAtMaxWeight,
+    'maxSessionVolumeKg': maxSessionVolumeKg,
+    'estimatedOneRepMaxKg': estimatedOneRepMaxKg,
+    'achievedAt': achievedAt.toIso8601String(),
+  };
 
   factory PersonalRecord.fromJson(Map<String, dynamic> json) => PersonalRecord(
-        exerciseId: json['exerciseId'] as String,
-        maxWeightKg: (json['maxWeightKg'] as num?)?.toDouble() ?? 0.0,
-        maxRepsAtMaxWeight: json['maxRepsAtMaxWeight'] as int? ?? 0,
-        maxSessionVolumeKg:
-            (json['maxSessionVolumeKg'] as num?)?.toDouble() ?? 0.0,
-        estimatedOneRepMaxKg:
-            (json['estimatedOneRepMaxKg'] as num?)?.toDouble() ?? 0.0,
-        achievedAt: DateTime.parse(json['achievedAt'] as String),
-      );
+    exerciseId: json['exerciseId'] as String,
+    maxWeightKg: (json['maxWeightKg'] as num?)?.toDouble() ?? 0.0,
+    maxRepsAtMaxWeight: json['maxRepsAtMaxWeight'] as int? ?? 0,
+    maxSessionVolumeKg: (json['maxSessionVolumeKg'] as num?)?.toDouble() ?? 0.0,
+    estimatedOneRepMaxKg:
+        (json['estimatedOneRepMaxKg'] as num?)?.toDouble() ?? 0.0,
+    achievedAt: DateTime.parse(json['achievedAt'] as String),
+  );
 }
 
 enum ProgressionDecision {
@@ -150,7 +150,8 @@ class ProgressiveOverloadCalculator {
     }
 
     // Check for pain or discomfort
-    final painReported = lastExercise.painReported ||
+    final painReported =
+        lastExercise.painReported ||
         lastExercise.sets.any((s) => s.painReported);
     if (painReported) {
       return ProgressionRecommendation(
@@ -160,18 +161,21 @@ class ProgressiveOverloadCalculator {
       );
     }
 
-    final completedSets =
-        lastExercise.sets.where((s) => s.isCompleted).toList();
+    final completedSets = lastExercise.sets
+        .where((s) => s.isCompleted)
+        .toList();
     if (completedSets.isEmpty) {
       return ProgressionRecommendation(
         exerciseId: exerciseId,
         decision: ProgressionDecision.maintainLoad,
-        message: 'Previous session sets were incomplete. Repeat at current load.',
+        message:
+            'Previous session sets were incomplete. Repeat at current load.',
       );
     }
 
     // Check average RPE
-    final avgRpe = completedSets.fold<int>(0, (sum, s) => sum + s.rpe) /
+    final avgRpe =
+        completedSets.fold<int>(0, (sum, s) => sum + s.rpe) /
         completedSets.length;
     final lastWeight = completedSets.last.weightKg;
     final lastReps = completedSets.last.actualReps;
@@ -180,7 +184,8 @@ class ProgressiveOverloadCalculator {
       return ProgressionRecommendation(
         exerciseId: exerciseId,
         decision: ProgressionDecision.deloadOrRest,
-        message: 'High perceived effort (RPE ${avgRpe.toStringAsFixed(1)}). Maintain or slightly decrease load to prioritize recovery and form.',
+        message:
+            'High perceived effort (RPE ${avgRpe.toStringAsFixed(1)}). Maintain or slightly decrease load to prioritize recovery and form.',
         suggestedWeightKg: lastWeight,
         suggestedReps: lastReps,
       );
@@ -190,7 +195,8 @@ class ProgressiveOverloadCalculator {
       return ProgressionRecommendation(
         exerciseId: exerciseId,
         decision: ProgressionDecision.maintainLoad,
-        message: 'Solid training stimulus (RPE ${avgRpe.toStringAsFixed(1)}). Maintain current weight to solidify movement mastery.',
+        message:
+            'Solid training stimulus (RPE ${avgRpe.toStringAsFixed(1)}). Maintain current weight to solidify movement mastery.',
         suggestedWeightKg: lastWeight,
         suggestedReps: lastReps,
       );
@@ -213,7 +219,8 @@ class ProgressiveOverloadCalculator {
       return ProgressionRecommendation(
         exerciseId: exerciseId,
         decision: ProgressionDecision.increaseLoad,
-        message: 'Smooth completion with reserve (RPE ${avgRpe.toStringAsFixed(1)}). Conservative increase of +${increment.toStringAsFixed(2)} kg recommended.',
+        message:
+            'Smooth completion with reserve (RPE ${avgRpe.toStringAsFixed(1)}). Conservative increase of +${increment.toStringAsFixed(2)} kg recommended.',
         suggestedWeightKg: newWeight,
         suggestedReps: lastReps,
       );

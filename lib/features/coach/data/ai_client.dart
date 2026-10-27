@@ -17,7 +17,9 @@ abstract class AiClient {
 
   Future<String?> checkConnection(AiCredentials credentials) async {
     final ok = await testConnection(credentials);
-    return ok ? null : 'Connection failed. Please check your network or credentials.';
+    return ok
+        ? null
+        : 'Connection failed. Please check your network or credentials.';
   }
 }
 
@@ -27,7 +29,8 @@ class AiException implements Exception {
   final int? statusCode;
 
   @override
-  String toString() => 'AiException: $message ${statusCode != null ? "(HTTP $statusCode)" : ""}';
+  String toString() =>
+      'AiException: $message ${statusCode != null ? "(HTTP $statusCode)" : ""}';
 }
 
 /// Normalizes OpenAI-compatible base URLs so that entering `https://api.groq.com/openai/v1`
@@ -56,7 +59,8 @@ String normalizeOpenAiEndpoint(String url) {
 }
 
 class HttpAiClient implements AiClient {
-  HttpAiClient({HttpClient? httpClient}) : _httpClient = httpClient ?? HttpClient();
+  HttpAiClient({HttpClient? httpClient})
+    : _httpClient = httpClient ?? HttpClient();
 
   final HttpClient _httpClient;
 
@@ -67,11 +71,15 @@ class HttpAiClient implements AiClient {
     required AiCredentials credentials,
   }) async {
     if (credentials.provider == AiProvider.offline) {
-      throw const AiException('Cannot dispatch network request with offline provider.');
+      throw const AiException(
+        'Cannot dispatch network request with offline provider.',
+      );
     }
 
     if (credentials.apiKey.trim().isEmpty) {
-      throw const AiException('API key is missing. Please configure credentials in Coach Settings.');
+      throw const AiException(
+        'API key is missing. Please configure credentials in Coach Settings.',
+      );
     }
 
     switch (credentials.provider) {
@@ -106,7 +114,9 @@ class HttpAiClient implements AiClient {
         systemPrompt: 'You are a fitness coach. Greet the athlete.',
         credentials: credentials.copyWith(maxTokens: 100),
       );
-      return res.content.trim().isNotEmpty ? null : 'Model returned an empty response. Please verify model name.';
+      return res.content.trim().isNotEmpty
+          ? null
+          : 'Model returned an empty response. Please verify model name.';
     } on AiException catch (e) {
       return e.message;
     } catch (e) {
@@ -140,7 +150,7 @@ class HttpAiClient implements AiClient {
       contents.add({
         'role': msg.role == MessageRole.user ? 'user' : 'model',
         'parts': [
-          {'text': msg.content}
+          {'text': msg.content},
         ],
       });
     }
@@ -150,8 +160,8 @@ class HttpAiClient implements AiClient {
       if (systemPrompt.isNotEmpty)
         'systemInstruction': {
           'parts': [
-            {'text': systemPrompt}
-          ]
+            {'text': systemPrompt},
+          ],
         },
       'generationConfig': {
         'temperature': credentials.temperature,
@@ -169,7 +179,8 @@ class HttpAiClient implements AiClient {
     } catch (_) {}
 
     if (response.statusCode != 200) {
-      final errorMsg = json?['error']?['message'] as String? ??
+      final errorMsg =
+          json?['error']?['message'] as String? ??
           (json?['message'] as String?) ??
           'Gemini API Error (HTTP ${response.statusCode})';
       throw AiException(errorMsg, statusCode: response.statusCode);
@@ -180,7 +191,8 @@ class HttpAiClient implements AiClient {
       throw const AiException('No response candidate returned by Gemini.');
     }
 
-    final text = candidates[0]['content']?['parts']?[0]?['text'] as String? ?? '';
+    final text =
+        candidates[0]['content']?['parts']?[0]?['text'] as String? ?? '';
     final tokenUsage = json?['usageMetadata']?['totalTokenCount'] as num?;
 
     return CoachMessage(
@@ -236,9 +248,7 @@ class HttpAiClient implements AiClient {
       'max_tokens': credentials.maxTokens,
     };
 
-    final headers = {
-      'Authorization': 'Bearer ${credentials.apiKey}',
-    };
+    final headers = {'Authorization': 'Bearer ${credentials.apiKey}'};
 
     final response = await _postJson(uri, payload, headers: headers);
     Map<String, dynamic>? json;
@@ -250,18 +260,24 @@ class HttpAiClient implements AiClient {
     } catch (_) {}
 
     if (response.statusCode != 200) {
-      final rawError = json?['error']?['message'] as String? ??
+      final rawError =
+          json?['error']?['message'] as String? ??
           (json?['message'] as String?) ??
           (response.body.isNotEmpty
-              ? (response.body.length > 200 ? '${response.body.substring(0, 200)}...' : response.body)
+              ? (response.body.length > 200
+                    ? '${response.body.substring(0, 200)}...'
+                    : response.body)
               : 'Request failed with status ${response.statusCode}');
 
       var errorMsg = rawError;
       final lower = rawError.toLowerCase();
-      if ((lower.contains('model') && (lower.contains('not found') || lower.contains('does not exist'))) ||
+      if ((lower.contains('model') &&
+              (lower.contains('not found') ||
+                  lower.contains('does not exist'))) ||
           lower.contains('decommissioned')) {
         if (endpointUrl.contains('groq.com')) {
-          errorMsg = '$rawError (On Groq, use supported models like "llama-3.3-70b-versatile" or "llama-3.1-8b-instant")';
+          errorMsg =
+              '$rawError (On Groq, use supported models like "llama-3.3-70b-versatile" or "llama-3.1-8b-instant")';
         }
       }
       throw AiException(errorMsg, statusCode: response.statusCode);
@@ -314,7 +330,9 @@ class HttpAiClient implements AiClient {
     required Map<String, String> headers,
   }) async {
     try {
-      final request = await _httpClient.postUrl(uri).timeout(const Duration(seconds: 25));
+      final request = await _httpClient
+          .postUrl(uri)
+          .timeout(const Duration(seconds: 25));
       request.headers.contentType = ContentType.json;
       for (final entry in headers.entries) {
         request.headers.set(entry.key, entry.value);
@@ -324,18 +342,26 @@ class HttpAiClient implements AiClient {
       request.contentLength = jsonPayload.length;
       request.add(jsonPayload);
 
-      final response = await request.close().timeout(const Duration(seconds: 25));
+      final response = await request.close().timeout(
+        const Duration(seconds: 25),
+      );
       final responseBody = await utf8.decodeStream(response);
 
       return (statusCode: response.statusCode, body: responseBody);
     } on SocketException catch (e) {
-      throw AiException('Internet connection error: ${e.message}. Please check your network connection.');
+      throw AiException(
+        'Internet connection error: ${e.message}. Please check your network connection.',
+      );
     } on HandshakeException catch (e) {
-      throw AiException('SSL Handshake error: ${e.message}. Please verify the endpoint URL.');
+      throw AiException(
+        'SSL Handshake error: ${e.message}. Please verify the endpoint URL.',
+      );
     } on HttpException catch (e) {
       throw AiException('HTTP error: ${e.message}');
     } on TimeoutException {
-      throw const AiException('Request timed out after 25s. Check your internet connection or endpoint speed.');
+      throw const AiException(
+        'Request timed out after 25s. Check your internet connection or endpoint speed.',
+      );
     } catch (e) {
       if (e is AiException) rethrow;
       throw AiException('AI request failed: $e');

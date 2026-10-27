@@ -47,7 +47,8 @@ class DailyHealthSummary {
   final String? notes;
 
   String get sleepFormatted {
-    if (sleepDurationMinutes == null || sleepDurationMinutes == 0) return 'No sleep data';
+    if (sleepDurationMinutes == null || sleepDurationMinutes == 0)
+      return 'No sleep data';
     final hours = sleepDurationMinutes! ~/ 60;
     final mins = sleepDurationMinutes! % 60;
     return '${hours}h ${mins}m';
@@ -103,54 +104,62 @@ class DailyHealthSummary {
       activeKcal: activeKcal ?? this.activeKcal,
       activeKcalSource: activeKcalSource ?? this.activeKcalSource,
       restingHeartRateBpm: restingHeartRateBpm ?? this.restingHeartRateBpm,
-      restingHeartRateSource: restingHeartRateSource ?? this.restingHeartRateSource,
+      restingHeartRateSource:
+          restingHeartRateSource ?? this.restingHeartRateSource,
       sleepDurationMinutes: sleepDurationMinutes ?? this.sleepDurationMinutes,
       deepSleepMinutes: deepSleepMinutes ?? this.deepSleepMinutes,
       remSleepMinutes: remSleepMinutes ?? this.remSleepMinutes,
       lightSleepMinutes: lightSleepMinutes ?? this.lightSleepMinutes,
       sleepSource: sleepSource ?? this.sleepSource,
-      externalWorkoutsCount: externalWorkoutsCount ?? this.externalWorkoutsCount,
+      externalWorkoutsCount:
+          externalWorkoutsCount ?? this.externalWorkoutsCount,
       syncedAt: syncedAt ?? this.syncedAt,
       notes: notes ?? this.notes,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'date': date,
-        'steps': steps,
-        'stepSource': stepSource.toJson(),
-        'distanceKm': distanceKm,
-        'distanceSource': distanceSource.toJson(),
-        'activeKcal': activeKcal,
-        'activeKcalSource': activeKcalSource.toJson(),
-        if (restingHeartRateBpm != null) 'restingHeartRateBpm': restingHeartRateBpm,
-        if (restingHeartRateSource != null)
-          'restingHeartRateSource': restingHeartRateSource!.toJson(),
-        if (sleepDurationMinutes != null)
-          'sleepDurationMinutes': sleepDurationMinutes,
-        if (deepSleepMinutes != null) 'deepSleepMinutes': deepSleepMinutes,
-        if (remSleepMinutes != null) 'remSleepMinutes': remSleepMinutes,
-        if (lightSleepMinutes != null) 'lightSleepMinutes': lightSleepMinutes,
-        if (sleepSource != null) 'sleepSource': sleepSource!.toJson(),
-        'externalWorkoutsCount': externalWorkoutsCount,
-        if (syncedAt != null) 'syncedAt': syncedAt!.toIso8601String(),
-        if (notes != null) 'notes': notes,
-      };
+    'date': date,
+    'steps': steps,
+    'stepSource': stepSource.toJson(),
+    'distanceKm': distanceKm,
+    'distanceSource': distanceSource.toJson(),
+    'activeKcal': activeKcal,
+    'activeKcalSource': activeKcalSource.toJson(),
+    if (restingHeartRateBpm != null) 'restingHeartRateBpm': restingHeartRateBpm,
+    if (restingHeartRateSource != null)
+      'restingHeartRateSource': restingHeartRateSource!.toJson(),
+    if (sleepDurationMinutes != null)
+      'sleepDurationMinutes': sleepDurationMinutes,
+    if (deepSleepMinutes != null) 'deepSleepMinutes': deepSleepMinutes,
+    if (remSleepMinutes != null) 'remSleepMinutes': remSleepMinutes,
+    if (lightSleepMinutes != null) 'lightSleepMinutes': lightSleepMinutes,
+    if (sleepSource != null) 'sleepSource': sleepSource!.toJson(),
+    'externalWorkoutsCount': externalWorkoutsCount,
+    if (syncedAt != null) 'syncedAt': syncedAt!.toIso8601String(),
+    if (notes != null) 'notes': notes,
+  };
 
   factory DailyHealthSummary.fromJson(Map<String, dynamic> json) {
     return DailyHealthSummary(
       date: json['date'] as String,
       steps: (json['steps'] as num?)?.toInt() ?? 0,
-      stepSource: HealthSource.fromJson(json['stepSource'] as Map<String, dynamic>? ?? {}),
+      stepSource: HealthSource.fromJson(
+        json['stepSource'] as Map<String, dynamic>? ?? {},
+      ),
       distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0.0,
-      distanceSource:
-          HealthSource.fromJson(json['distanceSource'] as Map<String, dynamic>? ?? {}),
+      distanceSource: HealthSource.fromJson(
+        json['distanceSource'] as Map<String, dynamic>? ?? {},
+      ),
       activeKcal: (json['activeKcal'] as num?)?.toDouble() ?? 0.0,
-      activeKcalSource:
-          HealthSource.fromJson(json['activeKcalSource'] as Map<String, dynamic>? ?? {}),
+      activeKcalSource: HealthSource.fromJson(
+        json['activeKcalSource'] as Map<String, dynamic>? ?? {},
+      ),
       restingHeartRateBpm: (json['restingHeartRateBpm'] as num?)?.toInt(),
       restingHeartRateSource: json['restingHeartRateSource'] != null
-          ? HealthSource.fromJson(json['restingHeartRateSource'] as Map<String, dynamic>)
+          ? HealthSource.fromJson(
+              json['restingHeartRateSource'] as Map<String, dynamic>,
+            )
           : null,
       sleepDurationMinutes: (json['sleepDurationMinutes'] as num?)?.toInt(),
       deepSleepMinutes: (json['deepSleepMinutes'] as num?)?.toInt(),
@@ -159,8 +168,11 @@ class DailyHealthSummary {
       sleepSource: json['sleepSource'] != null
           ? HealthSource.fromJson(json['sleepSource'] as Map<String, dynamic>)
           : null,
-      externalWorkoutsCount: (json['externalWorkoutsCount'] as num?)?.toInt() ?? 0,
-      syncedAt: json['syncedAt'] != null ? DateTime.tryParse(json['syncedAt'] as String) : null,
+      externalWorkoutsCount:
+          (json['externalWorkoutsCount'] as num?)?.toInt() ?? 0,
+      syncedAt: json['syncedAt'] != null
+          ? DateTime.tryParse(json['syncedAt'] as String)
+          : null,
       notes: json['notes'] as String?,
     );
   }

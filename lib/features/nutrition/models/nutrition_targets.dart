@@ -46,11 +46,13 @@ class NutritionCalculator {
     }
 
     // Clinical nutrition or under-18 suppression
-    if (profile.clinicalNutrition || (profile.age != null && profile.age! < 18)) {
+    if (profile.clinicalNutrition ||
+        (profile.age != null && profile.age! < 18)) {
       final userCalories = profile.calorieTarget ?? 2000.0;
       final userProtein = profile.proteinTarget ?? 100.0;
       final fat = (userCalories * 0.25) / 9.0;
-      final remainingCarbsKcal = userCalories - (userProtein * 4.0) - (fat * 9.0);
+      final remainingCarbsKcal =
+          userCalories - (userProtein * 4.0) - (fat * 9.0);
       final carbs = remainingCarbsKcal > 0 ? remainingCarbsKcal / 4.0 : 50.0;
       final fiber = (userCalories / 1000.0 * 14.0).clamp(20.0, 35.0);
       final weight = profile.weightKg ?? 70.0;
@@ -78,7 +80,10 @@ class NutritionCalculator {
     final age = profile.age;
 
     double? restingBmr;
-    if (weight != null && height != null && age != null && profile.energyEquation != 'Skip estimate') {
+    if (weight != null &&
+        height != null &&
+        age != null &&
+        profile.energyEquation != 'Skip estimate') {
       final coeff = profile.energyEquation == 'Male coefficient' ? 5.0 : -161.0;
       restingBmr = (10.0 * weight) + (6.25 * height) - (5.0 * age) + coeff;
       if (restingBmr <= 0) restingBmr = null;
@@ -94,18 +99,21 @@ class NutritionCalculator {
       targetKcal = profile.calorieTarget!;
       isPersonalCalorie = true;
       isEstimated = false;
-      explanation = 'Using your personal daily calorie target (${targetKcal.toStringAsFixed(0)} kcal).';
+      explanation =
+          'Using your personal daily calorie target (${targetKcal.toStringAsFixed(0)} kcal).';
     } else if (restingBmr != null) {
       final tdee = restingBmr * profile.activityFactor;
       double goalDelta = 0.0;
       if (profile.goal == 'Fat loss') {
         goalDelta = -400.0;
-      } else if (profile.goal == 'Build muscle' || profile.goal == 'Build strength') {
+      } else if (profile.goal == 'Build muscle' ||
+          profile.goal == 'Build strength') {
         goalDelta = 250.0;
       }
       targetKcal = (tdee + goalDelta).clamp(1200.0, 4500.0);
       isEstimated = true;
-      explanation = 'Mifflin–St Jeor estimate: BMR ${restingBmr.toStringAsFixed(0)} kcal × ${profile.activityFactor.toStringAsFixed(1)} activity factor ${goalDelta != 0.0 ? '${goalDelta > 0 ? '+' : ''}${goalDelta.toStringAsFixed(0)} kcal for ${profile.goal}' : ''} ≈ ${targetKcal.toStringAsFixed(0)} kcal/day.';
+      explanation =
+          'Mifflin–St Jeor estimate: BMR ${restingBmr.toStringAsFixed(0)} kcal × ${profile.activityFactor.toStringAsFixed(1)} activity factor ${goalDelta != 0.0 ? '${goalDelta > 0 ? '+' : ''}${goalDelta.toStringAsFixed(0)} kcal for ${profile.goal}' : ''} ≈ ${targetKcal.toStringAsFixed(0)} kcal/day.';
     } else {
       targetKcal = 2000.0;
       isEstimated = false;
@@ -122,7 +130,9 @@ class NutritionCalculator {
       double proteinMultiplier;
       if (profile.goal == 'Fat loss') {
         proteinMultiplier = 2.0; // Preserve lean mass during calorie deficit
-      } else if (profile.goal == 'Build muscle' || profile.goal == 'Build strength' || profile.goal == 'Body recomposition') {
+      } else if (profile.goal == 'Build muscle' ||
+          profile.goal == 'Build strength' ||
+          profile.goal == 'Body recomposition') {
         proteinMultiplier = 1.8;
       } else {
         proteinMultiplier = 1.6;

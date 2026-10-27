@@ -24,16 +24,21 @@ final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
   return ProgressRepository(store);
 });
 
-final bodyMeasurementsProvider = FutureProvider<List<BodyMeasurementEntry>>((ref) {
+final bodyMeasurementsProvider = FutureProvider<List<BodyMeasurementEntry>>((
+  ref,
+) {
   return ref.watch(progressRepositoryProvider).loadMeasurements();
 });
 
-final reminderPreferencesProvider =
-    FutureProvider<List<ReminderPreference>>((ref) {
+final reminderPreferencesProvider = FutureProvider<List<ReminderPreference>>((
+  ref,
+) {
   return ref.watch(progressRepositoryProvider).loadReminderPreferences();
 });
 
-final habitStreaksProvider = FutureProvider<Map<HabitType, HabitStreak>>((ref) async {
+final habitStreaksProvider = FutureProvider<Map<HabitType, HabitStreak>>((
+  ref,
+) async {
   final repo = ref.watch(progressRepositoryProvider);
   final workoutRepo = ref.watch(workoutRepositoryProvider);
   final nutritionRepo = ref.watch(nutritionRepositoryProvider);
@@ -44,7 +49,9 @@ final habitStreaksProvider = FutureProvider<Map<HabitType, HabitStreak>>((ref) a
   return repo.computeStreaks(sessions: sessions, nutritionLogs: nutritionLogs);
 });
 
-final muscleRecoveryProvider = FutureProvider<OverallSystemReadiness>((ref) async {
+final muscleRecoveryProvider = FutureProvider<OverallSystemReadiness>((
+  ref,
+) async {
   final repo = ref.watch(progressRepositoryProvider);
   final workoutRepo = ref.watch(workoutRepositoryProvider);
   final healthRepo = ref.watch(healthRepositoryProvider);
@@ -53,10 +60,7 @@ final muscleRecoveryProvider = FutureProvider<OverallSystemReadiness>((ref) asyn
   final today = todayIsoDate();
   final healthSummary = await healthRepo.getSummaryForDate(today);
 
-  return repo.computeReadiness(
-    sessions: sessions,
-    latestHealth: healthSummary,
-  );
+  return repo.computeReadiness(sessions: sessions, latestHealth: healthSummary);
 });
 
 final milestonesProvider = FutureProvider<List<MilestoneBadge>>((ref) async {
@@ -106,7 +110,9 @@ class ProgressDashboardData {
   final Map<String, DailyHealthSummary> healthSummaries;
 }
 
-final progressDashboardProvider = FutureProvider<ProgressDashboardData>((ref) async {
+final progressDashboardProvider = FutureProvider<ProgressDashboardData>((
+  ref,
+) async {
   final repo = ref.watch(progressRepositoryProvider);
   final profile = await ref.watch(profileProvider.future);
   final workoutRepo = ref.watch(workoutRepositoryProvider);
@@ -121,7 +127,8 @@ final progressDashboardProvider = FutureProvider<ProgressDashboardData>((ref) as
   final reminders = await repo.loadReminderPreferences();
 
   final today = todayIsoDate();
-  final healthToday = healthSummaries[today] ?? await healthRepo.getSummaryForDate(today);
+  final healthToday =
+      healthSummaries[today] ?? await healthRepo.getSummaryForDate(today);
 
   final readiness = repo.computeReadiness(
     sessions: sessions,
@@ -354,7 +361,9 @@ class ProgressRepository {
     };
   }
 
-  static List<PersonalRecord> computePersonalRecords(List<WorkoutSession> sessions) {
+  static List<PersonalRecord> computePersonalRecords(
+    List<WorkoutSession> sessions,
+  ) {
     final list = <PersonalRecord>[];
     final exerciseIds = <String>{};
     for (final s in sessions) {

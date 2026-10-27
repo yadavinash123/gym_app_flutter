@@ -71,12 +71,15 @@ class MuscleRecoveryCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          readiness.readinessLabel,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        Flexible(
+                          child: Text(
+                            readiness.readinessLabel,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -134,29 +137,37 @@ class MuscleRecoveryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    muscle.muscleGroup,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                  if (muscle.setsInLast48Hours > 0) ...[
-                    const SizedBox(width: 6),
-                    Text(
-                      '(${muscle.setsInLast48Hours} sets recent)',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFFA7B0BF),
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        muscle.muscleGroup,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
+                    if (muscle.setsInLast48Hours > 0) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        '(${muscle.setsInLast48Hours} sets)',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFFA7B0BF),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
+              const SizedBox(width: 8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     muscle.stateDisplayName,
@@ -195,10 +206,7 @@ class MuscleRecoveryCard extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 '~${muscle.estimatedHoursToFullRecovery}h remaining to 100% capacity',
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: Color(0xFFA7B0BF),
-                ),
+                style: const TextStyle(fontSize: 10, color: Color(0xFFA7B0BF)),
               ),
             ),
         ],

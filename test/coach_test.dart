@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,7 +24,10 @@ import 'package:fitforge_ai/features/profile/profile_repository.dart';
 import 'package:fitforge_ai/features/coach/presentation/widgets/formatted_coach_text.dart';
 
 class FakeAiClient implements AiClient {
-  FakeAiClient({this.shouldSucceed = true, this.mockResponse = 'Mock LLM Response'});
+  FakeAiClient({
+    this.shouldSucceed = true,
+    this.mockResponse = 'Mock LLM Response',
+  });
 
   bool shouldSucceed;
   String mockResponse;
@@ -168,7 +172,10 @@ void main() {
       expect(AiProvider.gemini.suggestedModels, contains('gemini-1.5-flash'));
       expect(AiProvider.openai.suggestedModels, contains('gpt-4o-mini'));
       expect(AiProvider.custom.suggestedModels, contains('openai/gpt-oss-20b'));
-      expect(AiProvider.custom.suggestedModels, contains('llama-3.3-70b-versatile'));
+      expect(
+        AiProvider.custom.suggestedModels,
+        contains('llama-3.3-70b-versatile'),
+      );
 
       expect(AiProvider.fromString('gemini'), AiProvider.gemini);
       expect(AiProvider.fromString('openai'), AiProvider.openai);
@@ -187,7 +194,9 @@ void main() {
         'https://api.groq.com/openai/v1/chat/completions',
       );
       expect(
-        normalizeOpenAiEndpoint('https://api.groq.com/openai/v1/chat/completions'),
+        normalizeOpenAiEndpoint(
+          'https://api.groq.com/openai/v1/chat/completions',
+        ),
         'https://api.groq.com/openai/v1/chat/completions',
       );
       expect(
@@ -250,7 +259,10 @@ void main() {
       expect(consent.shareHealth, isTrue);
       expect(consent.activeShareCount, 4);
 
-      final partial = consent.copyWith(shareHealth: false, shareNutrition: false);
+      final partial = consent.copyWith(
+        shareHealth: false,
+        shareNutrition: false,
+      );
       expect(partial.activeShareCount, 2);
 
       final json = partial.toJson();
@@ -294,11 +306,16 @@ void main() {
       );
       await secureStore.writeCredentials(creds);
 
-      final rawDiskData = await store.read(JsonSecureCredentialsStore.storageKey);
+      final rawDiskData = await store.read(
+        JsonSecureCredentialsStore.storageKey,
+      );
       expect(rawDiskData, isNotNull);
       expect(rawDiskData!.containsKey('apiKey'), isFalse);
       expect(rawDiskData.containsKey('obfuscatedKey'), isTrue);
-      expect(rawDiskData['obfuscatedKey'], isNot(equals('AIzaSySecretTestingKey99')));
+      expect(
+        rawDiskData['obfuscatedKey'],
+        isNot(equals('AIzaSySecretTestingKey99')),
+      );
 
       final restored = await secureStore.readCredentials();
       expect(restored, isNotNull);
@@ -325,14 +342,19 @@ void main() {
       weightKg: 68.0,
       calorieTarget: 2400.0,
       proteinTarget: 140.0,
-      schedule: ['Chest & Triceps', 'Back & Biceps', 'Rest', 'Legs', 'Shoulders', 'Rest', 'Rest'],
+      schedule: [
+        'Chest & Triceps',
+        'Back & Biceps',
+        'Rest',
+        'Legs',
+        'Shoulders',
+        'Rest',
+        'Rest',
+      ],
     );
 
     test('analyzes nutrition question and calculates ISSN protein ratio', () {
-      final mealLog = DailyNutritionLog(
-        date: '2026-10-22',
-        waterMl: 2800,
-      );
+      final mealLog = DailyNutritionLog(date: '2026-10-22', waterMl: 2800);
       mealLog.meals[MealType.breakfast]!.items.add(
         LoggedFoodItem(
           id: 'item_1',
@@ -357,7 +379,10 @@ void main() {
       );
 
       expect(response.offlineGenerated, isTrue);
-      expect(response.content, contains('Nutritional Balance & Fueling Analysis'));
+      expect(
+        response.content,
+        contains('Nutritional Balance & Fueling Analysis'),
+      );
       expect(response.content, contains('ISSN Protein Evaluation'));
       expect(response.content, contains('g/kg bodyweight'));
       expect(response.suggestedActions.isNotEmpty, isTrue);
@@ -477,10 +502,22 @@ void main() {
         profile: testProfile,
       );
 
-      expect(contextText, contains('BODY METRICS: [Redacted by user privacy choice]'));
-      expect(contextText, contains('NUTRITION LOG: [Redacted by user privacy choice]'));
-      expect(contextText, contains('WORKOUT HISTORY: [Redacted by user privacy choice]'));
-      expect(contextText, contains('HEALTH BIOMARKERS: [Redacted by user privacy choice]'));
+      expect(
+        contextText,
+        contains('BODY METRICS: [Redacted by user privacy choice]'),
+      );
+      expect(
+        contextText,
+        contains('NUTRITION LOG: [Redacted by user privacy choice]'),
+      );
+      expect(
+        contextText,
+        contains('WORKOUT HISTORY: [Redacted by user privacy choice]'),
+      );
+      expect(
+        contextText,
+        contains('HEALTH BIOMARKERS: [Redacted by user privacy choice]'),
+      );
     });
 
     test('chat persistence and clearing', () async {
@@ -508,11 +545,13 @@ void main() {
     });
 
     test('dispatches to online LLM when BYOK key configured and falls back on network error', () async {
-      await repo.saveCredentials(const AiCredentials(
-        provider: AiProvider.gemini,
-        apiKey: 'AIzaSyValidApiKey123',
-        modelName: 'gemini-1.5-flash',
-      ));
+      await repo.saveCredentials(
+        const AiCredentials(
+          provider: AiProvider.gemini,
+          apiKey: 'AIzaSyValidApiKey123',
+          modelName: 'gemini-1.5-flash',
+        ),
+      );
 
       fakeClient.shouldSucceed = true;
       fakeClient.mockResponse = 'Detailed hypertrophy advice from Gemini';
@@ -538,7 +577,10 @@ void main() {
 
       expect(res2.last.offlineGenerated, isTrue);
       expect(res2.last.content, contains('Could not reach Google Gemini'));
-      expect(res2.last.content, contains('Falling back to Offline Rule Engine'));
+      expect(
+        res2.last.content,
+        contains('Falling back to Offline Rule Engine'),
+      );
     });
   });
 
@@ -547,13 +589,85 @@ void main() {
       CoachMessage(
         id: 'welcome_1',
         role: MessageRole.assistant,
-        content: '👋 Welcome to FitForge AI Coach!\n\nHow can I help you today?',
+        content:
+            '👋 Welcome to FitForge AI Coach!\n\nHow can I help you today?',
         timestamp: DateTime.now(),
         offlineGenerated: true,
       ),
     ];
 
-    testWidgets('CoachScreen renders status bar, welcome bubble, suggestions, and sends a prompt', (tester) async {
+    testWidgets(
+      'CoachScreen renders status bar, welcome bubble, suggestions, and sends a prompt',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() => tester.view.resetPhysicalSize());
+
+        final secureStore = JsonSecureCredentialsStore(store);
+        final fakeClient = FakeAiClient();
+        final repo = CoachRepository(
+          store: store,
+          credentialsStore: secureStore,
+          aiClient: fakeClient,
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              storeProvider.overrideWithValue(store),
+              coachRepositoryProvider.overrideWithValue(repo),
+              coachMessagesProvider.overrideWith(
+                () => FakeCoachMessagesNotifier(welcomeMessage, repo),
+              ),
+              coachCredentialsProvider.overrideWith(
+                () => FakeCoachCredentialsNotifier(const AiCredentials()),
+              ),
+              coachConsentProvider.overrideWith(
+                () => FakeCoachConsentNotifier(const CoachConsent()),
+              ),
+              coachPersonaProvider.overrideWith(
+                () => FakeCoachPersonaNotifier(CoachPersona.scientific),
+              ),
+            ],
+            child: const MaterialApp(home: CoachScreen()),
+          ),
+        );
+
+        await tester.pump();
+
+        expect(find.text('FitForge'), findsOneWidget);
+        expect(find.text('AI Coach • Ready'), findsOneWidget);
+        expect(find.textContaining('crush your goals'), findsOneWidget);
+
+        await tester.dragUntilVisible(
+          find.text('Continue Last Chat'),
+          find.byType(SingleChildScrollView),
+          const Offset(0, -150),
+        );
+        await tester.pump();
+
+        await tester.tap(find.text('Continue Last Chat'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.text('FitForge AI'), findsOneWidget);
+
+        await tester.enterText(
+          find.byType(TextField),
+          'How to overload safely?',
+        );
+        await tester.tap(find.byIcon(Icons.arrow_forward_rounded));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('How to overload safely?'), findsOneWidget);
+        expect(find.textContaining('Progressive Overload'), findsOneWidget);
+      },
+    );
+
+    testWidgets('CoachSettingsScreen displays sections and preferences', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -571,69 +685,14 @@ void main() {
           overrides: [
             storeProvider.overrideWithValue(store),
             coachRepositoryProvider.overrideWithValue(repo),
-            coachMessagesProvider.overrideWith(() => FakeCoachMessagesNotifier(welcomeMessage, repo)),
-            coachCredentialsProvider.overrideWith(() => FakeCoachCredentialsNotifier(const AiCredentials())),
-            coachConsentProvider.overrideWith(() => FakeCoachConsentNotifier(const CoachConsent())),
-            coachPersonaProvider.overrideWith(() => FakeCoachPersonaNotifier(CoachPersona.scientific)),
+            coachCredentialsProvider.overrideWith(
+              () => FakeCoachCredentialsNotifier(const AiCredentials()),
+            ),
+            coachConsentProvider.overrideWith(
+              () => FakeCoachConsentNotifier(const CoachConsent()),
+            ),
           ],
-          child: const MaterialApp(
-            home: CoachScreen(),
-          ),
-        ),
-      );
-
-      await tester.pump();
-
-      expect(find.text('FitForge'), findsOneWidget);
-      expect(find.text('AI Coach • Ready'), findsOneWidget);
-      expect(find.textContaining('crush your goals'), findsOneWidget);
-
-      await tester.dragUntilVisible(
-        find.text('Continue Last Chat'),
-        find.byType(SingleChildScrollView),
-        const Offset(0, -150),
-      );
-      await tester.pump();
-
-      await tester.tap(find.text('Continue Last Chat'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-
-      expect(find.text('FitForge AI'), findsOneWidget);
-
-      await tester.enterText(find.byType(TextField), 'How to overload safely?');
-      await tester.tap(find.byIcon(Icons.arrow_forward_rounded));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-
-      expect(find.text('How to overload safely?'), findsOneWidget);
-      expect(find.textContaining('Progressive Overload'), findsOneWidget);
-    });
-
-    testWidgets('CoachSettingsScreen displays sections and preferences', (tester) async {
-      tester.view.physicalSize = const Size(360, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
-
-      final secureStore = JsonSecureCredentialsStore(store);
-      final fakeClient = FakeAiClient();
-      final repo = CoachRepository(
-        store: store,
-        credentialsStore: secureStore,
-        aiClient: fakeClient,
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            storeProvider.overrideWithValue(store),
-            coachRepositoryProvider.overrideWithValue(repo),
-            coachCredentialsProvider.overrideWith(() => FakeCoachCredentialsNotifier(const AiCredentials())),
-            coachConsentProvider.overrideWith(() => FakeCoachConsentNotifier(const CoachConsent())),
-          ],
-          child: const MaterialApp(
-            home: CoachSettingsScreen(),
-          ),
+          child: const MaterialApp(home: CoachSettingsScreen()),
         ),
       );
 
@@ -664,7 +723,9 @@ void main() {
       expect(find.text('Clear Chat History'), findsOneWidget);
     });
 
-    testWidgets('ConsentPreviewDialog renders payload without overflow', (tester) async {
+    testWidgets('ConsentPreviewDialog renders payload without overflow', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -682,7 +743,9 @@ void main() {
           overrides: [
             storeProvider.overrideWithValue(store),
             coachRepositoryProvider.overrideWithValue(repo),
-            coachConsentProvider.overrideWith(() => FakeCoachConsentNotifier(const CoachConsent())),
+            coachConsentProvider.overrideWith(
+              () => FakeCoachConsentNotifier(const CoachConsent()),
+            ),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -701,41 +764,52 @@ void main() {
       expect(find.text('Done'), findsOneWidget);
     });
 
-    testWidgets('CoachScreen responsive render on narrow screen (320x640) with zero overflow', (tester) async {
-      tester.view.physicalSize = const Size(320, 640);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
+    testWidgets(
+      'CoachScreen responsive render on narrow screen (320x640) with zero overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 640);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() => tester.view.resetPhysicalSize());
 
-      final secureStore = JsonSecureCredentialsStore(store);
-      final fakeClient = FakeAiClient();
-      final repo = CoachRepository(
-        store: store,
-        credentialsStore: secureStore,
-        aiClient: fakeClient,
-      );
+        final secureStore = JsonSecureCredentialsStore(store);
+        final fakeClient = FakeAiClient();
+        final repo = CoachRepository(
+          store: store,
+          credentialsStore: secureStore,
+          aiClient: fakeClient,
+        );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            storeProvider.overrideWithValue(store),
-            coachRepositoryProvider.overrideWithValue(repo),
-            coachMessagesProvider.overrideWith(() => FakeCoachMessagesNotifier(welcomeMessage, repo)),
-            coachCredentialsProvider.overrideWith(() => FakeCoachCredentialsNotifier(const AiCredentials())),
-            coachConsentProvider.overrideWith(() => FakeCoachConsentNotifier(const CoachConsent())),
-            coachPersonaProvider.overrideWith(() => FakeCoachPersonaNotifier(CoachPersona.scientific)),
-          ],
-          child: const MaterialApp(
-            home: CoachScreen(),
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              storeProvider.overrideWithValue(store),
+              coachRepositoryProvider.overrideWithValue(repo),
+              coachMessagesProvider.overrideWith(
+                () => FakeCoachMessagesNotifier(welcomeMessage, repo),
+              ),
+              coachCredentialsProvider.overrideWith(
+                () => FakeCoachCredentialsNotifier(const AiCredentials()),
+              ),
+              coachConsentProvider.overrideWith(
+                () => FakeCoachConsentNotifier(const CoachConsent()),
+              ),
+              coachPersonaProvider.overrideWith(
+                () => FakeCoachPersonaNotifier(CoachPersona.scientific),
+              ),
+            ],
+            child: const MaterialApp(home: CoachScreen()),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      expect(tester.takeException(), isNull);
-    });
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+      },
+    );
 
-    testWidgets('FormattedCoachText removes all stray and unclosed ** characters and renders clean text', (tester) async {
-      const responseWithAsterisks = '''
+    testWidgets(
+      'FormattedCoachText removes all stray and unclosed ** characters and renders clean text',
+      (tester) async {
+        const responseWithAsterisks = '''
 ### **Zone 2 Cardiovascular Plan**
 • **Optimal Target:** 135 bpm
 - **Energy:** **2100 / 2500 kcal**
@@ -747,23 +821,26 @@ void main() {
 *- **Consistency is key**
 ''';
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: FormattedCoachText(text: responseWithAsterisks),
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: FormattedCoachText(text: responseWithAsterisks),
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
+        await tester.pump();
 
-      // Ensure no raw "**" is displayed anywhere in text widgets
-      expect(find.textContaining('**'), findsNothing);
-      expect(find.text('Zone 2 Cardiovascular Plan'), findsOneWidget);
-      expect(find.textContaining('Optimal Target:'), findsOneWidget);
-      expect(find.textContaining('Sub-optimal Sleep Volume:'), findsOneWidget);
-      expect(find.textContaining('Consistency is key'), findsOneWidget);
-    });
+        // Ensure no raw "**" is displayed anywhere in text widgets
+        expect(find.textContaining('**'), findsNothing);
+        expect(find.text('Zone 2 Cardiovascular Plan'), findsOneWidget);
+        expect(find.textContaining('Optimal Target:'), findsOneWidget);
+        expect(
+          find.textContaining('Sub-optimal Sleep Volume:'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('Consistency is key'), findsOneWidget);
+      },
+    );
   });
 }
-

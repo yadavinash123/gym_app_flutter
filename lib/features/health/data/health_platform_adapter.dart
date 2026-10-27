@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import '../models/daily_health_summary.dart';
 import '../models/health_metric_type.dart';
 import '../models/health_permission.dart';
@@ -61,18 +62,14 @@ class SimulatedHealthAdapter implements HealthPlatformAdapter {
     List<HealthMetricType> metrics,
   ) async {
     // Default mock response: granted for all requested metrics
-    return {
-      for (final m in metrics) m: HealthPermissionStatus.granted,
-    };
+    return {for (final m in metrics) m: HealthPermissionStatus.granted};
   }
 
   @override
   Future<Map<HealthMetricType, HealthPermissionStatus>> requestPermissions(
     List<HealthMetricType> metrics,
   ) async {
-    return {
-      for (final m in metrics) m: HealthPermissionStatus.granted,
-    };
+    return {for (final m in metrics) m: HealthPermissionStatus.granted};
   }
 
   @override
@@ -89,7 +86,9 @@ class SimulatedHealthAdapter implements HealthPlatformAdapter {
     final actualSteps = max(2000, simulatedSteps + stepVariance);
     final actualRhr = (simulatedRestingHr + rhrVariance).clamp(48, 95);
     final actualSleep = max(300, simulatedSleepMinutes + sleepVariance);
-    final actualDistance = double.parse((actualSteps * 0.00075).toStringAsFixed(2));
+    final actualDistance = double.parse(
+      (actualSteps * 0.00075).toStringAsFixed(2),
+    );
     final actualKcal = double.parse((actualSteps * 0.045).toStringAsFixed(1));
 
     final deepSleep = (actualSleep * 0.22).round();
@@ -98,7 +97,9 @@ class SimulatedHealthAdapter implements HealthPlatformAdapter {
 
     return DailyHealthSummary(
       date: date,
-      steps: permittedMetrics.contains(HealthMetricType.steps) ? actualSteps : 0,
+      steps: permittedMetrics.contains(HealthMetricType.steps)
+          ? actualSteps
+          : 0,
       stepSource: source,
       distanceKm: permittedMetrics.contains(HealthMetricType.distance)
           ? actualDistance
@@ -110,22 +111,27 @@ class SimulatedHealthAdapter implements HealthPlatformAdapter {
       activeKcalSource: source,
       restingHeartRateBpm:
           permittedMetrics.contains(HealthMetricType.restingHeartRate)
-              ? actualRhr
-              : null,
+          ? actualRhr
+          : null,
       restingHeartRateSource:
           permittedMetrics.contains(HealthMetricType.restingHeartRate)
-              ? source
-              : null,
-      sleepDurationMinutes:
-          permittedMetrics.contains(HealthMetricType.sleep) ? actualSleep : null,
-      deepSleepMinutes:
-          permittedMetrics.contains(HealthMetricType.sleep) ? deepSleep : null,
-      remSleepMinutes:
-          permittedMetrics.contains(HealthMetricType.sleep) ? remSleep : null,
-      lightSleepMinutes:
-          permittedMetrics.contains(HealthMetricType.sleep) ? lightSleep : null,
-      sleepSource:
-          permittedMetrics.contains(HealthMetricType.sleep) ? source : null,
+          ? source
+          : null,
+      sleepDurationMinutes: permittedMetrics.contains(HealthMetricType.sleep)
+          ? actualSleep
+          : null,
+      deepSleepMinutes: permittedMetrics.contains(HealthMetricType.sleep)
+          ? deepSleep
+          : null,
+      remSleepMinutes: permittedMetrics.contains(HealthMetricType.sleep)
+          ? remSleep
+          : null,
+      lightSleepMinutes: permittedMetrics.contains(HealthMetricType.sleep)
+          ? lightSleep
+          : null,
+      sleepSource: permittedMetrics.contains(HealthMetricType.sleep)
+          ? source
+          : null,
       externalWorkoutsCount:
           permittedMetrics.contains(HealthMetricType.workouts) ? 1 : 0,
       syncedAt: DateTime.now(),

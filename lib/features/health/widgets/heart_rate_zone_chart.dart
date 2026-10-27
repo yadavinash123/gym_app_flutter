@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/health_source.dart';
 import '../models/heart_rate_zone.dart';
 
@@ -56,11 +57,16 @@ class HeartRateZoneChart extends StatelessWidget {
               ),
               if (source != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: source!.badgeColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: source!.badgeColor.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: source!.badgeColor.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Text(
                     source!.shortBadge,
@@ -99,7 +105,10 @@ class HeartRateZoneChart extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1C2430),
                     borderRadius: BorderRadius.circular(8),

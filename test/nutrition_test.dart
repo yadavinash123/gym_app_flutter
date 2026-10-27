@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -23,26 +24,25 @@ FoodItem sampleFood({
   double carbs = 53.0,
   double fat = 1.2,
   double fiber = 8.0,
-}) =>
-    FoodItem(
-      id: id,
-      name: name,
-      category: category,
-      diet: diet,
-      servingSize: servingSize,
-      servingUnit: 'g',
-      portions: const [
-        PortionUnit(name: '1 roti', grams: 35.0),
-        PortionUnit(name: '100g', grams: 100.0),
-      ],
-      calories: calories,
-      protein: protein,
-      carbs: carbs,
-      fat: fat,
-      fiber: fiber,
-      source: 'ICMR-NIN IFCT 2017',
-      url: 'https://example.com/roti',
-    );
+}) => FoodItem(
+  id: id,
+  name: name,
+  category: category,
+  diet: diet,
+  servingSize: servingSize,
+  servingUnit: 'g',
+  portions: const [
+    PortionUnit(name: '1 roti', grams: 35.0),
+    PortionUnit(name: '100g', grams: 100.0),
+  ],
+  calories: calories,
+  protein: protein,
+  carbs: carbs,
+  fat: fat,
+  fiber: fiber,
+  source: 'ICMR-NIN IFCT 2017',
+  url: 'https://example.com/roti',
+);
 
 void main() {
   group('FoodItem Model & Validation', () {
@@ -132,40 +132,43 @@ void main() {
       expect(more.protein, closeTo(30.0, 0.01));
     });
 
-    test('matches filtering by query, category, diet, and high protein tag', () {
-      final chicken = sampleFood(
-        id: 'chicken-breast',
-        name: 'Grilled Chicken Breast',
-        category: 'Proteins & Poultry',
-        diet: 'Non-vegetarian',
-        calories: 165.0,
-        protein: 31.0,
-        carbs: 0.0,
-        fat: 3.6,
-      );
+    test(
+      'matches filtering by query, category, diet, and high protein tag',
+      () {
+        final chicken = sampleFood(
+          id: 'chicken-breast',
+          name: 'Grilled Chicken Breast',
+          category: 'Proteins & Poultry',
+          diet: 'Non-vegetarian',
+          calories: 165.0,
+          protein: 31.0,
+          carbs: 0.0,
+          fat: 3.6,
+        );
 
-      final dal = sampleFood(
-        id: 'yellow-dal',
-        name: 'Moong Dal Soup',
-        category: 'Lentils & Legumes',
-        diet: 'Vegan',
-        calories: 105.0,
-        protein: 7.0,
-        carbs: 16.0,
-        fat: 1.5,
-      );
+        final dal = sampleFood(
+          id: 'yellow-dal',
+          name: 'Moong Dal Soup',
+          category: 'Lentils & Legumes',
+          diet: 'Vegan',
+          calories: 105.0,
+          protein: 7.0,
+          carbs: 16.0,
+          fat: 1.5,
+        );
 
-      expect(chicken.matches(query: 'chicken'), isTrue);
-      expect(chicken.matches(query: 'dal'), isFalse);
-      expect(chicken.matches(categoryFilter: 'Proteins & Poultry'), isTrue);
-      expect(chicken.matches(categoryFilter: 'Fruits'), isFalse);
-      expect(chicken.matches(dietFilter: 'Vegetarian'), isFalse);
-      expect(chicken.matches(highProteinOnly: true), isTrue);
+        expect(chicken.matches(query: 'chicken'), isTrue);
+        expect(chicken.matches(query: 'dal'), isFalse);
+        expect(chicken.matches(categoryFilter: 'Proteins & Poultry'), isTrue);
+        expect(chicken.matches(categoryFilter: 'Fruits'), isFalse);
+        expect(chicken.matches(dietFilter: 'Vegetarian'), isFalse);
+        expect(chicken.matches(highProteinOnly: true), isTrue);
 
-      expect(dal.matches(dietFilter: 'Vegetarian'), isTrue);
-      expect(dal.matches(dietFilter: 'Vegan'), isTrue);
-      expect(dal.matches(highProteinOnly: true), isFalse);
-    });
+        expect(dal.matches(dietFilter: 'Vegetarian'), isTrue);
+        expect(dal.matches(dietFilter: 'Vegan'), isTrue);
+        expect(dal.matches(highProteinOnly: true), isFalse);
+      },
+    );
   });
 
   group('Nutrition Targets & Calculations', () {
@@ -240,33 +243,36 @@ void main() {
       expect(targets.isEstimated, isFalse);
     });
 
-    test('suppresses automatic estimates for minors and clinical nutrition', () {
-      const minorProfile = Profile(
-        name: 'Young',
-        level: 'Beginner',
-        goal: 'Build muscle',
-        days: 3,
-        environment: 'Home',
-        age: 16,
-      );
+    test(
+      'suppresses automatic estimates for minors and clinical nutrition',
+      () {
+        const minorProfile = Profile(
+          name: 'Young',
+          level: 'Beginner',
+          goal: 'Build muscle',
+          days: 3,
+          environment: 'Home',
+          age: 16,
+        );
 
-      const clinicalProfile = Profile(
-        name: 'Patient',
-        level: 'Beginner',
-        goal: 'Weight maintenance',
-        days: 3,
-        environment: 'Home',
-        clinicalNutrition: true,
-      );
+        const clinicalProfile = Profile(
+          name: 'Patient',
+          level: 'Beginner',
+          goal: 'Weight maintenance',
+          days: 3,
+          environment: 'Home',
+          clinicalNutrition: true,
+        );
 
-      final minorTargets = NutritionCalculator.calculate(minorProfile);
-      expect(minorTargets.isClinicalSuppressed, isTrue);
-      expect(minorTargets.isEstimated, isFalse);
+        final minorTargets = NutritionCalculator.calculate(minorProfile);
+        expect(minorTargets.isClinicalSuppressed, isTrue);
+        expect(minorTargets.isEstimated, isFalse);
 
-      final clinicalTargets = NutritionCalculator.calculate(clinicalProfile);
-      expect(clinicalTargets.isClinicalSuppressed, isTrue);
-      expect(clinicalTargets.isEstimated, isFalse);
-    });
+        final clinicalTargets = NutritionCalculator.calculate(clinicalProfile);
+        expect(clinicalTargets.isClinicalSuppressed, isTrue);
+        expect(clinicalTargets.isEstimated, isFalse);
+      },
+    );
   });
 
   group('MealLog & DailyNutritionLog Models', () {
@@ -346,40 +352,43 @@ void main() {
       }
     });
 
-    test('returns empty log for unlogged date and persists newly added food', () async {
-      final initial = await repository.getDailyLog('2026-10-22');
-      expect(initial.isEmpty, isTrue);
-      expect(initial.waterMl, 0);
+    test(
+      'returns empty log for unlogged date and persists newly added food',
+      () async {
+        final initial = await repository.getDailyLog('2026-10-22');
+        expect(initial.isEmpty, isTrue);
+        expect(initial.waterMl, 0);
 
-      final food = sampleFood();
-      final item = LoggedFoodItem.fromFoodItem(
-        id: 'f-1',
-        food: food,
-        portion: const PortionUnit(name: '1 roti', grams: 35.0),
-        quantity: 2.0,
-      );
+        final food = sampleFood();
+        final item = LoggedFoodItem.fromFoodItem(
+          id: 'f-1',
+          food: food,
+          portion: const PortionUnit(name: '1 roti', grams: 35.0),
+          quantity: 2.0,
+        );
 
-      await repository.addFoodToMeal(
-        date: '2026-10-22',
-        mealType: MealType.breakfast,
-        item: item,
-      );
+        await repository.addFoodToMeal(
+          date: '2026-10-22',
+          mealType: MealType.breakfast,
+          item: item,
+        );
 
-      final updated = await repository.getDailyLog('2026-10-22');
-      expect(updated.meals[MealType.breakfast]!.items.length, 1);
-      expect(updated.meals[MealType.breakfast]!.items.first.name, 'Roti');
-      expect(updated.totalCalories, closeTo(184.8, 0.1));
+        final updated = await repository.getDailyLog('2026-10-22');
+        expect(updated.meals[MealType.breakfast]!.items.length, 1);
+        expect(updated.meals[MealType.breakfast]!.items.first.name, 'Roti');
+        expect(updated.totalCalories, closeTo(184.8, 0.1));
 
-      // Remove item
-      await repository.removeFoodFromMeal(
-        date: '2026-10-22',
-        mealType: MealType.breakfast,
-        itemId: 'f-1',
-      );
+        // Remove item
+        await repository.removeFoodFromMeal(
+          date: '2026-10-22',
+          mealType: MealType.breakfast,
+          itemId: 'f-1',
+        );
 
-      final afterRemove = await repository.getDailyLog('2026-10-22');
-      expect(afterRemove.meals[MealType.breakfast]!.items.isEmpty, isTrue);
-    });
+        final afterRemove = await repository.getDailyLog('2026-10-22');
+        expect(afterRemove.meals[MealType.breakfast]!.items.isEmpty, isTrue);
+      },
+    );
 
     test('tracks and updates water intake correctly', () async {
       await repository.addWater(date: '2026-10-22', amountMl: 250);
@@ -408,10 +417,7 @@ void main() {
         ),
       );
 
-      await repository.copyMeals(
-        fromDate: '2026-10-21',
-        toDate: '2026-10-22',
-      );
+      await repository.copyMeals(fromDate: '2026-10-21', toDate: '2026-10-22');
 
       final target = await repository.getDailyLog('2026-10-22');
       expect(target.meals[MealType.lunch]!.items.length, 1);
@@ -478,7 +484,9 @@ void main() {
   });
 
   group('UI Widgets Tests', () {
-    testWidgets('MacroProgressBar renders label and metrics without overflow', (tester) async {
+    testWidgets('MacroProgressBar renders label and metrics without overflow', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -503,31 +511,32 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('NutritionReferenceDialog opens and displays scientific citations', (tester) async {
-      const targets = NutritionTargets(
-        dailyCalories: 2200,
-        proteinGrams: 140,
-        carbsGrams: 240,
-        fatGrams: 60,
-        fiberGrams: 30,
-        waterMl: 2500,
-        explanation: 'Mifflin–St Jeor estimate: BMR 1700 kcal × 1.4',
-      );
+    testWidgets(
+      'NutritionReferenceDialog opens and displays scientific citations',
+      (tester) async {
+        const targets = NutritionTargets(
+          dailyCalories: 2200,
+          proteinGrams: 140,
+          carbsGrams: 240,
+          fatGrams: 60,
+          fiberGrams: 30,
+          waterMl: 2500,
+          explanation: 'Mifflin–St Jeor estimate: BMR 1700 kcal × 1.4',
+        );
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: NutritionReferenceDialog(targets: targets),
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(body: NutritionReferenceDialog(targets: targets)),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('Calculation Reference'), findsOneWidget);
-      expect(find.textContaining('Mifflin–St Jeor estimate'), findsOneWidget);
-      expect(find.text('Scientific Foundations'), findsOneWidget);
-      expect(find.text('Energy Expenditure (BMR)'), findsOneWidget);
-      expect(find.text('Protein Intake'), findsOneWidget);
-      expect(find.text('Close'), findsOneWidget);
-    });
+        expect(find.text('Calculation Reference'), findsOneWidget);
+        expect(find.textContaining('Mifflin–St Jeor estimate'), findsOneWidget);
+        expect(find.text('Scientific Foundations'), findsOneWidget);
+        expect(find.text('Energy Expenditure (BMR)'), findsOneWidget);
+        expect(find.text('Protein Intake'), findsOneWidget);
+        expect(find.text('Close'), findsOneWidget);
+      },
+    );
   });
 }

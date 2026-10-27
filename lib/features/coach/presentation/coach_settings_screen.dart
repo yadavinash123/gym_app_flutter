@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/ai_client.dart';
 import '../data/coach_repository.dart';
 import '../models/ai_credentials.dart';
@@ -11,7 +12,8 @@ class CoachSettingsScreen extends ConsumerStatefulWidget {
   const CoachSettingsScreen({super.key});
 
   @override
-  ConsumerState<CoachSettingsScreen> createState() => _CoachSettingsScreenState();
+  ConsumerState<CoachSettingsScreen> createState() =>
+      _CoachSettingsScreenState();
 }
 
 class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
@@ -26,8 +28,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
       _testSuccess = null;
     });
 
-    final errorMsg =
-        await ref.read(coachRepositoryProvider).checkConnection(creds);
+    final errorMsg = await ref
+        .read(coachRepositoryProvider)
+        .checkConnection(creds);
     final success = errorMsg == null;
 
     if (!mounted) return;
@@ -75,7 +78,10 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white70,
+                    ),
                     onPressed: () => Navigator.pop(ctx),
                   ),
                 ],
@@ -92,11 +98,16 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                 style: const TextStyle(color: Colors.white, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: 'Paste API key here (sk-... or AIza...)',
-                  hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                  hintStyle: const TextStyle(
+                    color: Colors.white38,
+                    fontSize: 13,
+                  ),
                   filled: true,
                   fillColor: const Color(0xFF1E2836),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -177,8 +188,8 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
       text: currentCreds.customEndpointUrl.isNotEmpty
           ? currentCreds.customEndpointUrl
           : (currentCreds.provider == AiProvider.gemini
-              ? ''
-              : 'https://api.openai.com/v1'),
+                ? ''
+                : 'https://api.openai.com/v1'),
     );
 
     showModalBottomSheet(
@@ -230,8 +241,10 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                 hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                 filled: true,
                 fillColor: const Color(0xFF1E2836),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -247,8 +260,12 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
               ),
               onPressed: () async {
                 final url = controller.text.trim();
-                final normalized = url.isNotEmpty ? normalizeOpenAiEndpoint(url) : '';
-                final updated = currentCreds.copyWith(customEndpointUrl: normalized);
+                final normalized = url.isNotEmpty
+                    ? normalizeOpenAiEndpoint(url)
+                    : '';
+                final updated = currentCreds.copyWith(
+                  customEndpointUrl: normalized,
+                );
                 await ref.read(coachCredentialsProvider.notifier).save(updated);
                 if (context.mounted) Navigator.pop(ctx);
               },
@@ -319,12 +336,12 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                   ],
                   current: prefs.aiModel,
                   onSelected: (val) {
-                    ref.read(coachPreferencesProvider.notifier).savePreferences(
-                          prefs.copyWith(aiModel: val),
-                        );
-                    ref.read(coachCredentialsProvider.notifier).save(
-                          creds.copyWith(modelName: val),
-                        );
+                    ref
+                        .read(coachPreferencesProvider.notifier)
+                        .savePreferences(prefs.copyWith(aiModel: val));
+                    ref
+                        .read(coachCredentialsProvider.notifier)
+                        .save(creds.copyWith(modelName: val));
                   },
                 ),
               ),
@@ -339,7 +356,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
               _buildNavigationRow(
                 icon: Icons.key_rounded,
                 title: 'API Key',
-                value: creds.apiKey.isNotEmpty ? creds.maskedApiKey : 'Not Configured',
+                value: creds.apiKey.isNotEmpty
+                    ? creds.maskedApiKey
+                    : 'Not Configured',
                 valueColor: creds.apiKey.isNotEmpty
                     ? const Color(0xFFB6FF3B)
                     : const Color(0xFFEF4444),
@@ -351,15 +370,18 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                 title: 'API Endpoint URL',
                 value: creds.customEndpointUrl.isNotEmpty
                     ? (creds.customEndpointUrl.length > 20
-                        ? '${creds.customEndpointUrl.substring(0, 20)}...'
-                        : creds.customEndpointUrl)
+                          ? '${creds.customEndpointUrl.substring(0, 20)}...'
+                          : creds.customEndpointUrl)
                     : 'Default URL',
                 onTap: () => _showEndpointSheet(creds),
               ),
               _buildDivider(),
               // Test Connection Row Button
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: Column(
                   children: [
                     SizedBox(
@@ -368,14 +390,17 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFB6FF3B),
                           side: BorderSide(
-                            color: const Color(0xFFB6FF3B).withValues(alpha: 0.6),
+                            color: const Color(0xFFB6FF3B)
+                                .withValues(alpha: 0.6),
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        onPressed: _isTesting ? null : () => _testConnection(creds),
+                        onPressed: _isTesting
+                            ? null
+                            : () => _testConnection(creds),
                         icon: _isTesting
                             ? const SizedBox(
                                 width: 16,
@@ -385,9 +410,14 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                                   color: Color(0xFFB6FF3B),
                                 ),
                               )
-                            : const Icon(Icons.wifi_tethering_rounded, size: 18),
+                            : const Icon(
+                                Icons.wifi_tethering_rounded,
+                                size: 18,
+                              ),
                         label: Text(
-                          _isTesting ? 'Testing Connection...' : 'Test Connection',
+                          _isTesting
+                              ? 'Testing Connection...'
+                              : 'Test Connection',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -440,9 +470,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                   ],
                   current: prefs.responseLanguage,
                   onSelected: (val) {
-                    ref.read(coachPreferencesProvider.notifier).savePreferences(
-                          prefs.copyWith(responseLanguage: val),
-                        );
+                    ref
+                        .read(coachPreferencesProvider.notifier)
+                        .savePreferences(prefs.copyWith(responseLanguage: val));
                   },
                 ),
               ),
@@ -452,9 +482,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                 title: 'Streaming Responses',
                 value: prefs.streamingResponses,
                 onChanged: (val) {
-                  ref.read(coachPreferencesProvider.notifier).savePreferences(
-                        prefs.copyWith(streamingResponses: val),
-                      );
+                  ref
+                      .read(coachPreferencesProvider.notifier)
+                      .savePreferences(prefs.copyWith(streamingResponses: val));
                 },
               ),
             ],
@@ -483,9 +513,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                   ],
                   current: prefs.fitnessGoal,
                   onSelected: (val) {
-                    ref.read(coachPreferencesProvider.notifier).savePreferences(
-                          prefs.copyWith(fitnessGoal: val),
-                        );
+                    ref
+                        .read(coachPreferencesProvider.notifier)
+                        .savePreferences(prefs.copyWith(fitnessGoal: val));
                   },
                 ),
               ),
@@ -504,9 +534,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                   ],
                   current: prefs.trainingLevel,
                   onSelected: (val) {
-                    ref.read(coachPreferencesProvider.notifier).savePreferences(
-                          prefs.copyWith(trainingLevel: val),
-                        );
+                    ref
+                        .read(coachPreferencesProvider.notifier)
+                        .savePreferences(prefs.copyWith(trainingLevel: val));
                   },
                 ),
               ),
@@ -526,7 +556,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                   ],
                   current: prefs.preferredCoachTone,
                   onSelected: (val) {
-                    ref.read(coachPreferencesProvider.notifier).savePreferences(
+                    ref
+                        .read(coachPreferencesProvider.notifier)
+                        .savePreferences(
                           prefs.copyWith(preferredCoachTone: val),
                         );
                     if (val.contains('Scientific')) {
@@ -563,9 +595,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                   ],
                   current: prefs.responseDetail,
                   onSelected: (val) {
-                    ref.read(coachPreferencesProvider.notifier).savePreferences(
-                          prefs.copyWith(responseDetail: val),
-                        );
+                    ref
+                        .read(coachPreferencesProvider.notifier)
+                        .savePreferences(prefs.copyWith(responseDetail: val));
                   },
                 ),
               ),
@@ -585,9 +617,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                 title: 'Save Chat History',
                 value: prefs.saveChatHistory,
                 onChanged: (val) {
-                  ref.read(coachPreferencesProvider.notifier).savePreferences(
-                        prefs.copyWith(saveChatHistory: val),
-                      );
+                  ref
+                      .read(coachPreferencesProvider.notifier)
+                      .savePreferences(prefs.copyWith(saveChatHistory: val));
                 },
               ),
               _buildDivider(),
@@ -596,7 +628,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                 title: 'Remember Conversation Context',
                 value: prefs.rememberConversationContext,
                 onChanged: (val) {
-                  ref.read(coachPreferencesProvider.notifier).savePreferences(
+                  ref
+                      .read(coachPreferencesProvider.notifier)
+                      .savePreferences(
                         prefs.copyWith(rememberConversationContext: val),
                       );
                 },
@@ -607,9 +641,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                 title: 'Voice Responses',
                 value: prefs.voiceResponses,
                 onChanged: (val) {
-                  ref.read(coachPreferencesProvider.notifier).savePreferences(
-                        prefs.copyWith(voiceResponses: val),
-                      );
+                  ref
+                      .read(coachPreferencesProvider.notifier)
+                      .savePreferences(prefs.copyWith(voiceResponses: val));
                 },
               ),
             ],
@@ -732,7 +766,9 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
               style: TextStyle(
                 color: valueColor ?? const Color(0xFFA7B0BF),
                 fontSize: 13,
-                fontWeight: valueColor != null ? FontWeight.w600 : FontWeight.normal,
+                fontWeight: valueColor != null
+                    ? FontWeight.w600
+                    : FontWeight.normal,
               ),
             ),
             const SizedBox(width: 4),
@@ -802,7 +838,10 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
                 child: Text(
                   title,
                   style: const TextStyle(
@@ -819,9 +858,12 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
                   title: Text(
                     opt,
                     style: TextStyle(
-                      color: isSelected ? const Color(0xFFB6FF3B) : Colors.white,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected
+                          ? const Color(0xFFB6FF3B)
+                          : Colors.white,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                   trailing: isSelected
@@ -842,19 +884,15 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
 
   void _pickProvider(AiCredentials creds) {
     // Only Online Providers: Offline option removed
-    final providers = [
-      'OpenAI',
-      'Google Gemini',
-      'Custom (OpenAI-compatible)',
-    ];
+    final providers = ['OpenAI', 'Google Gemini', 'Custom (OpenAI-compatible)'];
     _pickOption(
       title: 'Select AI Provider',
       options: providers,
       current: creds.provider == AiProvider.gemini
           ? 'Google Gemini'
           : (creds.provider == AiProvider.custom
-              ? 'Custom (OpenAI-compatible)'
-              : 'OpenAI'),
+                ? 'Custom (OpenAI-compatible)'
+                : 'OpenAI'),
       onSelected: (val) {
         AiProvider selected = AiProvider.openai;
         if (val.contains('Gemini')) {
@@ -863,14 +901,17 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
           selected = AiProvider.custom;
         }
 
-        ref.read(coachPreferencesProvider.notifier).savePreferences(
-              (ref.read(coachPreferencesProvider).value ?? const CoachPreferences())
+        ref
+            .read(coachPreferencesProvider.notifier)
+            .savePreferences(
+              (ref.read(coachPreferencesProvider).value ??
+                      const CoachPreferences())
                   .copyWith(providerName: val),
             );
 
-        ref.read(coachCredentialsProvider.notifier).save(
-              creds.copyWith(provider: selected),
-            );
+        ref
+            .read(coachCredentialsProvider.notifier)
+            .save(creds.copyWith(provider: selected));
       },
     );
   }
@@ -883,7 +924,11 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
-            Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 22),
+            Icon(
+              Icons.delete_outline_rounded,
+              color: Color(0xFFEF4444),
+              size: 22,
+            ),
             SizedBox(width: 8),
             Text(
               'Clear Chat History?',
@@ -902,7 +947,10 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70),
+            ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -910,7 +958,10 @@ class _CoachSettingsScreenState extends ConsumerState<CoachSettingsScreen> {
               foregroundColor: Colors.white,
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Clear All', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Clear All',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

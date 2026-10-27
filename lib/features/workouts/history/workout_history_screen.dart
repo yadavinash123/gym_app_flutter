@@ -57,9 +57,8 @@ class WorkoutHistoryScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     Text(
                       'No Recorded Workouts Yet',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: Theme.of(context).textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     const Text(
@@ -82,8 +81,10 @@ class WorkoutHistoryScreen extends ConsumerWidget {
             );
           }
 
-          final totalVolume =
-              sessions.fold<double>(0.0, (sum, s) => sum + s.totalVolumeKg);
+          final totalVolume = sessions.fold<double>(
+            0.0,
+            (sum, s) => sum + s.totalVolumeKg,
+          );
           final totalMinutes =
               sessions.fold<int>(0, (sum, s) => sum + s.durationSeconds) ~/ 60;
 
@@ -237,8 +238,7 @@ class WorkoutHistoryScreen extends ConsumerWidget {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) =>
-                              WorkoutDetailScreen(session: session),
+                          builder: (_) => WorkoutDetailScreen(session: session),
                         ),
                       );
                     },

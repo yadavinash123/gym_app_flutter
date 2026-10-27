@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/coach_repository.dart';
 import '../models/coach_conversation.dart';
 import 'widgets/conversation_card.dart';
 
 class CoachHistoryScreen extends ConsumerStatefulWidget {
-  const CoachHistoryScreen({
-    super.key,
-    this.onSelectConversation,
-  });
+  const CoachHistoryScreen({super.key, this.onSelectConversation});
 
   final ValueChanged<String>? onSelectConversation;
 
@@ -37,10 +35,12 @@ class _CoachHistoryScreenState extends ConsumerState<CoachHistoryScreen> {
   }
 
   void _startNewChat() async {
-    final id = await ref.read(coachConversationsProvider.notifier).createConversation(
-      title: 'New Conversation',
-      category: ConversationCategory.workout,
-    );
+    final id = await ref
+        .read(coachConversationsProvider.notifier)
+        .createConversation(
+          title: 'New Conversation',
+          category: ConversationCategory.workout,
+        );
     if (!mounted) return;
     if (widget.onSelectConversation != null) {
       widget.onSelectConversation!(id);
@@ -66,7 +66,11 @@ class _CoachHistoryScreenState extends ConsumerState<CoachHistoryScreen> {
         backgroundColor: const Color(0xFF0B0F14),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
@@ -90,14 +94,19 @@ class _CoachHistoryScreenState extends ConsumerState<CoachHistoryScreen> {
 
           final todayList = filtered.where((c) => c.isToday).toList();
           final yesterdayList = filtered.where((c) => c.isYesterday).toList();
-          final prev7DaysList = filtered.where((c) => c.isPrevious7Days).toList();
+          final prev7DaysList = filtered
+              .where((c) => c.isPrevious7Days)
+              .toList();
           final olderList = filtered.where((c) => c.isOlder).toList();
 
           return Column(
             children: [
               // Search & + New Chat Row
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     // Search Bar
@@ -172,7 +181,8 @@ class _CoachHistoryScreenState extends ConsumerState<CoachHistoryScreen> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFB6FF3B).withValues(alpha: 0.3),
+                              color: const Color(0xFFB6FF3B)
+                                  .withValues(alpha: 0.3),
                               blurRadius: 8,
                             ),
                           ],
@@ -235,55 +245,63 @@ class _CoachHistoryScreenState extends ConsumerState<CoachHistoryScreen> {
                         children: [
                           if (todayList.isNotEmpty) ...[
                             _buildSectionHeader('Today'),
-                            ...todayList.map((c) => ConversationCard(
-                                  conversation: c,
-                                  onTap: () => _selectChat(c.id),
-                                  onDelete: () => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .deleteConversation(c.id),
-                                  onRename: (title) => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .renameConversation(c.id, title),
-                                )),
+                            ...todayList.map(
+                              (c) => ConversationCard(
+                                conversation: c,
+                                onTap: () => _selectChat(c.id),
+                                onDelete: () => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .deleteConversation(c.id),
+                                onRename: (title) => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .renameConversation(c.id, title),
+                              ),
+                            ),
                           ],
                           if (yesterdayList.isNotEmpty) ...[
                             _buildSectionHeader('Yesterday'),
-                            ...yesterdayList.map((c) => ConversationCard(
-                                  conversation: c,
-                                  onTap: () => _selectChat(c.id),
-                                  onDelete: () => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .deleteConversation(c.id),
-                                  onRename: (title) => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .renameConversation(c.id, title),
-                                )),
+                            ...yesterdayList.map(
+                              (c) => ConversationCard(
+                                conversation: c,
+                                onTap: () => _selectChat(c.id),
+                                onDelete: () => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .deleteConversation(c.id),
+                                onRename: (title) => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .renameConversation(c.id, title),
+                              ),
+                            ),
                           ],
                           if (prev7DaysList.isNotEmpty) ...[
                             _buildSectionHeader('Previous 7 Days'),
-                            ...prev7DaysList.map((c) => ConversationCard(
-                                  conversation: c,
-                                  onTap: () => _selectChat(c.id),
-                                  onDelete: () => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .deleteConversation(c.id),
-                                  onRename: (title) => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .renameConversation(c.id, title),
-                                )),
+                            ...prev7DaysList.map(
+                              (c) => ConversationCard(
+                                conversation: c,
+                                onTap: () => _selectChat(c.id),
+                                onDelete: () => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .deleteConversation(c.id),
+                                onRename: (title) => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .renameConversation(c.id, title),
+                              ),
+                            ),
                           ],
                           if (olderList.isNotEmpty) ...[
                             _buildSectionHeader('Older'),
-                            ...olderList.map((c) => ConversationCard(
-                                  conversation: c,
-                                  onTap: () => _selectChat(c.id),
-                                  onDelete: () => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .deleteConversation(c.id),
-                                  onRename: (title) => ref
-                                      .read(coachConversationsProvider.notifier)
-                                      .renameConversation(c.id, title),
-                                )),
+                            ...olderList.map(
+                              (c) => ConversationCard(
+                                conversation: c,
+                                onTap: () => _selectChat(c.id),
+                                onDelete: () => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .deleteConversation(c.id),
+                                onRename: (title) => ref
+                                    .read(coachConversationsProvider.notifier)
+                                    .renameConversation(c.id, title),
+                              ),
+                            ),
                           ],
                           const SizedBox(height: 24),
                         ],

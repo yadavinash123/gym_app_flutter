@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../data/coach_repository.dart';
 import '../models/coach_conversation.dart';
 import 'widgets/chat_input_bar.dart';
@@ -29,12 +30,17 @@ class _CoachHomeViewState extends ConsumerState<CoachHomeView> {
     super.dispose();
   }
 
-  void _onFeatureCardTapped(String prompt, ConversationCategory category) async {
-    await ref.read(coachConversationsProvider.notifier).createConversation(
-      title: prompt.length > 28 ? '${prompt.substring(0, 28)}...' : prompt,
-      category: category,
-      initialPrompt: prompt,
-    );
+  void _onFeatureCardTapped(
+    String prompt,
+    ConversationCategory category,
+  ) async {
+    await ref
+        .read(coachConversationsProvider.notifier)
+        .createConversation(
+          title: prompt.length > 28 ? '${prompt.substring(0, 28)}...' : prompt,
+          category: category,
+          initialPrompt: prompt,
+        );
     widget.onSendPrompt(prompt);
   }
 
@@ -234,9 +240,7 @@ class _CoachHomeViewState extends ConsumerState<CoachHomeView> {
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF1C2430),
                                     shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white12,
-                                    ),
+                                    border: Border.all(color: Colors.white12),
                                   ),
                                   child: const Icon(
                                     Icons.schedule_rounded,
@@ -314,9 +318,7 @@ class _CoachHomeViewState extends ConsumerState<CoachHomeView> {
       decoration: BoxDecoration(
         color: const Color(0xFF141A22),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -343,11 +345,7 @@ class _CoachHomeViewState extends ConsumerState<CoachHomeView> {
                           color: iconColor.withValues(alpha: 0.35),
                         ),
                       ),
-                      child: Icon(
-                        icon,
-                        color: iconColor,
-                        size: 20,
-                      ),
+                      child: Icon(icon, color: iconColor, size: 20),
                     ),
                     Icon(
                       Icons.chevron_right_rounded,

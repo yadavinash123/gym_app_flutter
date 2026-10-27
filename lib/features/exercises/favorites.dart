@@ -20,7 +20,7 @@ class FavoritesRepository {
     if (data['version'] != 1 ||
         ids is! List ||
         ids.any(
-          (id) => id is! String || !RegExp(r'^[a-z][a-z0-9-]*$').hasMatch(id),
+          (id) => id is! String || !RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(id),
         )) {
       throw const FormatException('Invalid exercise preferences');
     }
@@ -29,7 +29,7 @@ class FavoritesRepository {
 
   // Serialize the entire read/modify/write, not only the final file write.
   Future<Set<String>> toggle(String id) {
-    if (!RegExp(r'^[a-z][a-z0-9-]*$').hasMatch(id)) {
+    if (!RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(id)) {
       return Future.error(ArgumentError('Invalid exercise ID'));
     }
     final result = _tail.then((_) async {

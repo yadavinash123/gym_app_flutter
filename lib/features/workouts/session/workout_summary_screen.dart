@@ -108,9 +108,9 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
                   Text(
                     'Great Job!',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                        ),
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -238,7 +238,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
                       const Chip(
                         label: Text('General'),
                         backgroundColor: Color(0xFF151B23),
-                      )
+                      ),
                     ]
                   : session.musclesTrained.map((m) {
                       return Chip(
@@ -385,9 +385,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     );
 
     try {
-      await ref
-          .read(workoutSessionsProvider.notifier)
-          .addSession(finalSession);
+      await ref.read(workoutSessionsProvider.notifier).addSession(finalSession);
       if (context.mounted) {
         context.go('/workouts');
       }

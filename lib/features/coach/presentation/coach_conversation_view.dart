@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../data/coach_repository.dart';
 import '../models/ai_provider.dart';
 import '../models/coach_message.dart';
@@ -106,7 +107,8 @@ class _CoachConversationViewState extends ConsumerState<CoachConversationView> {
     final messagesAsync = ref.watch(coachMessagesProvider);
     final credentialsAsync = ref.watch(coachCredentialsProvider);
 
-    final isOnline = credentialsAsync.value?.isConfigured == true &&
+    final isOnline =
+        credentialsAsync.value?.isConfigured == true &&
         credentialsAsync.value?.provider != AiProvider.offline;
 
     // Determine current suggested prompt chips
@@ -116,8 +118,10 @@ class _CoachConversationViewState extends ConsumerState<CoachConversationView> {
       'Make it home gym',
     ];
     if (messagesAsync.hasValue && messagesAsync.value!.isNotEmpty) {
-      final lastAssistant = messagesAsync.value!
-          .lastWhere((m) => m.isAssistant, orElse: () => messagesAsync.value!.last);
+      final lastAssistant = messagesAsync.value!.lastWhere(
+        (m) => m.isAssistant,
+        orElse: () => messagesAsync.value!.last,
+      );
       if (lastAssistant.suggestedActions.isNotEmpty) {
         promptChips = lastAssistant.suggestedActions;
       }
@@ -391,12 +395,14 @@ class _CoachConversationViewState extends ConsumerState<CoachConversationView> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
-        crossAxisAlignment:
-            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment:
-                isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: isUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Flexible(
@@ -441,10 +447,7 @@ class _CoachConversationViewState extends ConsumerState<CoachConversationView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Formatted Text Content (Markdown + Clean Bullet Syntax)
-                      FormattedCoachText(
-                        text: message.content,
-                        isUser: isUser,
-                      ),
+                      FormattedCoachText(text: message.content, isUser: isUser),
 
                       // User Message Timestamp & Done Checkmark
                       if (isUser) ...[

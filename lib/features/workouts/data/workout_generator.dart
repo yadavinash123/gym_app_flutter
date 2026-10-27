@@ -172,21 +172,29 @@ class WorkoutGenerator {
   }
 
   static List<Exercise> _selectCardio(List<Exercise> pool) {
-    final cardio = pool.where((e) =>
-        e.movement == 'Low-impact aerobic' ||
-        e.movement == 'Step' ||
-        e.id == 'walking' ||
-        e.id == 'step-up' ||
-        e.id == 'calf-raise').toList();
+    final cardio = pool
+        .where(
+          (e) =>
+              e.movement == 'Low-impact aerobic' ||
+              e.movement == 'Step' ||
+              e.id == 'walking' ||
+              e.id == 'step-up' ||
+              e.id == 'calf-raise',
+        )
+        .toList();
     if (cardio.isNotEmpty) return cardio;
     return pool.take(3).toList();
   }
 
   static List<Exercise> _selectMobility(List<Exercise> pool) {
-    final mobility = pool.where((e) =>
-        e.movement == 'Mobility' ||
-        e.movement == 'Core stability' ||
-        e.primary.contains('Abdominals')).toList();
+    final mobility = pool
+        .where(
+          (e) =>
+              e.movement == 'Mobility' ||
+              e.movement == 'Core stability' ||
+              e.primary.contains('Abdominals'),
+        )
+        .toList();
     if (mobility.isNotEmpty) return mobility;
     return pool.take(3).toList();
   }
@@ -196,30 +204,38 @@ class WorkoutGenerator {
     List<Exercise> catalog, {
     int limit = 2,
   }) {
-    final matches = catalog.where((e) =>
-        e.movement == 'Mobility' ||
-        e.id == 'chest-stretch' ||
-        e.id == 'ankle-mobility' ||
-        e.id == 'seated-rotation').take(limit);
+    final matches = catalog
+        .where(
+          (e) =>
+              e.movement == 'Mobility' ||
+              e.id == 'chest-stretch' ||
+              e.id == 'ankle-mobility' ||
+              e.id == 'seated-rotation',
+        )
+        .take(limit);
 
-    return matches.map((ex) => PlannedExercise(
-          exerciseId: ex.id,
-          exerciseName: ex.name,
-          primaryMuscles: ex.primary,
-          sets: [
-            const PlannedSet(
-              setNumber: 1,
-              targetReps: 10,
-              targetRestSeconds: 30,
-            ),
-            const PlannedSet(
-              setNumber: 2,
-              targetReps: 10,
-              targetRestSeconds: 30,
-            ),
-          ],
-          notes: ex.cue,
-        )).toList();
+    return matches
+        .map(
+          (ex) => PlannedExercise(
+            exerciseId: ex.id,
+            exerciseName: ex.name,
+            primaryMuscles: ex.primary,
+            sets: [
+              const PlannedSet(
+                setNumber: 1,
+                targetReps: 10,
+                targetRestSeconds: 30,
+              ),
+              const PlannedSet(
+                setNumber: 2,
+                targetReps: 10,
+                targetRestSeconds: 30,
+              ),
+            ],
+            notes: ex.cue,
+          ),
+        )
+        .toList();
   }
 
   static void _addFirstMatching(

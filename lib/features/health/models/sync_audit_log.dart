@@ -23,20 +23,24 @@ class SyncAuditLog {
   bool get isSuccess => status == 'success';
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'timestamp': timestamp.toIso8601String(),
-        'source': source.toJson(),
-        'status': status,
-        'recordsImported': recordsImported,
-        'details': details,
-        if (errorMessage != null) 'errorMessage': errorMessage,
-      };
+    'id': id,
+    'timestamp': timestamp.toIso8601String(),
+    'source': source.toJson(),
+    'status': status,
+    'recordsImported': recordsImported,
+    'details': details,
+    if (errorMessage != null) 'errorMessage': errorMessage,
+  };
 
   factory SyncAuditLog.fromJson(Map<String, dynamic> json) {
     return SyncAuditLog(
-      id: json['id'] as String? ?? DateTime.now().microsecondsSinceEpoch.toString(),
+      id:
+          json['id'] as String? ??
+          DateTime.now().microsecondsSinceEpoch.toString(),
       timestamp: DateTime.parse(json['timestamp'] as String),
-      source: HealthSource.fromJson(json['source'] as Map<String, dynamic>? ?? {}),
+      source: HealthSource.fromJson(
+        json['source'] as Map<String, dynamic>? ?? {},
+      ),
       status: json['status'] as String? ?? 'success',
       recordsImported: (json['recordsImported'] as num?)?.toInt() ?? 0,
       details: json['details'] as String? ?? '',

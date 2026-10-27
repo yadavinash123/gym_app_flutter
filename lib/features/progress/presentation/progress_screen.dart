@@ -54,9 +54,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         actions: [
           IconButton(
             tooltip: 'Log Measurement',
-            icon: const Icon(Icons.add_circle_outline_rounded,
-                color: Color(0xFFB6FF3B)),
-            onPressed: () => _openWeightEntryDialog(dashboardAsync.asData?.value),
+            icon: const Icon(
+              Icons.add_circle_outline_rounded,
+              color: Color(0xFFB6FF3B),
+            ),
+            onPressed: () =>
+                _openWeightEntryDialog(dashboardAsync.asData?.value),
           ),
           IconButton(
             tooltip: 'Reminders & Notifications',
@@ -67,12 +70,13 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         bottom: TabBar(
           controller: _tabController,
           isScrollable: false,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 6),
           indicatorColor: const Color(0xFFB6FF3B),
           indicatorWeight: 3,
           labelColor: const Color(0xFFB6FF3B),
           unselectedLabelColor: const Color(0xFFA7B0BF),
           labelStyle: const TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.5,
           ),
@@ -132,7 +136,8 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         : data.profile?.weightKg;
 
     final latestWeightDisplay = latestWeightKg != null
-        ? (isImperial ? latestWeightKg * 2.20462 : latestWeightKg).toStringAsFixed(1)
+        ? (isImperial ? latestWeightKg * 2.20462 : latestWeightKg)
+              .toStringAsFixed(1)
         : '--';
 
     // Calculate weight change compared to initial
@@ -143,20 +148,34 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
       final diffKg = current - initial;
       final diffDisplay = isImperial ? diffKg * 2.20462 : diffKg;
       final sign = diffDisplay > 0 ? '+' : '';
-      weightChangeStr = '$sign${diffDisplay.toStringAsFixed(1)} $weightUnit overall';
+      weightChangeStr =
+          '$sign${diffDisplay.toStringAsFixed(1)} $weightUnit overall';
     }
 
-    final workoutStreak = data.streaks[HabitType.workouts] ??
-        const HabitStreak(type: HabitType.workouts, currentStreak: 0, longestStreak: 0);
+    final workoutStreak =
+        data.streaks[HabitType.workouts] ??
+        const HabitStreak(
+          type: HabitType.workouts,
+          currentStreak: 0,
+          longestStreak: 0,
+        );
     final nutritionStreak = data.streaks[HabitType.nutrition];
     final hydrationStreak = data.streaks[HabitType.hydration];
 
     // Weekly volume calculation
     final now = DateTime.now();
     final sevenDaysAgo = now.subtract(const Duration(days: 7));
-    final recentSessions = data.sessions.where((s) => s.completedAt.isAfter(sevenDaysAgo)).toList();
-    final weeklyVolume = recentSessions.fold(0.0, (sum, s) => sum + s.totalVolumeKg);
-    final weeklySets = recentSessions.fold(0, (sum, s) => sum + s.totalCompletedSets);
+    final recentSessions = data.sessions
+        .where((s) => s.completedAt.isAfter(sevenDaysAgo))
+        .toList();
+    final weeklyVolume = recentSessions.fold(
+      0.0,
+      (sum, s) => sum + s.totalVolumeKg,
+    );
+    final weeklySets = recentSessions.fold(
+      0,
+      (sum, s) => sum + s.totalCompletedSets,
+    );
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -175,24 +194,31 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'BODY WEIGHT',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                      color: Color(0xFFA7B0BF),
+                  const Expanded(
+                    child: Text(
+                      'BODY WEIGHT',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.0,
+                        color: Color(0xFFA7B0BF),
+                      ),
                     ),
                   ),
                   InkWell(
                     onTap: () => _openWeightEntryDialog(data),
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFB6FF3B).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFB6FF3B).withOpacity(0.3)),
+                        border: Border.all(
+                          color: const Color(0xFFB6FF3B).withOpacity(0.3),
+                        ),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
@@ -237,13 +263,17 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                     ),
                   ),
                   if (weightChangeStr != null) ...[
-                    const Spacer(),
-                    Text(
-                      weightChangeStr,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF00D4FF),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        weightChangeStr,
+                        textAlign: TextAlign.end,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF00D4FF),
+                        ),
                       ),
                     ),
                   ],
@@ -297,25 +327,31 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatColumn(
-                    label: 'Volume Lifted',
-                    value: weeklyVolume >= 1000
-                        ? '${(weeklyVolume / 1000).toStringAsFixed(1)}k'
-                        : weeklyVolume.toStringAsFixed(0),
-                    unit: 'kg',
-                    color: const Color(0xFF00D4FF),
+                  Expanded(
+                    child: _buildStatColumn(
+                      label: 'Volume Lifted',
+                      value: weeklyVolume >= 1000
+                          ? '${(weeklyVolume / 1000).toStringAsFixed(1)}k'
+                          : weeklyVolume.toStringAsFixed(0),
+                      unit: 'kg',
+                      color: const Color(0xFF00D4FF),
+                    ),
                   ),
-                  _buildStatColumn(
-                    label: 'Sessions',
-                    value: '${recentSessions.length}',
-                    unit: 'completed',
-                    color: const Color(0xFFB6FF3B),
+                  Expanded(
+                    child: _buildStatColumn(
+                      label: 'Sessions',
+                      value: '${recentSessions.length}',
+                      unit: 'completed',
+                      color: const Color(0xFFB6FF3B),
+                    ),
                   ),
-                  _buildStatColumn(
-                    label: 'Total Sets',
-                    value: '$weeklySets',
-                    unit: 'sets',
-                    color: Colors.white,
+                  Expanded(
+                    child: _buildStatColumn(
+                      label: 'Total Sets',
+                      value: '$weeklySets',
+                      unit: 'sets',
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -357,10 +393,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Color(0xFFA7B0BF),
-          ),
+          style: const TextStyle(fontSize: 11, color: Color(0xFFA7B0BF)),
         ),
       ],
     );
@@ -413,10 +446,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
           if (unlocked.isEmpty)
             const Text(
               'No milestones unlocked yet. Complete workouts, log nutrition, and maintain streaks to earn badges!',
-              style: TextStyle(
-                fontSize: 12,
-                color: Color(0xFFA7B0BF),
-              ),
+              style: TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
             )
           else
             Wrap(
@@ -424,7 +454,11 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
               runSpacing: 8,
               children: unlocked.take(4).map((badge) {
                 return Chip(
-                  avatar: Icon(badge.iconData, size: 16, color: const Color(0xFFB6FF3B)),
+                  avatar: Icon(
+                    badge.iconData,
+                    size: 16,
+                    color: const Color(0xFFB6FF3B),
+                  ),
                   label: Text(
                     badge.title,
                     style: const TextStyle(
@@ -434,7 +468,9 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                     ),
                   ),
                   backgroundColor: const Color(0xFF1C2430),
-                  side: BorderSide(color: const Color(0xFFB6FF3B).withOpacity(0.3)),
+                  side: BorderSide(
+                    color: const Color(0xFFB6FF3B).withOpacity(0.3),
+                  ),
                 );
               }).toList(),
             ),
@@ -470,7 +506,10 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     }).toList();
 
     // 2. Weekly Volume data
-    final volumeBars = _computeWeeklyVolumeBars(data.sessions, _chartDaysFilter);
+    final volumeBars = _computeWeeklyVolumeBars(
+      data.sessions,
+      _chartDaysFilter,
+    );
 
     // 3. Compound lift 1RM list
     final prExercises = data.prs.map((pr) => pr.exerciseId).toSet().toList();
@@ -482,15 +521,14 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
       padding: const EdgeInsets.all(20),
       children: [
         // Time filter chips
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             _buildFilterChip('7 Days', 7),
-            const SizedBox(width: 8),
             _buildFilterChip('30 Days', 30),
-            const SizedBox(width: 8),
             _buildFilterChip('90 Days', 90),
-            const SizedBox(width: 8),
             _buildFilterChip('All Time', 365),
           ],
         ),
@@ -510,7 +548,8 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
           points: weightPoints,
           lineColor: const Color(0xFFB6FF3B),
           unit: weightUnit,
-          emptyMessage: 'Log your body weight to view progress curves over time',
+          emptyMessage:
+              'Log your body weight to view progress curves over time',
         ),
         const SizedBox(height: 24),
         // Chart 2: Weekly Volume Bar Chart
@@ -524,10 +563,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
           ),
         ),
         const SizedBox(height: 10),
-        VolumeBarChart(
-          bars: volumeBars,
-          primaryColor: const Color(0xFF00D4FF),
-        ),
+        VolumeBarChart(bars: volumeBars, primaryColor: const Color(0xFF00D4FF)),
         const SizedBox(height: 24),
         // Chart 3: Personal Records / Strength 1RM Trends
         if (data.prs.isNotEmpty) ...[
@@ -558,7 +594,8 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
                       child: Text(id.replaceAll('_', ' ').toUpperCase()),
                     );
                   }).toList(),
-                  onChanged: (val) => setState(() => _selectedPrExerciseId = val),
+                  onChanged: (val) =>
+                      setState(() => _selectedPrExerciseId = val),
                 ),
             ],
           ),
@@ -590,7 +627,10 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     );
   }
 
-  List<VolumeBarData> _computeWeeklyVolumeBars(List<WorkoutSession> sessions, int daysLimit) {
+  List<VolumeBarData> _computeWeeklyVolumeBars(
+    List<WorkoutSession> sessions,
+    int daysLimit,
+  ) {
     if (sessions.isEmpty) return [];
 
     final now = DateTime.now();
@@ -623,12 +663,17 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
     return bars;
   }
 
-  Widget _buildStrengthTrendCard(ProgressDashboardData data, String? exerciseId) {
+  Widget _buildStrengthTrendCard(
+    ProgressDashboardData data,
+    String? exerciseId,
+  ) {
     if (exerciseId == null) return const SizedBox.shrink();
 
     // Find PR record
-    final pr = data.prs.firstWhere((p) => p.exerciseId == exerciseId,
-        orElse: () => data.prs.first);
+    final pr = data.prs.firstWhere(
+      (p) => p.exerciseId == exerciseId,
+      orElse: () => data.prs.first,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -720,15 +765,20 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
             children: [
               Row(
                 children: [
-                  const Icon(Icons.science_rounded,
-                      color: Color(0xFF00D4FF), size: 20),
+                  const Icon(
+                    Icons.science_rounded,
+                    color: Color(0xFF00D4FF),
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Supercompensation & Recovery Curve',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  const Expanded(
+                    child: Text(
+                      'Supercompensation & Recovery Curve',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
@@ -756,9 +806,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen>
   Widget _buildMilestonesTab(ProgressDashboardData data) {
     return ListView(
       padding: const EdgeInsets.all(20),
-      children: [
-        MilestoneGrid(milestones: data.milestones),
-      ],
+      children: [MilestoneGrid(milestones: data.milestones)],
     );
   }
 

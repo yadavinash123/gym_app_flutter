@@ -34,14 +34,29 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
       return 'Today, ${_monthName(dt.month)} ${dt.day}';
     }
     final yesterday = now.subtract(const Duration(days: 1));
-    if (dt.year == yesterday.year && dt.month == yesterday.month && dt.day == yesterday.day) {
+    if (dt.year == yesterday.year &&
+        dt.month == yesterday.month &&
+        dt.day == yesterday.day) {
       return 'Yesterday, ${_monthName(dt.month)} ${dt.day}';
     }
     return '${_weekdayName(dt.weekday)}, ${_monthName(dt.month)} ${dt.day}';
   }
 
   String _monthName(int m) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[m - 1];
   }
 
@@ -94,15 +109,25 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
                     onTap: _pickDate,
                     borderRadius: BorderRadius.circular(12),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFFB6FF3B)),
+                          const Icon(
+                            Icons.calendar_today_outlined,
+                            size: 16,
+                            color: Color(0xFFB6FF3B),
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             _displayDate(_selectedDate),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
                           ),
                         ],
                       ),
@@ -121,73 +146,99 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
                   ? Center(
                       child: Padding(
                         padding: const EdgeInsets.all(24),
-                        child: Text('Error loading daily log: ${logsState.error}'),
+                        child: Text(
+                          'Error loading daily log: ${logsState.error}',
+                        ),
                       ),
                     )
                   : ListView(
                       padding: const EdgeInsets.all(16),
                       children: [
                         // Target & Progress Overview Card
-                    _buildOverviewCard(context, targets, log),
-                    const SizedBox(height: 16),
-                    // Hydration Card
-                    _buildHydrationCard(context, dateKey, targets, log),
-                    const SizedBox(height: 20),
-                    // Meal Logs
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'DAILY MEALS',
-                          style: TextStyle(
-                            letterSpacing: 1.5,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFA7B0BF),
-                          ),
-                        ),
-                        PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_horiz, color: Color(0xFFA7B0BF)),
-                          onSelected: (action) async {
-                            if (action == 'copy_yesterday') {
-                              final yesterdayKey = _formatDateKey(_selectedDate.subtract(const Duration(days: 1)));
-                              await ref.read(nutritionLogsProvider.notifier).copyFrom(
-                                    fromDate: yesterdayKey,
-                                    toDate: dateKey,
-                                  );
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Copied yesterday’s meals')),
-                                );
-                              }
-                            } else if (action == 'clear_today') {
-                              await ref.read(nutritionLogsProvider.notifier).clearAllMeals(date: dateKey);
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Cleared all meals for this day')),
-                                );
-                              }
-                            }
-                          },
-                          itemBuilder: (ctx) => [
-                            const PopupMenuItem(
-                              value: 'copy_yesterday',
-                              child: Text('Copy yesterday’s meals'),
+                        _buildOverviewCard(context, targets, log),
+                        const SizedBox(height: 16),
+                        // Hydration Card
+                        _buildHydrationCard(context, dateKey, targets, log),
+                        const SizedBox(height: 20),
+                        // Meal Logs
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'DAILY MEALS',
+                              style: TextStyle(
+                                letterSpacing: 1.5,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFA7B0BF),
+                              ),
                             ),
-                            const PopupMenuItem(
-                              value: 'clear_today',
-                              child: Text('Clear all meals'),
+                            PopupMenuButton<String>(
+                              icon: const Icon(
+                                Icons.more_horiz,
+                                color: Color(0xFFA7B0BF),
+                              ),
+                              onSelected: (action) async {
+                                if (action == 'copy_yesterday') {
+                                  final yesterdayKey = _formatDateKey(
+                                    _selectedDate.subtract(
+                                      const Duration(days: 1),
+                                    ),
+                                  );
+                                  await ref
+                                      .read(nutritionLogsProvider.notifier)
+                                      .copyFrom(
+                                        fromDate: yesterdayKey,
+                                        toDate: dateKey,
+                                      );
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Copied yesterday’s meals',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } else if (action == 'clear_today') {
+                                  await ref
+                                      .read(nutritionLogsProvider.notifier)
+                                      .clearAllMeals(date: dateKey);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Cleared all meals for this day',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              itemBuilder: (ctx) => [
+                                const PopupMenuItem(
+                                  value: 'copy_yesterday',
+                                  child: Text('Copy yesterday’s meals'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'clear_today',
+                                  child: Text('Clear all meals'),
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                        const SizedBox(height: 8),
+                        for (final mealType in MealType.all)
+                          _buildMealCard(
+                            context,
+                            dateKey,
+                            mealType,
+                            log.meals[mealType] ?? Meal(type: mealType),
+                          ),
+                        const SizedBox(height: 40),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    for (final mealType in MealType.all)
-                      _buildMealCard(context, dateKey, mealType, log.meals[mealType] ?? Meal(type: mealType)),
-                    const SizedBox(height: 40),
-                  ],
-                ),
             ),
           ],
         ),
@@ -196,7 +247,10 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
         backgroundColor: const Color(0xFFB6FF3B),
         foregroundColor: Colors.black,
         icon: const Icon(Icons.add),
-        label: const Text('Log Food', style: TextStyle(fontWeight: FontWeight.bold)),
+        label: const Text(
+          'Log Food',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -211,7 +265,11 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
     );
   }
 
-  Widget _buildOverviewCard(BuildContext context, NutritionTargets targets, DailyNutritionLog log) {
+  Widget _buildOverviewCard(
+    BuildContext context,
+    NutritionTargets targets,
+    DailyNutritionLog log,
+  ) {
     final remainingKcal = targets.dailyCalories - log.totalCalories;
     final calorieProgress = targets.dailyCalories > 0
         ? (log.totalCalories / targets.dailyCalories).clamp(0.0, 1.0)
@@ -286,7 +344,9 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
             child: LinearProgressIndicator(
               value: calorieProgress,
               backgroundColor: const Color(0xFF1C2430),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFB6FF3B)),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFFB6FF3B),
+              ),
               minHeight: 8,
             ),
           ),
@@ -298,7 +358,9 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: remainingKcal >= 0 ? const Color(0xFFA7B0BF) : const Color(0xFFFF7B72),
+              color: remainingKcal >= 0
+                  ? const Color(0xFFA7B0BF)
+                  : const Color(0xFFFF7B72),
             ),
           ),
           const SizedBox(height: 16),
@@ -337,7 +399,12 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
     );
   }
 
-  Widget _buildHydrationCard(BuildContext context, String dateKey, NutritionTargets targets, DailyNutritionLog log) {
+  Widget _buildHydrationCard(
+    BuildContext context,
+    String dateKey,
+    NutritionTargets targets,
+    DailyNutritionLog log,
+  ) {
     final waterProgress = targets.waterMl > 0
         ? (log.waterMl / targets.waterMl).clamp(0.0, 1.0)
         : 0.0;
@@ -357,7 +424,11 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.water_drop, color: Color(0xFF00D4FF), size: 22),
+                  const Icon(
+                    Icons.water_drop,
+                    color: Color(0xFF00D4FF),
+                    size: 22,
+                  ),
                   const SizedBox(width: 8),
                   const Text(
                     'Hydration',
@@ -381,7 +452,9 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
             child: LinearProgressIndicator(
               value: waterProgress,
               backgroundColor: const Color(0xFF1C2430),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00D4FF)),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFF00D4FF),
+              ),
               minHeight: 6,
             ),
           ),
@@ -392,34 +465,43 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               ActionChip(
-                avatar: const Icon(Icons.add, size: 16, color: Color(0xFF00D4FF)),
+                avatar: const Icon(
+                  Icons.add,
+                  size: 16,
+                  color: Color(0xFF00D4FF),
+                ),
                 label: const Text('+250 ml', style: TextStyle(fontSize: 12)),
                 onPressed: () {
-                  ref.read(nutritionLogsProvider.notifier).addWater(
-                        date: dateKey,
-                        amountMl: 250,
-                      );
+                  ref
+                      .read(nutritionLogsProvider.notifier)
+                      .addWater(date: dateKey, amountMl: 250);
                 },
               ),
               ActionChip(
-                avatar: const Icon(Icons.add, size: 16, color: Color(0xFF00D4FF)),
+                avatar: const Icon(
+                  Icons.add,
+                  size: 16,
+                  color: Color(0xFF00D4FF),
+                ),
                 label: const Text('+500 ml', style: TextStyle(fontSize: 12)),
                 onPressed: () {
-                  ref.read(nutritionLogsProvider.notifier).addWater(
-                        date: dateKey,
-                        amountMl: 500,
-                      );
+                  ref
+                      .read(nutritionLogsProvider.notifier)
+                      .addWater(date: dateKey, amountMl: 500);
                 },
               ),
               if (log.waterMl > 0)
                 IconButton(
                   tooltip: 'Reset water',
-                  icon: const Icon(Icons.refresh, size: 18, color: Color(0xFFA7B0BF)),
+                  icon: const Icon(
+                    Icons.refresh,
+                    size: 18,
+                    color: Color(0xFFA7B0BF),
+                  ),
                   onPressed: () {
-                    ref.read(nutritionLogsProvider.notifier).setWater(
-                          date: dateKey,
-                          waterMl: 0,
-                        );
+                    ref
+                        .read(nutritionLogsProvider.notifier)
+                        .setWater(date: dateKey, waterMl: 0);
                   },
                 ),
             ],
@@ -429,7 +511,12 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
     );
   }
 
-  Widget _buildMealCard(BuildContext context, String dateKey, String mealType, Meal meal) {
+  Widget _buildMealCard(
+    BuildContext context,
+    String dateKey,
+    String mealType,
+    Meal meal,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -449,13 +536,19 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
                   children: [
                     Text(
                       mealType,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     if (meal.items.isNotEmpty)
                       Text(
                         '${meal.totalCalories.toStringAsFixed(0)} kcal • ${meal.totalProtein.toStringAsFixed(1)}g P',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFFA7B0BF),
+                        ),
                       ),
                   ],
                 ),
@@ -470,7 +563,11 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.add, size: 16, color: Color(0xFFB6FF3B)),
+                  icon: const Icon(
+                    Icons.add,
+                    size: 16,
+                    color: Color(0xFFB6FF3B),
+                  ),
                   label: const Text(
                     'Add Food',
                     style: TextStyle(
@@ -497,23 +594,36 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: meal.items.length,
-              separatorBuilder: (_, _) => const Divider(height: 1, color: Color(0xFF1C2430)),
+              separatorBuilder: (_, _) =>
+                  const Divider(height: 1, color: Color(0xFF1C2430)),
               itemBuilder: (ctx, index) {
                 final item = meal.items[index];
                 return ListTile(
                   dense: true,
                   title: Text(
                     item.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                   subtitle: Text(
                     '${item.quantity % 1 == 0 ? item.quantity.toStringAsFixed(0) : item.quantity.toStringAsFixed(1)} × ${item.portionName} (${item.grams.toStringAsFixed(0)}g) • ${item.calories.toStringAsFixed(0)} kcal • ${item.protein.toStringAsFixed(1)}g P',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFFA7B0BF),
+                    ),
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 18, color: Color(0xFFA7B0BF)),
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      size: 18,
+                      color: Color(0xFFA7B0BF),
+                    ),
                     onPressed: () {
-                      ref.read(nutritionLogsProvider.notifier).removeFood(
+                      ref
+                          .read(nutritionLogsProvider.notifier)
+                          .removeFood(
                             date: dateKey,
                             mealType: mealType,
                             itemId: item.id,

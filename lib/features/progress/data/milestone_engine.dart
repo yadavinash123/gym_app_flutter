@@ -32,7 +32,9 @@ class MilestoneEngine {
         .length;
 
     final hydrationGoalDays = nutritionLogs.values
-        .where((log) => log.waterMl >= log.waterTargetMl && log.waterTargetMl > 0)
+        .where(
+          (log) => log.waterMl >= log.waterTargetMl && log.waterTargetMl > 0,
+        )
         .length;
 
     // Health stats: sleep days >= 7 hours (420 mins)
@@ -87,7 +89,8 @@ class MilestoneEngine {
           newCurrentValue = current.currentValue;
       }
 
-      final newlyUnlocked = !current.isUnlocked && newCurrentValue >= base.targetValue;
+      final newlyUnlocked =
+          !current.isUnlocked && newCurrentValue >= base.targetValue;
       final isNowUnlocked = current.isUnlocked || newlyUnlocked;
       final unlockedTimestamp = newlyUnlocked ? now : current.unlockedAt;
 

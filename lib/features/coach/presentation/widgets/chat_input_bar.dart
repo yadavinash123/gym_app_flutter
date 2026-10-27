@@ -99,10 +99,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   controller: widget.controller,
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _submit(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
                     filled: false,
                     fillColor: Colors.transparent,

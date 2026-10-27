@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/coach_repository.dart';
 import 'coach_conversation_view.dart';
 import 'coach_home_view.dart';
 
-enum CoachViewMode {
-  home,
-  conversation,
-}
+enum CoachViewMode { home, conversation }
 
 class CoachScreen extends ConsumerStatefulWidget {
-  const CoachScreen({
-    super.key,
-    this.initialViewMode = CoachViewMode.home,
-  });
+  const CoachScreen({super.key, this.initialViewMode = CoachViewMode.home});
 
   final CoachViewMode initialViewMode;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/health_repository.dart';
 import '../models/health_permission.dart';
 
@@ -11,9 +12,7 @@ class HealthPermissionsScreen extends ConsumerWidget {
     final permissionsAsync = ref.watch(healthPermissionsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Health Permissions & Privacy'),
-      ),
+      appBar: AppBar(title: const Text('Health Permissions & Privacy')),
       body: permissionsAsync.when(
         loading: () => const Center(child: Text('Loading permissions...')),
         error: (err, _) => Center(
@@ -53,7 +52,8 @@ class HealthPermissionsScreen extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00D4FF).withValues(alpha: 0.15),
+                              color: const Color(0xFF00D4FF)
+                                  .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
@@ -91,7 +91,10 @@ class HealthPermissionsScreen extends ConsumerWidget {
                       const SizedBox(height: 12),
                       const Text(
                         'FitForge requests access only to contextualize recovery, cardio readiness, and energy expenditure. Data is read on-demand and stored exclusively in private local JSON files.',
-                        style: TextStyle(fontSize: 12, color: Color(0xFFA7B0BF)),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFFA7B0BF),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Row(
@@ -100,7 +103,9 @@ class HealthPermissionsScreen extends ConsumerWidget {
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: const Color(0xFFB6FF3B),
-                                side: const BorderSide(color: Color(0xFFB6FF3B)),
+                                side: const BorderSide(
+                                  color: Color(0xFFB6FF3B),
+                                ),
                               ),
                               onPressed: () => ref
                                   .read(healthPermissionsProvider.notifier)
@@ -153,7 +158,9 @@ class HealthPermissionsScreen extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: perm.metric.color.withValues(alpha: 0.15),
+                                color: perm.metric.color.withValues(
+                                  alpha: 0.15,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Icon(

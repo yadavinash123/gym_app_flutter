@@ -43,7 +43,8 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
   }
 
   PlannedRoutine _buildRoutine() {
-    final id = widget.initialRoutine?.id ??
+    final id =
+        widget.initialRoutine?.id ??
         'custom-${DateTime.now().millisecondsSinceEpoch}';
     return PlannedRoutine(
       id: id,
@@ -64,9 +65,7 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF151B23),
         title: Text(
-          widget.initialRoutine == null
-              ? 'CREATE ROUTINE'
-              : 'EDIT ROUTINE',
+          widget.initialRoutine == null ? 'CREATE ROUTINE' : 'EDIT ROUTINE',
           style: const TextStyle(
             letterSpacing: 1.5,
             fontWeight: FontWeight.bold,
@@ -127,10 +126,7 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
                 value: 'Lower-body strength',
                 child: Text('Lower-body strength'),
               ),
-              DropdownMenuItem(
-                value: 'Mobility',
-                child: Text('Mobility'),
-              ),
+              DropdownMenuItem(value: 'Mobility', child: Text('Mobility')),
               DropdownMenuItem(
                 value: 'Easy cardio',
                 child: Text('Easy cardio'),
@@ -228,7 +224,9 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
             final ex = entry.value;
             final setsCount = ex.sets.length;
             final reps = ex.sets.isNotEmpty ? ex.sets.first.targetReps : 10;
-            final rest = ex.sets.isNotEmpty ? ex.sets.first.targetRestSeconds : 60;
+            final rest = ex.sets.isNotEmpty
+                ? ex.sets.first.targetRestSeconds
+                : 60;
 
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
@@ -281,7 +279,8 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
                         onDecrement: () {
                           if (setsCount > 1) {
                             setState(() {
-                              final newSets = List<PlannedSet>.from(ex.sets)..removeLast();
+                              final newSets = List<PlannedSet>.from(ex.sets)
+                                ..removeLast();
                               _exercises[index] = ex.copyWith(sets: newSets);
                             });
                           }
@@ -331,8 +330,11 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
                           if (rest > 15) {
                             setState(() {
                               final newSets = ex.sets
-                                  .map((s) =>
-                                      s.copyWith(targetRestSeconds: rest - 15))
+                                  .map(
+                                    (s) => s.copyWith(
+                                      targetRestSeconds: rest - 15,
+                                    ),
+                                  )
                                   .toList();
                               _exercises[index] = ex.copyWith(sets: newSets);
                             });
@@ -341,8 +343,10 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
                         onIncrement: () {
                           setState(() {
                             final newSets = ex.sets
-                                .map((s) =>
-                                    s.copyWith(targetRestSeconds: rest + 15))
+                                .map(
+                                  (s) =>
+                                      s.copyWith(targetRestSeconds: rest + 15),
+                                )
                                 .toList();
                             _exercises[index] = ex.copyWith(sets: newSets);
                           });
@@ -365,7 +369,10 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
             icon: const Icon(Icons.add, color: Color(0xFFB6FF3B)),
             label: const Text(
               'Add Exercise to Routine',
-              style: TextStyle(color: Color(0xFFB6FF3B), fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Color(0xFFB6FF3B),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -448,8 +455,13 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
                     final ex = exercises[index - 1];
                     return ListTile(
                       title: Text(ex.name),
-                      subtitle: Text('${ex.group} • ${ex.equipment.join(', ')}'),
-                      trailing: const Icon(Icons.add_circle_outline, color: Color(0xFFB6FF3B)),
+                      subtitle: Text(
+                        '${ex.group} • ${ex.equipment.join(', ')}',
+                      ),
+                      trailing: const Icon(
+                        Icons.add_circle_outline,
+                        color: Color(0xFFB6FF3B),
+                      ),
                       onTap: () {
                         setState(() {
                           _exercises.add(
@@ -458,9 +470,21 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
                               exerciseName: ex.name,
                               primaryMuscles: ex.primary,
                               sets: const [
-                                PlannedSet(setNumber: 1, targetReps: 10, targetRestSeconds: 60),
-                                PlannedSet(setNumber: 2, targetReps: 10, targetRestSeconds: 60),
-                                PlannedSet(setNumber: 3, targetReps: 10, targetRestSeconds: 60),
+                                PlannedSet(
+                                  setNumber: 1,
+                                  targetReps: 10,
+                                  targetRestSeconds: 60,
+                                ),
+                                PlannedSet(
+                                  setNumber: 2,
+                                  targetReps: 10,
+                                  targetRestSeconds: 60,
+                                ),
+                                PlannedSet(
+                                  setNumber: 3,
+                                  targetReps: 10,
+                                  targetRestSeconds: 60,
+                                ),
                               ],
                               notes: ex.cue,
                             ),
@@ -490,9 +514,9 @@ class _CustomWorkoutScreenState extends ConsumerState<CustomWorkoutScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save routine: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to save routine: $e')));
       }
     }
   }

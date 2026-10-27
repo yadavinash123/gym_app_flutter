@@ -26,7 +26,10 @@ class FormattedCoachText extends StatelessWidget {
 
     // 1. Clean up reasoning blocks and weird bullet combinations like "*- " or "* - "
     var cleanText = text
-        .replaceAll(RegExp(r'<think>[\s\S]*?</think>', caseSensitive: false), '')
+        .replaceAll(
+          RegExp(r'<think>[\s\S]*?</think>', caseSensitive: false),
+          '',
+        )
         .replaceAll(RegExp(r'</?think>', caseSensitive: false), '')
         .trim();
 
@@ -83,55 +86,60 @@ class FormattedCoachText extends StatelessWidget {
         final firstLower = cells.first.toLowerCase();
         if (cells.length > 1 &&
             (firstLower == 'action' ||
-             firstLower == 'zone' ||
-             firstLower == 'metric' ||
-             firstLower == 'parameter' ||
-             firstLower == 'item' ||
-             firstLower == 'nutrient')) {
+                firstLower == 'zone' ||
+                firstLower == 'metric' ||
+                firstLower == 'parameter' ||
+                firstLower == 'item' ||
+                firstLower == 'nutrient')) {
           continue;
         }
 
         // Format row cleanly as a bullet item without messy asterisks
-        final cleanFirst = cells.first.replaceAll('**', '').replaceAll('*', '').trim();
+        final cleanFirst = cells.first
+            .replaceAll('**', '')
+            .replaceAll('*', '')
+            .trim();
         final rest = cells.sublist(1).join(' • ').replaceAll('**', '').trim();
         final bulletContent = cells.length == 1
             ? cleanFirst
             : '**$cleanFirst:** $rest';
 
-        widgets.add(Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 2, right: 8),
-                child: Text(
-                  '•',
-                  style: TextStyle(
-                    color: Color(0xFFB6FF3B),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text.rich(
-                  TextSpan(
-                    children: _parseInlineSpans(
-                      bulletContent,
-                      const TextStyle(
-                        fontSize: 13.5,
-                        color: Color(0xFFE6EDF3),
-                        height: 1.4,
-                      ),
-                      boldColor: Colors.white,
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 2, right: 8),
+                  child: Text(
+                    '•',
+                    style: TextStyle(
+                      color: Color(0xFFB6FF3B),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      children: _parseInlineSpans(
+                        bulletContent,
+                        const TextStyle(
+                          fontSize: 13.5,
+                          color: Color(0xFFE6EDF3),
+                          height: 1.4,
+                        ),
+                        boldColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ));
+        );
         continue;
       }
 
@@ -147,60 +155,68 @@ class FormattedCoachText extends StatelessWidget {
             .replaceAll('**', '')
             .replaceAll('*', '');
         final fontSize = hashCount == 1 ? 16.0 : (hashCount == 2 ? 15.0 : 13.5);
-        final color = hashCount <= 2 ? const Color(0xFFB6FF3B) : const Color(0xFF00D4FF);
+        final color = hashCount <= 2
+            ? const Color(0xFFB6FF3B)
+            : const Color(0xFF00D4FF);
 
-        widgets.add(Padding(
-          padding: const EdgeInsets.only(top: 8, bottom: 4),
-          child: Text(
-            headerText,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: color,
-              letterSpacing: 0.2,
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 4),
+            child: Text(
+              headerText,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: color,
+                letterSpacing: 0.2,
+              ),
             ),
           ),
-        ));
+        );
         continue;
       }
 
       // Check for Bullet points (starts with '• ')
       if (line.startsWith('• ') || line.startsWith('•')) {
-        final content = line.startsWith('• ') ? line.substring(2).trim() : line.substring(1).trim();
-        widgets.add(Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 2, right: 8),
-                child: Text(
-                  '•',
-                  style: TextStyle(
-                    color: Color(0xFFB6FF3B),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text.rich(
-                  TextSpan(
-                    children: _parseInlineSpans(
-                      content,
-                      const TextStyle(
-                        fontSize: 13.5,
-                        color: Color(0xFFE6EDF3),
-                        height: 1.4,
-                      ),
-                      boldColor: Colors.white,
+        final content = line.startsWith('• ')
+            ? line.substring(2).trim()
+            : line.substring(1).trim();
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 2, right: 8),
+                  child: Text(
+                    '•',
+                    style: TextStyle(
+                      color: Color(0xFFB6FF3B),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      children: _parseInlineSpans(
+                        content,
+                        const TextStyle(
+                          fontSize: 13.5,
+                          color: Color(0xFFE6EDF3),
+                          height: 1.4,
+                        ),
+                        boldColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ));
+        );
         continue;
       }
 
@@ -209,60 +225,64 @@ class FormattedCoachText extends StatelessWidget {
       if (numberMatch != null) {
         final numStr = numberMatch.group(1)!;
         final content = numberMatch.group(2)!;
-        widgets.add(Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 6),
-                child: Text(
-                  '$numStr.',
-                  style: const TextStyle(
-                    color: Color(0xFF00D4FF),
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text.rich(
-                  TextSpan(
-                    children: _parseInlineSpans(
-                      content,
-                      const TextStyle(
-                        fontSize: 13.5,
-                        color: Color(0xFFE6EDF3),
-                        height: 1.4,
-                      ),
-                      boldColor: Colors.white,
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: Text(
+                    '$numStr.',
+                    style: const TextStyle(
+                      color: Color(0xFF00D4FF),
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      children: _parseInlineSpans(
+                        content,
+                        const TextStyle(
+                          fontSize: 13.5,
+                          color: Color(0xFFE6EDF3),
+                          height: 1.4,
+                        ),
+                        boldColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ));
+        );
         continue;
       }
 
       // Regular paragraph line with full bold/italic/code parsing
-      widgets.add(Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Text.rich(
-          TextSpan(
-            children: _parseInlineSpans(
-              line,
-              const TextStyle(
-                fontSize: 13.5,
-                color: Color(0xFFE6EDF3),
-                height: 1.4,
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text.rich(
+            TextSpan(
+              children: _parseInlineSpans(
+                line,
+                const TextStyle(
+                  fontSize: 13.5,
+                  color: Color(0xFFE6EDF3),
+                  height: 1.4,
+                ),
+                boldColor: Colors.white,
               ),
-              boldColor: Colors.white,
             ),
           ),
         ),
-      ));
+      );
     }
 
     return Column(
@@ -279,7 +299,8 @@ class FormattedCoachText extends StatelessWidget {
       if (result.startsWith('**')) {
         final colonIdx = result.indexOf(':');
         if (colonIdx != -1) {
-          result = '${result.substring(0, colonIdx)}**${result.substring(colonIdx)}';
+          result =
+              '${result.substring(0, colonIdx)}**${result.substring(colonIdx)}';
         } else {
           result = '$result**';
         }
@@ -304,56 +325,59 @@ class FormattedCoachText extends StatelessWidget {
 
     for (final match in pattern.allMatches(fixedText)) {
       if (match.start > lastMatchEnd) {
-        final raw = fixedText.substring(lastMatchEnd, match.start).replaceAll('**', '');
+        final raw = fixedText
+            .substring(lastMatchEnd, match.start)
+            .replaceAll('**', '');
         if (raw.isNotEmpty) {
-          spans.add(TextSpan(
-            text: raw,
-            style: baseStyle,
-          ));
+          spans.add(TextSpan(text: raw, style: baseStyle));
         }
       }
 
       if (match.group(2) != null) {
         // Bold: **text** - remove ** completely and display clean bold text
         final boldContent = match.group(2)!.replaceAll('**', '').trim();
-        spans.add(TextSpan(
-          text: boldContent,
-          style: baseStyle.copyWith(
-            fontWeight: FontWeight.bold,
-            color: boldColor ?? Colors.white,
+        spans.add(
+          TextSpan(
+            text: boldContent,
+            style: baseStyle.copyWith(
+              fontWeight: FontWeight.bold,
+              color: boldColor ?? Colors.white,
+            ),
           ),
-        ));
+        );
       } else if (match.group(4) != null) {
         // Italic: *text*
         final italicContent = match.group(4)!.replaceAll('*', '').trim();
-        spans.add(TextSpan(
-          text: italicContent,
-          style: baseStyle.copyWith(
-            fontStyle: FontStyle.italic,
+        spans.add(
+          TextSpan(
+            text: italicContent,
+            style: baseStyle.copyWith(fontStyle: FontStyle.italic),
           ),
-        ));
+        );
       } else if (match.group(6) != null) {
         // Code: `text`
-        spans.add(WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E2836),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.white12),
-            ),
-            child: Text(
-              match.group(6)!,
-              style: const TextStyle(
-                fontSize: 11,
-                fontFamily: 'monospace',
-                color: Color(0xFF00D4FF),
+        spans.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E2836),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Text(
+                match.group(6)!,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                  color: Color(0xFF00D4FF),
+                ),
               ),
             ),
           ),
-        ));
+        );
       }
       lastMatchEnd = match.end;
     }
@@ -361,10 +385,7 @@ class FormattedCoachText extends StatelessWidget {
     if (lastMatchEnd < fixedText.length) {
       final raw = fixedText.substring(lastMatchEnd).replaceAll('**', '');
       if (raw.isNotEmpty) {
-        spans.add(TextSpan(
-          text: raw,
-          style: baseStyle,
-        ));
+        spans.add(TextSpan(text: raw, style: baseStyle));
       }
     }
 
