@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/theme.dart';
+import 'custom_exercise_form_screen.dart';
+import 'custom_exercise_repository.dart';
+
 import '../../shared/widgets/page_body.dart';
+import '../../shared/widgets/toast.dart';
 import '../settings/data/settings_repository.dart';
-import '../workouts/data/workout_repository.dart';
 import '../workouts/models/planned_workout.dart';
 import '../workouts/models/workout_session.dart';
 import '../workouts/session/workout_session_controller.dart';
@@ -33,6 +37,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
   String? category;
   String? level;
   bool onlyFavorites = false;
+  bool onlyCustom = false;
   String sortBy = 'name_asc'; // 'name_asc', 'name_desc', 'muscle'
 
   @override
@@ -50,6 +55,25 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
     super.dispose();
   }
 
+  Future<void> _openCreateCustomExercise(BuildContext context, [String? prefill]) async {
+    final created = await Navigator.of(context).push<Exercise?>(
+      MaterialPageRoute(
+        builder: (_) => CustomExerciseFormScreen(
+          existing: prefill != null && prefill.isNotEmpty
+              ? Exercise(id: '', name: prefill, isCustom: true)
+              : null,
+        ),
+      ),
+    );
+    if (created != null && context.mounted) {
+      setState(() {
+        _searchController.clear();
+        query = '';
+        onlyCustom = true;
+      });
+    }
+  }
+
   void _clearFilters() {
     setState(() {
       _searchController.clear();
@@ -59,6 +83,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
       category = null;
       level = null;
       onlyFavorites = false;
+      onlyCustom = false;
     });
   }
 
@@ -143,6 +168,22 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
         title: const Text('Exercise Library'),
         actions: [
           IconButton(
+            tooltip: 'Create custom exercise',
+            icon: const Icon(
+              Icons.add_circle_outline,
+              color: Color(0xFFB6FF3B),
+            ),
+            onPressed: () => _openCreateCustomExercise(context, query.trim()),
+          ),
+          IconButton(
+            tooltip: onlyCustom ? 'Show all exercises' : 'Custom exercises only',
+            icon: Icon(
+              onlyCustom ? Icons.tune : Icons.tune_outlined,
+              color: onlyCustom ? const Color(0xFFB6FF3B) : null,
+            ),
+            onPressed: () => setState(() => onlyCustom = !onlyCustom),
+          ),
+          IconButton(
             tooltip: 'Interactive Muscle Map',
             icon: const Icon(
               Icons.accessibility_new_rounded,
@@ -203,6 +244,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                 equipmentFilter: equipment,
                 levelFilter: level,
                 categoryFilter: category,
+                customOnly: onlyCustom,
                 favorites: onlyFavorites ? favSet : null,
               );
             }).toList();
@@ -222,7 +264,8 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                 equipment != null ||
                 category != null ||
                 level != null ||
-                onlyFavorites;
+                onlyFavorites ||
+                onlyCustom;
 
             return CustomScrollView(
               slivers: [
@@ -268,6 +311,39 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                               side: const BorderSide(color: Color(0xFF283241)),
                               onPressed: () =>
                                   _openMuscleMapDialog(context, catalog),
+                            ),
+                            FilterChip(
+                              avatar: Icon(
+                                Icons.tune_rounded,
+                                size: 14,
+                                color: onlyCustom
+                                    ? Colors.black
+                                    : const Color(0xFFB6FF3B),
+                              ),
+                              label: Text(
+                                catalog.any((e) => e.isCustom)
+                                    ? 'Custom (${catalog.where((e) => e.isCustom).length})'
+                                    : 'Custom',
+                              ),
+                              selected: onlyCustom,
+                              selectedColor: const Color(0xFFB6FF3B),
+                              checkmarkColor: Colors.black,
+                              labelStyle: TextStyle(
+                                color: onlyCustom ? Colors.black : Colors.white,
+                                fontSize: 12,
+                                fontWeight: onlyCustom
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                              backgroundColor: const Color(0xFF151B23),
+                              side: BorderSide(
+                                color: onlyCustom
+                                    ? const Color(0xFFB6FF3B)
+                                    : const Color(0xFF283241),
+                              ),
+                              onSelected: (selected) {
+                                setState(() => onlyCustom = selected);
+                              },
                             ),
                             for (final m in muscleGroups)
                               FilterChip(
@@ -357,7 +433,8 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                           children: [
                             Expanded(
                               child: Text(
-                                '${visible.length} exercises',
+                                '${visible.length} exercises'
+                                '${catalog.where((e) => e.isCustom).isNotEmpty ? " • ${catalog.where((e) => e.isCustom).length} custom" : ""}',
                                 style: const TextStyle(
                                   color: Color(0xFFA7B0BF),
                                   fontWeight: FontWeight.bold,
@@ -379,6 +456,73 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                         ),
                         const SizedBox(height: 8),
                       ],
+                    ),
+                  ),
+                ),
+
+                // Create your own exercise banner
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: InkWell(
+                      onTap: () => _openCreateCustomExercise(context, query.trim()),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF151B23),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFB6FF3B).withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFB6FF3B).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.add_circle_outline,
+                                color: Color(0xFFB6FF3B),
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Create your own exercise',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'Name + body part, and a photo, video or GIF',
+                                    style: TextStyle(
+                                      color: Color(0xFFA7B0BF),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Color(0xFFA7B0BF),
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -448,56 +592,104 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFF151B23),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF283241)),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Image.asset(
-              exercise.stillForFigure(figure),
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Image.network(
-                exercise.stillUrlForFigure(figure),
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
-                  Icons.fitness_center_rounded,
-                  color: Color(0xFF00D4FF),
-                  size: 22,
-                ),
+              border: Border.all(
+                color: exercise.isCustom
+                    ? const Color(0xFFB6FF3B).withValues(alpha: 0.5)
+                    : const Color(0xFF283241),
               ),
             ),
+            clipBehavior: Clip.antiAlias,
+            child: exercise.isCustom
+                ? (exercise.mediaPath != null && File(exercise.mediaPath!).existsSync()
+                    ? (exercise.mediaType == 'video'
+                        ? const Center(
+                            child: Icon(
+                              Icons.play_circle_fill,
+                              color: Color(0xFFB6FF3B),
+                              size: 26,
+                            ),
+                          )
+                        : Image.file(
+                            File(exercise.mediaPath!),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.fitness_center_rounded,
+                              color: Color(0xFFB6FF3B),
+                              size: 22,
+                            ),
+                          ))
+                    : (exercise.videoUrl != null && exercise.videoUrl!.isNotEmpty
+                        ? const Center(
+                            child: Icon(
+                              Icons.video_library_rounded,
+                              color: Color(0xFF00D4FF),
+                              size: 22,
+                            ),
+                          )
+                        : const Center(
+                            child: Icon(
+                              Icons.fitness_center_rounded,
+                              color: Color(0xFFB6FF3B),
+                              size: 22,
+                            ),
+                          )))
+                : Image.asset(
+                    exercise.stillForFigure(figure),
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Image.network(
+                      exercise.stillUrlForFigure(figure),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.fitness_center_rounded,
+                        color: Color(0xFF00D4FF),
+                        size: 22,
+                      ),
+                    ),
+                  ),
           ),
-          title: Text(
-            exercise.name,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  exercise.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              if (exercise.isCustom)
+                Container(
+                  margin: const EdgeInsets.only(left: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFB6FF3B).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: const Color(0xFFB6FF3B).withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: const Text(
+                    'CUSTOM',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFFB6FF3B),
+                    ),
+                  ),
+                ),
+            ],
           ),
           subtitle: Text(
-            '${exercise.group} • ${exercise.level}\n${exercise.equipment.join(', ')} • HD Video',
+            '${exercise.group} • ${exercise.level}\n${exercise.equipment.join(', ')} • ${exercise.isCustom ? (exercise.mediaType != null ? exercise.mediaType!.toUpperCase() : "CUSTOM") : "HD Video"}',
             style: const TextStyle(color: Color(0xFFA7B0BF), fontSize: 12),
           ),
           isThreeLine: true,
           trailing: FavoriteButton(id: exercise.id, name: exercise.name),
           onTap: () => context.push('/exercises/${exercise.id}'),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBadge(
-    String label,
-    Color bg, {
-    Color textColor = const Color(0xFFA7B0BF),
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -539,8 +731,13 @@ class FavoriteButton extends ConsumerWidget {
 }
 
 class ExerciseDetailScreen extends ConsumerWidget {
-  const ExerciseDetailScreen({super.key, required this.id});
+  const ExerciseDetailScreen({
+    super.key,
+    required this.id,
+    this.exercise,
+  });
   final String id;
+  final Exercise? exercise;
 
   void _back(BuildContext context) {
     if (context.canPop()) {
@@ -618,15 +815,6 @@ class ExerciseDetailScreen extends ConsumerWidget {
     final updatedRoutine = sessionState.routine.copyWith(
       exercises: updatedExercises,
     );
-    final updatedLogs =
-        List<CompletedExercise>.from(sessionState.loggedExercises)..add(
-          CompletedExercise(
-            exerciseId: exercise.id,
-            exerciseName: exercise.name,
-            primaryMuscles: exercise.primary,
-            sets: [],
-          ),
-        );
 
     ref
         .read(activeWorkoutSessionProvider.notifier)
@@ -636,58 +824,155 @@ class ExerciseDetailScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _openEditCustomExercise(
+    BuildContext context,
+    Exercise exercise,
+  ) async {
+    final result = await Navigator.of(context).push<dynamic>(
+      MaterialPageRoute(
+        builder: (_) => CustomExerciseFormScreen(existing: exercise),
+      ),
+    );
+    if (result == 'deleted' && context.mounted) {
+      _back(context);
+    }
+  }
+
+  Future<void> _confirmDeleteCustomExercise(
+    BuildContext context,
+    WidgetRef ref,
+    Exercise exercise,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF151B23),
+        title: Text(
+          'Delete “${exercise.name}”?',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text(
+          'This exercise will be permanently deleted from your custom exercises. Completed workout logs will keep their recorded sets.',
+          style: TextStyle(color: Color(0xFFA7B0BF), fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFFF4D4D),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await ref
+          .read(customExercisesProvider.notifier)
+          .deleteExercise(exercise.id);
+      if (context.mounted) {
+        AppToast.show(
+          context,
+          message: '“${exercise.name}” deleted',
+          type: ToastType.delete,
+        );
+        _back(context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final customList = ref.watch(customExercisesProvider).value;
+    final catalogList = ref.watch(exerciseCatalogProvider).value;
+    final currentExercise = exercise ??
+        (customList != null ? findExerciseById(customList, id) : null) ??
+        (catalogList != null ? findExerciseById(catalogList, id) : null);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Exercise guide'),
         leading: BackButton(onPressed: () => _back(context)),
+        actions: [
+          if (currentExercise?.isCustom == true) ...[
+            IconButton(
+              tooltip: 'Edit custom exercise',
+              icon: const Icon(Icons.edit_outlined, color: Color(0xFF00D4FF)),
+              onPressed: () => _openEditCustomExercise(context, currentExercise!),
+            ),
+            IconButton(
+              tooltip: 'Delete custom exercise',
+              icon: const Icon(Icons.delete_outline, color: Color(0xFFFF4D4D)),
+              onPressed: () => _confirmDeleteCustomExercise(context, ref, currentExercise!),
+            ),
+          ],
+        ],
       ),
       body: SafeArea(
-        child: ref
-            .watch(exerciseCatalogProvider)
-            .when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: Color(0xFFB6FF3B)),
-              ),
-              error: (err, _) => PageBody(
-                children: [
-                  InfoCard(
-                    title: 'Exercise not found',
-                    message: '$err',
-                    icon: Icons.error_outline,
-                  ),
-                  OutlinedButton(
-                    onPressed: () => _back(context),
-                    child: const Text('Open exercise library'),
-                  ),
-                ],
-              ),
-              data: (catalog) {
-                final exercise = findExerciseById(catalog, id);
-                if (exercise == null) {
-                  return PageBody(
-                    children: [
-                      const InfoCard(
-                        title: 'Exercise not found',
-                        message: 'The requested exercise is not available in the library.',
-                        icon: Icons.search_off,
-                      ),
-                      const SizedBox(height: 16),
-                      FilledButton(
-                        onPressed: () => context.go('/exercises'),
-                        child: const Text('Open exercise library'),
-                      ),
-                    ],
-                  );
-                }
+        child: currentExercise != null
+            ? _buildExerciseDetailView(context, ref, currentExercise, catalogList)
+            : ref.watch(exerciseCatalogProvider).when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFB6FF3B)),
+                ),
+                error: (err, _) => PageBody(
+                  children: [
+                    InfoCard(
+                      title: 'Exercise not found',
+                      message: '$err',
+                      icon: Icons.error_outline,
+                    ),
+                    OutlinedButton(
+                      onPressed: () => _back(context),
+                      child: const Text('Open exercise library'),
+                    ),
+                  ],
+                ),
+                data: (catalog) {
+                  final ex = findExerciseById(catalog, id);
+                  if (ex == null) {
+                    return PageBody(
+                      children: [
+                        const InfoCard(
+                          title: 'Exercise not found',
+                          message:
+                              'The requested exercise is not available in the library.',
+                          icon: Icons.search_off,
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: () => context.go('/exercises'),
+                          child: const Text('Open exercise library'),
+                        ),
+                      ],
+                    );
+                  }
 
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  child: Column(
+                  return _buildExerciseDetailView(context, ref, ex, catalog);
+                },
+              ),
+      ),
+    );
+  }
+
+  Widget _buildExerciseDetailView(
+    BuildContext context,
+    WidgetRef ref,
+    Exercise exercise,
+    List<Exercise>? catalog,
+  ) {
+    final effectiveCatalog = catalog ?? ref.read(exerciseCatalogProvider).value ?? [];
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 16,
+      ),
+      child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header & Title
@@ -698,15 +983,47 @@ class ExerciseDetailScreen extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  exercise.name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        exercise.name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
                                       ),
+                                    ),
+                                    if (exercise.isCustom)
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFB6FF3B)
+                                              .withValues(alpha: 0.15),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: const Color(0xFFB6FF3B)
+                                                .withValues(alpha: 0.5),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'CUSTOM',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                            color: Color(0xFFB6FF3B),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -759,6 +1076,28 @@ class ExerciseDetailScreen extends ConsumerWidget {
                             icon: const Icon(Icons.add),
                             label: const Text('Add to Workout'),
                           ),
+                          if (exercise.isCustom) ...[
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF00D4FF),
+                                side: const BorderSide(color: Color(0xFF00D4FF)),
+                              ),
+                              onPressed: () =>
+                                  _openEditCustomExercise(context, exercise),
+                              icon: const Icon(Icons.edit_outlined),
+                              label: const Text('Edit Exercise'),
+                            ),
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFFFF4D4D),
+                                side: const BorderSide(color: Color(0xFFFF4D4D)),
+                              ),
+                              onPressed: () =>
+                                  _confirmDeleteCustomExercise(context, ref, exercise),
+                              icon: const Icon(Icons.delete_outline),
+                              label: const Text('Delete Exercise'),
+                            ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -994,11 +1333,11 @@ class ExerciseDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 8),
                         for (final altId in exercise.alternatives)
-                          if (catalog.any((e) => e.id == altId))
+                          if (effectiveCatalog.any((e) => e.id == altId))
                             ListTile(
                               contentPadding: EdgeInsets.zero,
                               title: Text(
-                                catalog.firstWhere((e) => e.id == altId).name,
+                                effectiveCatalog.firstWhere((e) => e.id == altId).name,
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: const Icon(
@@ -1033,9 +1372,5 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 );
-              },
-            ),
-      ),
-    );
   }
 }

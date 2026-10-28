@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -100,6 +102,48 @@ class _ExerciseAnimationPlayerState extends State<ExerciseAnimationPlayer> {
     });
 
     try {
+      final ex = widget.exercise;
+      if (ex != null && ex.isCustom) {
+        if (ex.mediaType == 'image' || ex.mediaType == 'gif') {
+          if (mounted) {
+            setState(() {
+              _isInitialized = true;
+              _hasError = false;
+            });
+          }
+          return;
+        }
+
+        if (ex.mediaType == 'video') {
+          if (ex.mediaPath != null && File(ex.mediaPath!).existsSync()) {
+            _controller = VideoPlayerController.file(File(ex.mediaPath!));
+          } else if (ex.videoUrl != null && ex.videoUrl!.isNotEmpty) {
+            _controller = VideoPlayerController.networkUrl(
+              Uri.parse(ex.videoUrl!),
+            );
+          }
+
+          if (_controller != null) {
+            await _controller!.initialize();
+            await _controller!.setLooping(true);
+            await _controller!.setVolume(0.0);
+            await _controller!.play();
+            if (mounted) setState(() => _isInitialized = true);
+            return;
+          }
+        }
+
+        // Custom exercise without media or with non-video media:
+        // do not attempt to load catalogue GitHub video
+        if (mounted) {
+          setState(() {
+            _isInitialized = true;
+            _hasError = false;
+          });
+        }
+        return;
+      }
+
       // 1. Try local bundled asset first
       bool assetExists = false;
       try {
@@ -190,6 +234,24 @@ class _ExerciseAnimationPlayerState extends State<ExerciseAnimationPlayer> {
   }
 
   Widget _buildPosterWidget({BoxFit fit = BoxFit.cover}) {
+    final ex = widget.exercise;
+    if (ex != null && ex.isCustom) {
+      if (ex.mediaPath != null && File(ex.mediaPath!).existsSync()) {
+        return Image.file(
+          File(ex.mediaPath!),
+          fit: fit,
+          errorBuilder: (_, __, ___) => _buildAnatomicalFallback(),
+        );
+      }
+      if (ex.videoUrl != null && ex.videoUrl!.isNotEmpty) {
+        return Image.network(
+          ex.videoUrl!,
+          fit: fit,
+          errorBuilder: (_, __, ___) => _buildAnatomicalFallback(),
+        );
+      }
+      return _buildAnatomicalFallback();
+    }
     return Image.asset(
       _localAssetStillPath,
       fit: fit,
@@ -235,6 +297,18 @@ class _ExerciseAnimationPlayerState extends State<ExerciseAnimationPlayer> {
     super.dispose();
   }
 
+  bool get _isCustomExercise =>
+      (widget.exercise?.isCustom ?? false) ||
+      (widget.exercise?.id.startsWith('c_') ?? false);
+
+  bool get _isCustomPhotoOrGif =>
+      _isCustomExercise &&
+      (widget.exercise?.mediaType == 'image' ||
+          widget.exercise?.mediaType == 'gif');
+
+  bool get _isCustomVideo =>
+      _isCustomExercise && widget.exercise?.mediaType == 'video';
+
   @override
   Widget build(BuildContext context) {
     final hasFemaleVariant = widget.exercise?.femaleVariant != null;
@@ -250,8 +324,15 @@ class _ExerciseAnimationPlayerState extends State<ExerciseAnimationPlayer> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Background / Video display
-          if (_isInitialized && _controller != null)
+          // Background / Video / Photo display
+          if (_isCustomPhotoOrGif)
+            GestureDetector(
+              onTap: _openFullScreen,
+              child: SizedBox.expand(
+                child: _buildPosterWidget(fit: BoxFit.contain),
+              ),
+            )
+          else if (_isInitialized && _controller != null)
             GestureDetector(
               onTap: _togglePlayPause,
               child: SizedBox.expand(
@@ -264,6 +345,11 @@ class _ExerciseAnimationPlayerState extends State<ExerciseAnimationPlayer> {
                   ),
                 ),
               ),
+            )
+          else if (_isCustomExercise)
+            // Custom exercise without active video playback: show poster or anatomical fallback directly, NEVER a loading spinner
+            SizedBox.expand(
+              child: _buildPosterWidget(fit: BoxFit.contain),
             )
           else if (!_hasError)
             SizedBox.expand(
@@ -303,18 +389,30 @@ class _ExerciseAnimationPlayerState extends State<ExerciseAnimationPlayer> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: const Color(0xFF283241)),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.hd_rounded,
+                        (widget.exercise?.isCustom ?? false)
+                            ? (widget.exercise?.mediaType == 'image'
+                                  ? Icons.image_rounded
+                                  : widget.exercise?.mediaType == 'gif'
+                                  ? Icons.gif_box_rounded
+                                  : Icons.videocam_rounded)
+                            : Icons.hd_rounded,
                         size: 14,
-                        color: Color(0xFFB6FF3B),
+                        color: const Color(0xFFB6FF3B),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
-                        'HD VIDEO',
-                        style: TextStyle(
+                        (widget.exercise?.isCustom ?? false)
+                            ? (widget.exercise?.mediaType == 'image'
+                                  ? 'PHOTO'
+                                  : widget.exercise?.mediaType == 'gif'
+                                  ? 'ANIMATED GIF'
+                                  : 'CUSTOM VIDEO')
+                            : 'HD VIDEO',
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFFB6FF3B),
@@ -400,49 +498,89 @@ class _ExerciseAnimationPlayerState extends State<ExerciseAnimationPlayer> {
             ),
           ),
 
-          // Bottom Controls (Play/Pause, Fullscreen)
-          Positioned(
-            bottom: 12,
-            right: 12,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0B0F14).withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF283241)),
+          // Bottom Controls
+          if (_controller != null && _isInitialized)
+            Positioned(
+              bottom: 12,
+              right: 12,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0B0F14).withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF283241)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      iconSize: 20,
+                      tooltip: _isPlaying ? 'Pause' : 'Play',
+                      style: IconButton.styleFrom(
+                        foregroundColor: const Color(0xFFB6FF3B),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      icon: Icon(
+                        _isPlaying
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded,
+                      ),
+                      onPressed: _togglePlayPause,
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      iconSize: 18,
+                      tooltip: 'Fullscreen',
+                      style: IconButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      icon: const Icon(Icons.fullscreen_rounded),
+                      onPressed: _openFullScreen,
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    iconSize: 20,
-                    tooltip: _isPlaying ? 'Pause' : 'Play',
-                    style: IconButton.styleFrom(
-                      foregroundColor: const Color(0xFFB6FF3B),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    icon: Icon(
-                      _isPlaying
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                    ),
-                    onPressed: _togglePlayPause,
+            )
+          else if (_isCustomPhotoOrGif)
+            Positioned(
+              bottom: 12,
+              right: 12,
+              child: InkWell(
+                onTap: _openFullScreen,
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
                   ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    iconSize: 18,
-                    tooltip: 'Fullscreen',
-                    style: IconButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    icon: const Icon(Icons.fullscreen_rounded),
-                    onPressed: _openFullScreen,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0B0F14).withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFF283241)),
                   ),
-                ],
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.fullscreen_rounded,
+                        size: 16,
+                        color: Color(0xFFB6FF3B),
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Tap to Zoom',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

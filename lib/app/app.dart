@@ -6,6 +6,7 @@ import '../features/coach/presentation/coach_history_screen.dart';
 import '../features/coach/presentation/coach_screen.dart';
 import '../features/coach/presentation/coach_settings_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
+import '../features/exercises/custom_exercise_form_screen.dart';
 import '../features/exercises/exercise_screens.dart';
 import '../features/health/screens/health_permissions_screen.dart';
 import '../features/health/screens/health_screen.dart';
@@ -27,8 +28,11 @@ import '../features/workouts/custom/custom_workout_screen.dart';
 import '../shared/widgets/page_body.dart';
 import 'theme.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     routes: [
       GoRoute(path: '/', builder: (_, _) => const SplashScreen()),
@@ -42,8 +46,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(
-        path: '/exercises',
-        builder: (_, _) => const ExerciseLibraryScreen(),
+        path: '/exercises/new',
+        builder: (_, _) => const CustomExerciseFormScreen(),
       ),
       GoRoute(
         path: '/exercises/:id',
@@ -100,6 +104,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/home', builder: (_, _) => const DashboardScreen()),
           GoRoute(
+            path: '/exercises',
+            builder: (_, _) => const ExerciseLibraryScreen(),
+          ),
+          GoRoute(
             path: '/workouts',
             builder: (_, _) => const WorkoutHomeScreen(),
           ),
@@ -116,8 +124,6 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
-
-final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class FitForgeApp extends ConsumerWidget {
   const FitForgeApp({super.key});
@@ -177,7 +183,8 @@ class ProfileScreen extends ConsumerWidget {
 
 const destinations = [
   (path: '/home', label: 'Home', icon: Icons.home_outlined),
-  (path: '/workouts', label: 'Workouts', icon: Icons.fitness_center_rounded),
+  (path: '/exercises', label: 'Exercises', icon: Icons.fitness_center_rounded),
+  (path: '/workouts', label: 'Workouts', icon: Icons.sports_gymnastics_rounded),
   (path: '/nutrition', label: 'Nutrition', icon: Icons.restaurant_outlined),
   (path: '/progress', label: 'Progress', icon: Icons.insights_outlined),
   (path: '/coach', label: 'AI', icon: Icons.auto_awesome),

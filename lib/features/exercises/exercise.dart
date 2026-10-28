@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'custom_exercise_repository.dart';
 
 const muscleGroups = [
   'Chest',
@@ -57,6 +58,9 @@ class Exercise {
     this.maleVariant,
     this.variantOf,
     this.alternatives = const [],
+    this.isCustom = false,
+    this.mediaPath,
+    this.mediaType,
   });
 
   Exercise.fromJson(Map<String, dynamic> json)
@@ -103,22 +107,28 @@ class Exercise {
       mistake = json['mistake'] as String? ?? '',
       source = json['source'] as String? ?? 'FitForge',
       url = json['url'] as String? ?? 'https://fitforge.ai',
-      animation =
-          json['animation'] as String? ??
-          '${(json['id'] as String).trim()}.mp4',
+      animation = json['animation'] as String? ??
+          (((json['isCustom'] as bool? ?? false) || (json['id'] as String? ?? '').startsWith('c_'))
+              ? null
+              : '${(json['id'] as String).trim()}.mp4'),
       hasLicensedAnimation = json['hasLicensedAnimation'] as bool? ?? true,
-      clip =
-          json['clip'] as String? ??
+      clip = json['clip'] as String? ??
           (json['animation'] as String? ??
-              '${(json['id'] as String).trim()}.mp4'),
-      still =
-          json['still'] as String? ?? '${(json['id'] as String).trim()}.webp',
-      videoUrl =
-          json['videoUrl'] as String? ??
-          'https://raw.githubusercontent.com/DuarteSantos8/openGym/main/catalogue/media/clip/${json['clip'] ?? json['animation'] ?? "${(json['id'] as String).trim()}.mp4"}',
-      stillUrl =
-          json['stillUrl'] as String? ??
-          'https://raw.githubusercontent.com/DuarteSantos8/openGym/main/catalogue/media/still/${json['still'] ?? "${(json['id'] as String).trim()}.webp"}',
+              (((json['isCustom'] as bool? ?? false) || (json['id'] as String? ?? '').startsWith('c_'))
+                  ? null
+                  : '${(json['id'] as String).trim()}.mp4')),
+      still = json['still'] as String? ??
+          (((json['isCustom'] as bool? ?? false) || (json['id'] as String? ?? '').startsWith('c_'))
+              ? null
+              : '${(json['id'] as String).trim()}.webp'),
+      videoUrl = json['videoUrl'] as String? ??
+          (((json['isCustom'] as bool? ?? false) || (json['id'] as String? ?? '').startsWith('c_'))
+              ? null
+              : 'https://raw.githubusercontent.com/DuarteSantos8/openGym/main/catalogue/media/clip/${json['clip'] ?? json['animation'] ?? "${(json['id'] as String).trim()}.mp4"}'),
+      stillUrl = json['stillUrl'] as String? ??
+          (((json['isCustom'] as bool? ?? false) || (json['id'] as String? ?? '').startsWith('c_'))
+              ? null
+              : 'https://raw.githubusercontent.com/DuarteSantos8/openGym/main/catalogue/media/still/${json['still'] ?? "${(json['id'] as String).trim()}.webp"}'),
       muscleMap = json['muscleMap'] is Map<String, dynamic>
           ? json['muscleMap'] as Map<String, dynamic>
           : const {},
@@ -129,7 +139,12 @@ class Exercise {
       femaleVideoUrl = json['femaleVideoUrl'] as String?,
       femaleStillUrl = json['femaleStillUrl'] as String?,
       variantOf = json['variantOf'] as String?,
-      alternatives = _toStringList(json['alternatives']) {
+      alternatives = _toStringList(json['alternatives']),
+      isCustom = json['isCustom'] as bool? ??
+          (json['id'] as String).startsWith('c_') ||
+          json['custom'] == true,
+      mediaPath = json['mediaPath'] as String?,
+      mediaType = json['mediaType'] as String? {
     if (id.isEmpty) {
       throw const FormatException('Invalid exercise: ID is empty');
     }
@@ -171,6 +186,135 @@ class Exercise {
   final String? maleVariant;
   final String? variantOf;
   final List<String> alternatives;
+  final bool isCustom;
+  final String? mediaPath;
+  final String? mediaType;
+
+  Exercise copyWith({
+    String? id,
+    String? name,
+    String? rawName,
+    String? group,
+    String? bodyPart,
+    List<String>? primary,
+    String? target,
+    List<String>? secondary,
+    List<String>? equipment,
+    String? rawEquipment,
+    String? level,
+    String? movement,
+    String? category,
+    String? description,
+    List<String>? instructions,
+    String? startingPosition,
+    List<String>? steps,
+    String? cue,
+    String? mistake,
+    String? source,
+    String? url,
+    String? animation,
+    bool? hasLicensedAnimation,
+    String? clip,
+    String? still,
+    String? videoUrl,
+    String? stillUrl,
+    Map<String, dynamic>? muscleMap,
+    String? femaleVariant,
+    String? femaleClip,
+    String? femaleStill,
+    String? femaleVideoUrl,
+    String? femaleStillUrl,
+    String? maleVariant,
+    String? variantOf,
+    List<String>? alternatives,
+    bool? isCustom,
+    String? mediaPath,
+    String? mediaType,
+  }) {
+    return Exercise(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      rawName: rawName ?? this.rawName,
+      group: group ?? this.group,
+      bodyPart: bodyPart ?? this.bodyPart,
+      primary: primary ?? this.primary,
+      target: target ?? this.target,
+      secondary: secondary ?? this.secondary,
+      equipment: equipment ?? this.equipment,
+      rawEquipment: rawEquipment ?? this.rawEquipment,
+      level: level ?? this.level,
+      movement: movement ?? this.movement,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      instructions: instructions ?? this.instructions,
+      startingPosition: startingPosition ?? this.startingPosition,
+      steps: steps ?? this.steps,
+      cue: cue ?? this.cue,
+      mistake: mistake ?? this.mistake,
+      source: source ?? this.source,
+      url: url ?? this.url,
+      animation: animation ?? this.animation,
+      hasLicensedAnimation: hasLicensedAnimation ?? this.hasLicensedAnimation,
+      clip: clip ?? this.clip,
+      still: still ?? this.still,
+      videoUrl: videoUrl ?? this.videoUrl,
+      stillUrl: stillUrl ?? this.stillUrl,
+      muscleMap: muscleMap ?? this.muscleMap,
+      femaleVariant: femaleVariant ?? this.femaleVariant,
+      femaleClip: femaleClip ?? this.femaleClip,
+      femaleStill: femaleStill ?? this.femaleStill,
+      femaleVideoUrl: femaleVideoUrl ?? this.femaleVideoUrl,
+      femaleStillUrl: femaleStillUrl ?? this.femaleStillUrl,
+      maleVariant: maleVariant ?? this.maleVariant,
+      variantOf: variantOf ?? this.variantOf,
+      alternatives: alternatives ?? this.alternatives,
+      isCustom: isCustom ?? this.isCustom,
+      mediaPath: mediaPath ?? this.mediaPath,
+      mediaType: mediaType ?? this.mediaType,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'rawName': rawName,
+    'group': group,
+    'bodyPart': bodyPart,
+    'primary': primary,
+    'target': target,
+    'secondary': secondary,
+    'equipment': equipment,
+    'rawEquipment': rawEquipment,
+    'level': level,
+    'movement': movement,
+    'category': category,
+    'description': description,
+    'instructions': instructions,
+    'startingPosition': startingPosition,
+    'steps': steps,
+    'cue': cue,
+    'mistake': mistake,
+    'source': source,
+    'url': url,
+    if (animation != null) 'animation': animation,
+    'hasLicensedAnimation': hasLicensedAnimation,
+    if (clip != null) 'clip': clip,
+    if (still != null) 'still': still,
+    if (videoUrl != null) 'videoUrl': videoUrl,
+    if (stillUrl != null) 'stillUrl': stillUrl,
+    'muscleMap': muscleMap,
+    if (femaleVariant != null) 'femaleVariant': femaleVariant,
+    if (femaleClip != null) 'femaleClip': femaleClip,
+    if (femaleStill != null) 'femaleStill': femaleStill,
+    if (femaleVideoUrl != null) 'femaleVideoUrl': femaleVideoUrl,
+    if (femaleStillUrl != null) 'femaleStillUrl': femaleStillUrl,
+    if (maleVariant != null) 'maleVariant': maleVariant,
+    if (variantOf != null) 'variantOf': variantOf,
+    'alternatives': alternatives,
+    'isCustom': isCustom,
+    if (mediaPath != null) 'mediaPath': mediaPath,
+    if (mediaType != null) 'mediaType': mediaType,
+  };
 
   String get effectiveVideoUrl =>
       videoUrl ??
@@ -254,9 +398,14 @@ class Exercise {
     String? equipmentFilter,
     String? levelFilter,
     String? categoryFilter,
+    bool? customOnly,
     Set<String>? favorites,
   }) {
     if (favorites != null && !favorites.contains(id)) {
+      return false;
+    }
+
+    if (customOnly == true && !isCustom) {
       return false;
     }
 
@@ -321,6 +470,8 @@ class Exercise {
           movement,
           category,
           description,
+          source,
+          if (isCustom) 'custom custom_exercise',
         ].join(' ').toLowerCase();
 
         for (final term in terms) {
@@ -385,6 +536,9 @@ Future<List<Exercise>> loadCatalog([AssetBundle? bundle]) async {
   return result;
 }
 
-final exerciseCatalogProvider = FutureProvider<List<Exercise>>(
-  (ref) => loadCatalog(),
-);
+final exerciseCatalogProvider = FutureProvider<List<Exercise>>((ref) async {
+  final baseCatalog = await loadCatalog();
+  final customList = ref.watch(customExercisesProvider).value ?? [];
+  if (customList.isEmpty) return baseCatalog;
+  return [...customList, ...baseCatalog];
+});
